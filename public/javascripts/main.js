@@ -985,7 +985,12 @@ $(document).ready( function () {
                                        'toolbox-is-open',
                                        'toolbox2-is-open',
                                        'toolbox3-is-open');
-        button_element.textContent = 'OPEN';
+
+        // animate hamburgers
+        document.getElementById('line_one').style.top = '40%';
+        document.getElementById('line_three').style.top = '60%';
+
+
         // show selected_file in case it was removed by being dragged onto the toolbox
         if (typeof selected_file.image_id !== 'undefined') {
           document.getElementById(selected_file.image_id).style.display = 'block';
@@ -1012,7 +1017,12 @@ $(document).ready( function () {
         *   }, 10);
         */
 
-        button_element.textContent = 'CLOSE';
+        // animate hamburgers
+        document.getElementById('line_one').style.top = '35%';
+        document.getElementById('line_three').style.top = '65%';
+
+
+
       }; // end of a-toolbox-is-open if
     }; // end of dragging_no_click if
   });   // end of toolbox_toggle_button click
@@ -1024,7 +1034,7 @@ $(document).ready( function () {
 */
 
   // on click, toggle reportbox
-  $('#report_button').on( 'click', function () {
+  $('#report_button').on('click', function () {
     // if report_box is open, hide it
     if (  document.body.classList.contains('report_on') ) {
       report_on = false;

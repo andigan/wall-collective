@@ -26,6 +26,32 @@ position:absolute;
 width:100%;
 }
 
+#line_one {
+  top: 40%;
+}
+
+#line_two {
+  top: 50%;
+}
+
+#line_three {
+  top: 60%;
+}
+
+#line_one, #line_two, #line_three {
+  background-color: black;
+  border-radius: 20%;
+  height: 4%;
+  left: 15%;
+  position: absolute;
+  -moz-transition:all .13s;
+  -ms-transition:all .13s;
+  -o-transition:all .13s;
+  -webkit-transition:all .13s;
+  transition:all .13s ease-in-out;
+  width: 70%;
+}
+
 #reportbox {
 background-color:transparent;
 border:1px dashed white;
