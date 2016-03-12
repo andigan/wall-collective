@@ -1,7 +1,7 @@
 var config = {};
 
 // set port
-config.port = 8000;
+config.port = 80;
 
 // set mongDB database
 config.database_name = 'max';
@@ -12,7 +12,6 @@ config.use_cdn = true;
 // set image directories
 config.logdir              = 'logs/filelog';
 config.publicimagedir      = 'public/art';
-config.slashimagedirslash  = '/art/';
 
 // set start up dragger statuses
 config.resize_dragger_status               = 'none';
@@ -23,6 +22,7 @@ config.grayscale_invert_dragger_status     = 'none';
 config.contrast_saturate_dragger_status    = 'none';
 config.party_dragger_status                = 'none';
 
-
+// ignore
+config.slashimagedirslash  = '/' + config.publicimagedir.split('/')[1] + '/';
 
 module.exports = config;
