@@ -26,6 +26,7 @@ config.port = '80';
 config.publicimagedir = 'public/art';
 config.slashimagedirslash = '/art/';
 config.database_name = 'mydatabase';
+config.use_cdn = true;
 ```
 
 4. Run the app:
