@@ -4,4 +4,3 @@
 /routes
 /node_modules
 /public/javascripts/cdn_locals
-*.DS_Store
