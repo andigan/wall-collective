@@ -20,7 +20,7 @@ $ npm install
 ```
 3. Edit the config.js file.
 
-  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example:
+Example:
 ```
 config.port = '80';
 config.publicimagedir = 'public/art';
