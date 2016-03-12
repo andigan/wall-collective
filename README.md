@@ -25,7 +25,7 @@ A real-time app for sharing, manipulating, and arranging images.
   ```
 3. Edit the config.js file.
 
-Example:
+  Example:
 
   ```
   config.port = '80';
