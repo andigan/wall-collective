@@ -14,16 +14,19 @@ A real-time app for sharing, manipulating, and arranging images.
 ### Installation
 
 1. Install and run MongoDB:
+
   ```
   $ mongod
   ```
 2. Install the npm dependencies:
+
   ```
   $ npm install
   ```
 3. Edit the config.js file.
 
 Example:
+
   ```
   config.port = '80';
   config.publicimagedir = 'public/art';
@@ -33,5 +36,7 @@ Example:
   ```
 
 4. Run the app:
+
   ```
   $ node app.js
+  ```
