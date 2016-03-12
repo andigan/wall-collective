@@ -18,7 +18,16 @@ $ mongod
 ```
 $ npm install
 ```
+3. Edit the config.js file.
 
-3. Run the app:
+  &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Example:
+```
+config.port = '80';
+config.publicimagedir = 'public/art';
+config.slashimagedirslash = '/art/';
+config.database_name = 'mydatabase';
+```
+
+4. Run the app:
 ```
 $ node app.js
