@@ -11,6 +11,7 @@ config.use_cdn = true;
 
 // set image directories
 config.logdir              = 'logs/filelog';
+// NOTICE: config.publicimagedir can only accept one directory path, e.g. 'public/onenameonly'
 config.publicimagedir      = 'public/art';
 
 // set start up dragger statuses
