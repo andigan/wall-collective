@@ -12,7 +12,7 @@
     {# css rules are overwritten by links that follow #}
     <link rel="stylesheet" type="text/css" href="/stylesheets/style.css" />
 
-    {% set use_cdn = true %}
+    {% set use_cdn = {{config.use_cdn}} %}
 
     {# jquery scripts #}
     {% if use_cdn %}
@@ -223,11 +223,10 @@
 
     </div> {# wrapper #}
 
-
     {# main script #}
     <script>
       var resize_dragger_status          = '{{config.resize_dragger_status}}',
-          opacity_dragger_status         = '{{config.opacity_dragger_status}}',
+        opacity_dragger_status           = '{{config.opacity_dragger_status}}',
         rotation_dragger_status          = '{{config.rotation_dragger_status}}',
         blur_brightness_dragger_status   = '{{config.blur_brightness_dragger_status}}',
         grayscale_invert_dragger_status  = '{{config.grayscale_invert_dragger_status}}',

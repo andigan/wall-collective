@@ -32,7 +32,16 @@
 * Copyright (c) 2016 Andrew Nease (andrew.nease.code@gmail.com)
 */
 
-
+/*
+*   Config setup
+*     config.js file contains:
+*     config.port
+*     config.logdir
+*     config.publicimagedir
+*     config.slashimagedirslash
+*     config.resize_dragger_status ||| 'block' or 'none'
+*     config.use_cdn
+*/
 var config = require('./config.js'),
   // set the port
   port    =   process.env.PORT || config.port,
@@ -62,34 +71,8 @@ var config = require('./config.js'),
   multiparty = require('connect-multiparty');
 
 /*
-*   Config setup
-*     custom config file contains:
-*     config.port
-*     config.logdir
-*     config.publicimagedir
-*     config.slashimagedirslash
-*     config.resize_dragger_status ||| 'block' or 'none'
-*/
-
-// FUTURE WORK: move these to config.js file
-config.logdir                              = 'logs/filelog';
-config.publicimagedir                      = 'public/art';
-config.slashimagedirslash                  = '/art/';
-
-config.resize_dragger_status               = 'none';
-config.opacity_dragger_status              = 'none';
-config.rotation_dragger_status             = 'none';
-config.blur_brightness_dragger_status      = 'none';
-config.grayscale_invert_dragger_status     = 'none';
-config.contrast_saturate_dragger_status    = 'none';
-config.party_dragger_status                = 'none';
-
-/*
-*   Configurations
-*     not sure what this one is.
 *     required for busboy?
 */
-
 multipartyMiddleware = multiparty();
 
 // view directory setup
@@ -330,18 +313,26 @@ io.on('connection', function (socket) {
 *     change dragger switch status
 */
 
-mongoose.connect('mongodb://localhost/max'); // connects to max database
+mongoose.connect('mongodb://localhost/' + config.database_name); // connects to max database
 
 // check to make sure MongoDb is connected.
 mongoose.connection.on('open', function () {
   console.log('\nConnected to mongo server.\n');
 });
+// When there is a mongoose error:
 mongoose.connection.on('error', function (err) {
-  console.log('\nCould not connect to mongo server.\n');
+  console.log('\nCould not connect to mongo server.\n\n\n');
   console.log(err);
   // exit node
-  process.exit(1);
+  process.exit(0);
 });
+// When the connection is disconnected:
+mongoose.connection.on('disconnected', function () {
+  console.log('\nLost connection to mongo server.\n\n\n');
+  // exit node
+  process.exit(0);
+});
+
 
 var MaxImageSchema = new mongoose.Schema({
     idtag: String,
