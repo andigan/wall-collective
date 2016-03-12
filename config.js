@@ -1,7 +1,7 @@
 var config = {};
 
 // set port
-config.port = 80;
+config.port = 8000;
 
 // set mongDB database
 config.database_name = 'max';
