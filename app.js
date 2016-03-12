@@ -332,6 +332,17 @@ io.on('connection', function (socket) {
 
 mongoose.connect('mongodb://localhost/max'); // connects to max database
 
+// check to make sure MongoDb is connected.
+mongoose.connection.on('open', function () {
+  console.log('\nConnected to mongo server.\n');
+});
+mongoose.connection.on('error', function (err) {
+  console.log('\nCould not connect to mongo server.\n');
+  console.log(err);
+  // exit node
+  process.exit(1);
+});
+
 var MaxImageSchema = new mongoose.Schema({
     idtag: String,
     domtag: Number,
