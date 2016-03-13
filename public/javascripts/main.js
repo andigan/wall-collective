@@ -992,7 +992,8 @@ $(document).ready( function () {
 
 
         // show selected_file in case it was removed by being dragged onto the toolbox
-        if (typeof selected_file.image_id !== 'undefined') {
+        // except when selected_file.image_id is undefined or ''
+        if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
           document.getElementById(selected_file.image_id).style.display = 'block';
         };
 

@@ -264,6 +264,10 @@ io.on('connection', function (socket) {
 
     MaxImage.find({ filename: data.selected_filename }).remove().exec();
 
+    fs.unlink(path.join(__dirname, config.publicimagedir, data.selected_filename), function (err) {
+      if (err) throw err;
+      console.log('successfully deleted file.');
+    });
   }); // end of socket
 
 /*
@@ -649,9 +653,17 @@ app.post('/addfile', function (req, res) {
                         if (err) return console.error(err);
 
                         ajax_post_response_data.idtag = fs.statSync(config.publicimagedir + '/' + newfilename).mtime.toISOString().concat( newfilename );
-                        ajax_post_response_data.domtag = highdomitem.domtag + 1;
                         ajax_post_response_data.image_filename = newfilename;
-                        ajax_post_response_data.z_index = highzitem.zindex + 1;
+
+                        // if there are results
+                        if (highzitem !== null) {
+                          ajax_post_response_data.domtag = highdomitem.domtag + 1;
+                          ajax_post_response_data.z_index = highzitem.zindex + 1;
+                        // else if there are no results
+                        } else {
+                          ajax_post_response_data.domtag = 1;
+                          ajax_post_response_data.z_index = 1;
+                        };
 
                         MaxImage.update(
                           {           idtag    : ajax_post_response_data.idtag }, // filter
