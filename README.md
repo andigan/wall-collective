@@ -23,7 +23,7 @@ A real-time app for sharing, arranging, and transforming images.
   - grayscale/inversion
   - contrast/saturation
   - hue-rotation
-- Optional: On touchscreen, use pinch gesture to change an image size and angle.
+- Optional: On a touchscreen, use pinch gesture to change an image size and angle.
 
 ## Installation
 
