@@ -2,26 +2,17 @@
 // 1. z-index system: have more formal control over z-indexes on the page and with other clients
 // 2. change posts to sockets (maybe)
 // 3. Make sure deletes and uploads aren't ruined by simultaneous requests
-// 4. #m5 is buried in the createswitchforid function
-// 5. Figure out -stretch- mode and what is going on. //DONE
 // 6. Implement module system
 // 7. on stop drag, send all z_indexes to switch them in clients
-// 8. if second image is dropped on toolbox, return the first to the page.
+// 8. if second image is dropped on garbage can, return the first to the page.
 // 9. change resize dragger to lock_axis
 // 10. performance seems severely dependent on image sizes on screen.
 //     work to reduce image size to something more appropriate
 // 11. Implement flat mode.  remove all angles, disallow rotations, and allow stretch mode
-// 12. handle zero images on page
+// 12. handle zero images on page // DONE Doublecheck
 // 13. change .textContent to .innerText
 // 14. fix upload dimensions
-
-// QUESTION  nunjucks isn't reading the second string as a string
-// without quotation marks
-//        <script>
-//        var resize_dragger_status = 'none';
-//          var image_dir   = /art/;
-//        </script>
-
+// 15. draggers will probably fail if the page is empty because selected_file will be empty
 // ---------------------------------------START--------------------------------------------------------------------
 
 /*
@@ -51,8 +42,8 @@ $(document).ready( function () {
 *   Development Helpers
 */
 
-  // setTimeout(function () { $( '#toolbox_toggle_button' ).trigger( 'click' ); }, 0);
-  // setTimeout(function () { $( '#draggers_toolbox_button' ).trigger( 'click' ); }, 0);
+  // setTimeout(function () { $( '#navigation_toggle_button' ).trigger( 'click' ); }, 0);
+  // setTimeout(function () { $( '#dragger_switches_button' ).trigger( 'click' ); }, 0);
   // setTimeout(function () { $( '#report_button' ).trigger( 'click' ); }, 0);
   // setTimeout(function () { $( '#drag_stretch_button' ).trigger( 'click' ); }, 0);
 
@@ -91,6 +82,7 @@ $(document).ready( function () {
     upload_top = '0px',
     upload_left = '0px',
     upload_width = '75px',
+    upload_height = '100px',
 
     // set visual limits for draggers
     blur_level = 7,
@@ -98,16 +90,19 @@ $(document).ready( function () {
     contrast_level = 10,
     saturate_level = 10,
 
-    // set up selected_file, which is used when an image is clicked or dragged
-    selected_file = { },
+    // used when an image is clicked or dragged, especially by draggers
+    selected_file = {},
+
+    // used by delete button
+    image_to_delete = {},
 
     // used by the upload counter (TO BE REPLACED)
     uploadtotal = 0,
 
-    // previously used by toolbox_button.draggable
-    // toolbox_button_is_stationary = true,
+    // previously used by navigation_toggle_button_container.draggable
+    // navigation_toggle_button_is_stationary = true,
 
-    // used by report box
+      // used by report box
     report_on = true;
 
   // FUTURE WORK: this is to define report_on if it is undeclared/undefined
@@ -122,101 +117,9 @@ $(document).ready( function () {
 
   // call setup functions
   create_reportbox(); // create report box, make it draggable
-  toolbox_setup();  // select where to put buttons
-  adjust_toolbox(); // for when window is resized, adjusts the sizes within the toolbox using mainwide and mainhigh
   assigndrag();     // initial assign drag to all .drawing elements
   draggers_setup();  // setup dragger buttons
-
-
-/*
-*   Setup functions/configs
-*     toolbox set up
-*     configure where to put menu buttons
-*/
-
-  function toolbox_setup() {
-    var selectlocation_element = document.getElementById('mc2r0'),
-      previewlocation_element = document.getElementById('mc2r2'),
-      selectbox_element = document.createElement('div'),
-      selectheader_element = document.createElement('div'),
-      selectcontainer_element = document.createElement('div'),
-      selectimage_element = document.createElement('img'),
-      previewcontainer_element = document.createElement('div'),
-      previewimage_element = document.createElement('img');
-
-    // create buttons for toolboxes
-    createbuttonforid ('delete_file_button'               , 'mc1r1', 'Delete Image'); // hidden
-    createbuttonforid ('draggers_toolbox_button'          , 'mc1r1', 'Draggers');
-
-    createbuttonforid ('confirm_upload_button'            , 'mc2r1', 'Confirm Upload'); // hidden
-    createbuttonforid ('settings_toolbox_button'          , 'mc3r1', 'Settings');
-
-    createbuttonforid ('drag_stretch_button'              , 'sc1r1', '-Drag-');
-    createbuttonforid ('report_button'                    , 'sc1r2', 'Info Is Off');
-    createbuttonforid ('reset_page_button'                , 'sc2r3', 'Reset Page');
-
-    // create switches for draggers
-    createswitchforid ('dragger_all_switch'               , 'dc1r1', 'all draggers');
-    createswitchforid ('resize_dragger_switch'            , 'dc1r2', 'resize');
-    createswitchforid ('rotation_dragger_switch'          , 'dc1r3', 'rotation');
-
-    createswitchforid ('opacity_dragger_switch'           , 'dc3r1', 'opacity');
-
-    createswitchforid ('blur_brightness_dragger_switch'   , 'dc2r1', 'blur/brightness');
-    createswitchforid ('grayscale_invert_dragger_switch'  , 'dc2r2', 'grayscale/invert');
-    createswitchforid ('contrast_saturate_dragger_switch' , 'dc2r3', 'contrast/saturate');
-
-    createswitchforid ('party_dragger_switch'             , 'dc3r3', 'party');
-
-
-    // FUTURE WORK: explore javascript version of adding a form
-    // add_file_button form
-    $('#mc1r2').append("\
-      <form id='add_file_button' name='title' method='post'\
-            enctype='multipart/form-data'\
-            action='addfile/' runat='server'>\
-        <div class='btn-file button'> Upload Image\
-        <input id='fileselect' type='file' name='upl'>\
-        </div>\
-      </form>");
-
-    // create div structure for image_preview_container
-    previewcontainer_element.setAttribute('id', 'image_upload_preview_container');
-    previewlocation_element.appendChild(previewcontainer_element);
-
-    previewimage_element.setAttribute('id', 'image_upload_preview');
-    previewimage_element.src = '/images/1x1.png';
-    previewimage_element.alt = 'confirm upload';
-    previewcontainer_element.appendChild(previewimage_element);
-    // Result:
-    //  <div id='image_upload_preview_container'>
-    //    <img id='image_upload_preview'
-    //         src='/images/1x1.png' alt='confirm upload'>
-    //  </div>
-
-    // create div structure for selected_image_box
-    selectbox_element.setAttribute('id', 'selected_image_box');
-    selectlocation_element.appendChild(selectbox_element);
-
-    selectheader_element.setAttribute('id', 'selectheader');
-    selectcontainer_element.setAttribute('id', 'selected_image_container');
-    selectbox_element.appendChild(selectheader_element);
-    selectbox_element.appendChild(selectcontainer_element);
-
-    selectimage_element.setAttribute('id', 'selected_image');
-    selectimage_element.src = '/images/1x1.png';
-    selectimage_element.alt = 'selected image';
-    selectcontainer_element.appendChild(selectimage_element);
-    //    result:
-    //    <div id='selected_image_box'>
-    //      <div id='selectheader'>
-    //      </div>
-    //      <div id='selected_image_container'>
-    //        <img id='selected_image'
-    //             src='/images/1x1.png' alt='selected image'>
-    //      </div>
-    //    </div>
-  } // end of toolbox_setup
+  assign_first_image_to_selected_file();
 
 /*
 *   Setup functions/configs
@@ -252,19 +155,20 @@ $(document).ready( function () {
 
       // toggle all_dragger switch
       this.classList.toggle('switchon');
-      // if all_dragger has been switched on, add class 'switchon' to all class 'switchbtn's and show draggers
+      // if all_dragger has been switched on, add class 'switchon' to all class 'dragger_switch's and show draggers
       if (document.getElementById('dragger_all_switch').classList.contains('switchon')) {
-        switch_elements = document.getElementsByClassName('switchbtn');
+        switch_elements = document.getElementsByClassName('dragger_switch');
         for (i = 0; i < switch_elements.length; i++) {
           switch_elements[i].classList.add('switchon');
         };
+        set_dragger_locations(selected_file.image_id);
         dragger_elements = document.getElementsByClassName('dragger');
         for (i = 0; i < dragger_elements.length; i++) {
           dragger_elements[i].style.display = 'block';
         };
-      // if all_dragger has been switched off, remove class 'switchon' from all class 'switchbtn's and hide draggers
+      // if all_dragger has been switched off, remove class 'switchon' from all class 'dragger_switch's and hide draggers
       } else {
-        switch_elements = document.getElementsByClassName('switchbtn');
+        switch_elements = document.getElementsByClassName('dragger_switch');
         for (i = 0; i < switch_elements.length; i++) {
           switch_elements[i].classList.remove('switchon');
         };
@@ -280,9 +184,9 @@ $(document).ready( function () {
     $('#dragger_all_switch').click(function () {
       $(this).toggleClass('switchon');
       if ($(this).hasClass('switchon')) {
-        $('.switchbtn').addClass('switchon');
+        $('.dragger_switch').addClass('switchon');
       } else {
-        $('.switchbtn').removeClass('switchon');
+        $('.dragger_switch').removeClass('switchon');
         $('.dragger').css('display', 'none');
       }; // end of if
     }); // end of dragger_all_switch.click
@@ -294,56 +198,6 @@ $(document).ready( function () {
 *     create button for location id
 *     A function to create specific buttons to div ids
 */
-
-  function createbuttonforid(buttonname, id, button_label) {
-    var button_element = document.createElement('div'),
-      id_element = document.getElementById(id);
-
-    // setup button_element div
-    button_element.setAttribute('id', buttonname);
-    button_element.classList.add('button');
-    button_element.textContent = button_label;
-
-    // Add new element to 'id'
-    id_element.appendChild(button_element);
-
-    // special case: hide delete and confirm upload buttons
-    if ((buttonname === 'delete_file_button') || (buttonname === 'confirm_upload_button')) {
-      button_element.style.display = 'none';
-    };
-
-    // special case: add drag-is-open class to drag_stretch toggle
-    if (buttonname === 'drag_stretch_button') {
-      button_element.classList.add('drag-is-open');
-    };
-  }
-
-  /*
-  *   Setup helper functions
-  *     create switch for location id
-  *     A function to create specific switches to div ids
-  */
-
-  function createswitchforid(switchname, id, switch_label) {
-    var id_element = document.getElementById(id),
-      switch_element = document.createElement('div'),
-      switchlabel_element = document.createElement('div');
-
-    switchlabel_element.classList.add('switchlabel');
-    switchlabel_element.textContent = switch_label;
-
-    switch_element.setAttribute('id', switchname);
-    switch_element.classList.add('switchbtn');
-
-    // Add new element to 'id'
-    id_element.appendChild(switchlabel_element);
-    id_element.appendChild(switch_element);
-
-    // special case: underline dragger_all_switch label
-    if (switchname === 'dragger_all_switch') {
-      switchlabel_element.style.textDecoration = 'underline';
-    };
-  } // end of createswitchforid
 
 /*
 *   Setup helper functions
@@ -439,66 +293,6 @@ $(document).ready( function () {
   };
 
 /*
-*   adjust_toolbox
-*     called when toolbox_container size initializes or changes.
-*     adjust the sizes within the toolbox using mainwide and mainhigh
-*     mainwide and mainhigh are newly assigned, based on window.height, window.width
-*     FUTURE WORK: Eventually implement flex boxes and vh, vw
-*                  and remove this section altogether
-*/
-
-  function adjust_toolbox() {
-
-    // toolbox_container new width and height
-    var tbwidth = mainwide,
-      tbheight = mainhigh * 0.4,
-
-      columnwid = tbwidth * 0.3333333,
-      rowhigh = tbheight * 0.33333333;
-
-    // This is used to size columns, rows, and buttons
-    $('.col_1').css({ 'top': '0',
-                      'left': '0',
-                      'height': tbheight + 'px',
-                      'width': columnwid + 'px'});
-    $('.col_2').css({ 'top': '0',
-                      'left': columnwid + 'px',
-                      'height': tbheight + 'px',
-                      'width': columnwid + 'px'});
-    $('.col_3').css({ 'top': '0',
-                      'left': (columnwid * 2) + 'px',
-                      'height': tbheight + 'px',
-                      'width': columnwid + 'px'});
-    $('.row_1').css({ 'top': '0',
-                   // 'left': '0px',
-                      'width': columnwid + 'px',
-                      'height': rowhigh + 'px'});
-    $('.row_2').css({ 'top': rowhigh + 'px',
-                   // 'left': columnwid + 'px',
-                      'width': columnwid + 'px',
-                      'height': rowhigh + 'px'});
-    $('.row_3').css({ 'top': (rowhigh * 2) + 'px',
-                   // 'left': (columnwid * 2) + 'px',
-                      'width': columnwid + 'px',
-                      'height': rowhigh + 'px'});
-
-    $('.col_2 .row_2').css('height', (rowhigh * 2) + 'px');
-
-    $('.button').css({'left': (columnwid * 0.1) + 'px',
-                      'top': (rowhigh * 0.1) + 'px',
-                      'height': (rowhigh * 0.8) + 'px',
-                      'width': (columnwid * 0.8) + 'px',
-                      'line-height': (rowhigh * 0.8) + 'px'});
-
-
-    document.getElementById('toolbox_toggle_container').style.top = 'auto';
-    document.getElementById('toolbox_toggle_container').style.left = 'auto';
-    document.getElementById('toolbox_toggle_container').style.bottom = '0';
-    document.getElementById('toolbox_toggle_container').style.right = '0';
-  } // end of adjust_toolbox
-
-
-/*
 *   dragger_setup
 *     draggers_setup to create draggers and add dragger_switch functionalities
 */
@@ -529,6 +323,7 @@ $(document).ready( function () {
 
       // if switched on, show dragger, change persistent status
       if (this.classList.contains('switchon')) {
+        set_dragger_locations(selected_file.image_id);
         document.getElementById(dragger_name + '_dragger').style.display = 'block';
         socket.emit('change_' + dragger_name + '_dragger_status', 'block');
       // else hide dragger, change persistent status
@@ -540,71 +335,93 @@ $(document).ready( function () {
   }; // end of dragger_setup
 
 /*
-*   toolbox change functions
-*     Functions to change the state of the toolbox
+*   state change functions
+*     Functions to change the state of the containers and buttons
 *     in response to drags, uploads, etc
 */
 
-  function toolbox_change_to_default() {
-    // show
-    document.getElementById('add_file_button').style.display = 'block';
-    document.getElementById('drag_stretch_button').style.display = 'block';
-    document.getElementById('settings_toolbox_button').style.display = 'block';
-    document.getElementById('draggers_toolbox_button').style.display = 'block';
-    // hide
-    document.getElementById('delete_file_button').style.display = 'none';
-    document.getElementById('confirm_upload_button').style.display = 'none';
-    document.getElementById('selected_image_box').style.display = 'none';
-    // change
+  function state_change_to_close_all() {
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+    document.getElementById('options_container').classList.remove('options_container_is_open');
+    // replace image_upload_preview
     document.getElementById('image_upload_preview').src = '/images/1x1.png';
-    document.getElementById('selected_image').src = '/images/1x1.png';
+  }
 
-    document.getElementById('toolbox-container').classList.remove('file_selection_ready', 'upload_ready');
-  } // end of toolbox_change_to_default
+  function state_change_to_options() {
+    document.getElementById('options_container').classList.add('options_container_is_open');
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+  }
 
-  function toolbox_change_to_file_selected() {
-    // show
-    document.getElementById('delete_file_button').style.display = 'block';
-    document.getElementById('selected_image_box').style.display = 'block';
-    // hide
-    document.getElementById('add_file_button').style.display = 'none';
-    document.getElementById('drag_stretch_button').style.display = 'none';
-    document.getElementById('draggers_toolbox_button').style.display = 'none';
-    document.getElementById('settings_toolbox_button').style.display = 'none';
-    document.getElementById('confirm_upload_button').style.display = 'none';
+  function state_change_to_upload() {
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  } // end of state_change_to_upload
 
-    document.getElementById('toolbox-container').classList.add('file_selection_ready');
-  } // end of toolbox_change_to_file_selected
+  function state_change_after_upload() {
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    document.getElementById('upload_preview_container').style.display = 'none';
+    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    // this setTimeout is that the upload_preview_container disappears immediately and resets
+    // to visible after the transition effect
+    setTimeout(function () {
+      document.getElementById('upload_preview_container').style.display = 'block';
+      document.getElementById('confirm_or_reject_container').style.display = 'flex';
+    }, 500);
+
+    // replace image_upload_preview
+     document.getElementById('image_upload_preview').src = '/images/1x1.png';
+  }
+
+  function state_change_to_delete() {
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+
+    document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
+    document.getElementById('delete_preview').src = image_to_delete.src;
+  } // end of state_change_to_upload
 
 
-  function toolbox_change_to_upload() {
-    // show
-    document.getElementById('confirm_upload_button').style.display = 'block';
-    // hide
-    document.getElementById('settings_toolbox_button').style.display = 'none';
-    document.getElementById('drag_stretch_button').style.display = 'none';
-    document.getElementById('draggers_toolbox_button').style.display = 'none';
-    document.getElementById('delete_file_button').style.display = 'none';
+  function state_change_after_delete() {
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    document.getElementById('delete_preview_container').style.display = 'none';
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    // this setTimeout is that the upload_preview_container disappears immediately and resets
+    // to visible after the transition effect
+    setTimeout(function () {
+      document.getElementById('delete_preview_container').style.display = 'block';
+    }, 500);
 
-    document.getElementById('toolbox-container').classList.add('upload_ready');
-  } // end of toolbox_change_to_upload
+    // replace delete_preview
+    document.getElementById('delete_preview').src = '/images/1x1.png';
+  }
 
+  function state_change_after_reject_delete() {
+    var data = {};
+
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    document.getElementById('delete_preview_container').style.display = 'none';
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    // this setTimeout is that the upload_preview_container disappears immediately and resets
+    // to visible after the transition effect
+    setTimeout(function () {
+      document.getElementById('delete_preview_container').style.display = 'block';
+    }, 500);
+
+    // reshow hidden image, move it up a bit
+    document.getElementById(image_to_delete.image_id).style.top = '0px';
+    document.getElementById(image_to_delete.image_id).style.display = 'block';
+
+    // show image on other clients
+    data.image_id = image_to_delete.image_id;
+    data.selected_top = '0px';
+
+    socket.emit('clientemit_show_image', data);
+  }
 
 /*
 *   Page helper functions
 */
-
-  // used by delete image button
-  function clear_selected_file() {
-    selected_file.image_id        = '';
-    selected_file.image_filename  = '';
-    selected_file.src             = '';
-    selected_file.width           = '';
-    selected_file.height          = '';
-    selected_file.transform       = '';
-    selected_file.zindex          = '';
-  };
-
 
 /*
 *   Page helper functions
@@ -622,6 +439,8 @@ $(document).ready( function () {
 */
   $('#wrapper').on('click touchstart', function (event) {
     var dragger_elements = {};
+    // DEBUG
+    // alert(event.target.getAttribute('id'));
 
     // if wrapper is clicked...
     // this is necessary because the wrapper is registered under other clicks
@@ -633,12 +452,11 @@ $(document).ready( function () {
         dragger_elements[i].style.display = 'none';
       };
 
-      // close toolboxes, disable dragger transitions
-      document.body.classList.remove('dragger_transitions',
-                                     'a-toolbox-is-open',
-                                     'toolbox-is-open',
-                                     'toolbox2-is-open',
-                                     'toolbox3-is-open');
+      // close button containers and remove dragger_transitions
+      document.body.classList.remove('dragger_transitions');
+
+//      document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+
     };
   }); // end of document.on.click
 
@@ -665,10 +483,42 @@ $(document).ready( function () {
     clearreport();
     report([[1, 'resize: new width : ' + mainwidepx],
             [2, 'resize: new height : ' + mainhighpx]]);
-    adjust_toolbox();
   // bubbling phase (ahem)
   }, false); // end of addEventListener.resize
 
+/*
+*   Page helper functions
+*     hide draggers
+*/
+
+  function hide_draggers() {
+    var dragger_elements = document.getElementsByClassName('dragger'),
+      i = 0;
+
+    for (i = 0; i < dragger_elements.length; i++) {
+      dragger_elements[i].style.display = 'none';
+    };
+  }
+
+/*
+*   Page helper functions
+*     assign for image to selected file
+*     FUTURE WORK: sloppy handling of errors
+*/
+
+  function assign_first_image_to_selected_file() {
+    // get the first image
+    var first_image_element = document.getElementById('images').firstElementChild;
+
+    // put the image in the selected_file object
+    selected_file.image_id        = first_image_element.getAttribute('id');
+    selected_file.image_filename  = first_image_element.getAttribute('title');
+    selected_file.src             = first_image_element.src;
+    selected_file.width           = first_image_element.style.width;
+    selected_file.height          = first_image_element.style.height;
+    selected_file.transform       = first_image_element.style.transform;;
+    selected_file.zindex          = first_image_element.style.zIndex;
+  };
 
 
 
@@ -841,7 +691,10 @@ $(document).ready( function () {
 
   // remove deleted image
   socket.on('broadcast_delete_image', function (data) {
-    document.getElementById(data.selected_id).remove();
+    document.getElementById(data.id_to_delete).remove();
+    if (data.id_to_delete === selected_file.selected_id) {
+      assign_first_image_to_selected_file();
+    };
   });
 
   // add uploaded image
@@ -903,8 +756,8 @@ $(document).ready( function () {
   // show elements
   socket.on('broadcast_show_image', function (data) {
     document.getElementById(data.image_id).style.display = 'block';
-    document.getElementById(data.image_id).style.left = data.selected_left + 'px';
-    document.getElementById(data.image_id).style.top = data.selected_top + 'px';
+//    document.getElementById(data.image_id).style.left = data.selected_left + 'px';
+    document.getElementById(data.image_id).style.top = data.selected_top;
   });
 
 /*
@@ -917,8 +770,12 @@ $(document).ready( function () {
 */
 
   socket.on('broadcast_chunk_sent', function (uploaddata) {
+
     uploadtotal = uploadtotal + uploaddata;
-    report([[1, 'Uploaded ' + uploaddata + ' bytes for a total of ' + uploadtotal  + ' bytes' ]]);
+
+    document.getElementById('confirm_or_reject_container_info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.' ;
+
+
   });
 
 /*
@@ -945,7 +802,7 @@ $(document).ready( function () {
     // if '-drag-' is on, replace it with '-resize-'
     if (button_element.classList.contains('drag-is-open')) {
       // switch to "resize" mode
-      button_element.textContent = '-Stretch-';
+      button_element.textContent = '-stretch-';
       button_element.classList.remove('drag-is-open');
       button_element.classList.add('stretch-is-open');
       // disable moving
@@ -955,7 +812,7 @@ $(document).ready( function () {
     // else if '-resize-' is on, replace it with '-drag-'
     } else {
       // switch to "-drag-" mode
-      button_element.textContent = '-Drag-';
+      button_element.textContent = '-drag-';
       button_element.classList.remove('stretch-is-open');
       button_element.classList.add('drag-is-open');
       // enable moving
@@ -967,66 +824,55 @@ $(document).ready( function () {
 
 /*
 *   Buttons
-*     open/close toolbox
+*     open/close navigation
 */
 
-  // on click, toggle toolbox, change toolbox to default
-  $('#toolbox_toggle_button').on( 'click', function () {
-    var button_element = document.getElementById('toolbox_toggle_button');
+  // on click, toggle navigation, change navigation to default
+  $('#navigation_toggle_button').on( 'click', function () {
+    var button_element = document.getElementById('navigation_toggle_button');
 
     // if the button is being dragged, don't do anything with the click
     // FUTURE WORK: stop event propagation
     if ( button_element.classList.contains('dragging_no_click') === false ) {
 
-      // if any toolbox is open, close it
-      if (  document.body.classList.contains('a-toolbox-is-open')  ) {
+      // if button containers are open, close them
+      document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
 
-        document.body.classList.remove('a-toolbox-is-open',
-                                       'toolbox-is-open',
-                                       'toolbox2-is-open',
-                                       'toolbox3-is-open');
+
+      if (  document.body.classList.contains('button_container_is_open')  ) {
+
+        document.body.classList.remove('button_container_is_open');
+
+        document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+
 
         // animate hamburgers
         document.getElementById('line_one').style.top = '40%';
         document.getElementById('line_three').style.top = '60%';
 
 
-        // show selected_file in case it was removed by being dragged onto the toolbox
+        // show selected_file in case it was removed by being dragged onto the garbage can
         // except when selected_file.image_id is undefined or ''
         if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
           document.getElementById(selected_file.image_id).style.display = 'block';
         };
 
-        // reset toolbox
-        toolbox_change_to_default();
-      // if no toolboxes are open, open them all
+        // reset button containers
+          state_change_to_close_all();
+
+      // if no button containers are open, open them all
       } else {
+        document.getElementById('navigation_container').classList.add('navigation_container_is_open');
 
-        document.body.classList.add('a-toolbox-is-open',
-                                    'toolbox-is-open',
-                                    'toolbox2-is-open',
-                                    'toolbox3-is-open');
 
-        /* FUTURE WORK: maybe can delete
-        *   not sure why, but the above line wasn't working some of the time after the page loaded
-        *   so I added the classes below
-        *   setTimeout(function () {
-        *   document.body.classList.add('a-toolbox-is-open',
-        *                               'toolbox-is-open',
-        *                               'toolbox2-is-open',
-        *                               'toolbox3-is-open');
-        *   }, 10);
-        */
+        document.body.classList.add('button_container_is_open');
 
         // animate hamburgers
         document.getElementById('line_one').style.top = '35%';
         document.getElementById('line_three').style.top = '65%';
-
-
-
-      }; // end of a-toolbox-is-open if
+      }; // end of button_container_is_open if
     }; // end of dragging_no_click if
-  });   // end of toolbox_toggle_button click
+  });   // end of navigation_toggle_button click
 
 
 /*
@@ -1041,36 +887,39 @@ $(document).ready( function () {
       report_on = false;
       document.body.classList.remove('report_on');
       document.getElementById('reportbox').style.display = 'none';
-      document.getElementById('report_button').textContent = 'Info Is Off';
-    // if toolbox is closed, show it
+      document.getElementById('report_button').textContent = 'info is off';
+    // if report_box is closed, show it
     } else {
       report_on = true;
       document.body.classList.add('report_on');
       document.getElementById('reportbox').style.display = 'block';
-      document.getElementById('report_button').textContent = 'Info Is On';
+      document.getElementById('report_button').textContent = 'info is on';
     }; // end of if
   }); // end of #report_button.on(click)
 
 /*
 *   Buttons
-*     toolbox2 / settings button
+*     options button
 */
 
-  // on click, close toolbox and toolbox3 to show toolbox2
-  $('#settings_toolbox_button').on('click', function () {
-    document.body.classList.add('a-toolbox-is-open');
-    document.body.classList.remove('toolbox-is-open', 'toolbox3-is-open');
+  // on click, open options container
+  $('#options_container_button').on('click', function () {
+    state_change_to_options();
   }); // end of on click
+
 
 /*
 *   Buttons
-*     toolbox3 / draggers button
+*     draggers options_container_button button
 */
+  // on click, toggle is_open class
+  $('#dragger_switches_button').on('click', function () {
 
-  // on click, close toolbox and toolbox2 to show toolbox3
-  $('#draggers_toolbox_button').on('click', function () {
-    document.body.classList.add('a-toolbox-is-open');
-    document.body.classList.remove('toolbox-is-open', 'toolbox2-is-open');
+    document.getElementById('dragger_switches_container').classList.toggle('dragger_switches_container_is_open');
+
+    if (document.getElementById('dragger_switches_container').classList.contains('dragger_switches_container_is_open')) {
+      document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    };
   }); // end of on click
 
 /*
@@ -1106,7 +955,10 @@ $(document).ready( function () {
     if (input.files && input.files[0]) {
       reader = new FileReader();
       reader.onload = function (event) {
+
+        document.getElementById('upload_preview_container').classList.add('upload_preview_container_is_open');
         document.getElementById('image_upload_preview').src = event.target.result;
+
       }; // end of reader.onload function set
       reader.readAsDataURL(input.files[0]);
     } // end of if
@@ -1115,23 +967,29 @@ $(document).ready( function () {
 
   // on click, load up the image preview
   $('#fileselect').on('change', function () {
-    // change toolbox to add confirm_upload_button
-    toolbox_change_to_upload();
-    // use the helper function above to load preview image into the toolbox
+    // open upload_preview_container
+    state_change_to_upload();
+    // use the helper function above to load preview image into the upload_preview_container
     // readURL(document.getElementById('fileselect'));
     readURL(this);
   }); // end of file select change
 
 
-  // on click, send a submit to the html form with id='add_file_button'
-  // the html form with id='add_file_button' posts to '/addfile'
+  // on click, send a submit to the html form with id='upload_image_button'
+  // the html form with id='upload_image_button' posts to '/addfile'
   $('#confirm_upload_button').on('click', function () {
-    $('#add_file_button').ajaxSubmit({
+
+    document.getElementById('confirm_or_reject_container').style.display = 'none';
+
+
+    $('#upload_image_button').ajaxSubmit({
       // method from jquery.form
       error: function (xhr) {
         status('Error: ' + xhr.status);
-        // change toolbox and remove upload_preview
-        toolbox_change_to_default();
+        // change navigation_container and remove upload_preview
+        state_change_after_upload();
+        document.getElementById('confirm_or_reject_container_info').textContent = 'Error!';
+
       },
       success: function (response) {
   /* response from server is the uploaded file information:
@@ -1152,6 +1010,7 @@ $(document).ready( function () {
         image_element.setAttribute('data-scale', '1');
         image_element.setAttribute('data-angle', '0');
         image_element.style.width = upload_width;
+        image_element.style.height = upload_height;
         image_element.style.zIndex = response.z_index;
         image_element.style.top = upload_top;
         image_element.style.left = upload_left;
@@ -1163,11 +1022,9 @@ $(document).ready( function () {
         // assign drag to added element
         assigndrag(response.domtag);
 
-        // change toolbox and remove upload_preview
-        toolbox_change_to_default();
-
-        // replace image_upload_preview
-        document.getElementById('image_upload_preview').src = '/images/1x1.png';
+        // change navigation container and remove upload_preview
+        state_change_after_upload();
+        document.getElementById('confirm_or_reject_container_info').textContent = '';
 
         // emit to other clients
         socketdata.uploaded_filename = response.image_filename;
@@ -1179,27 +1036,36 @@ $(document).ready( function () {
     }); // end of ajax submit
   }); // end of confirmbutton on.click
 
+  $('#reject_upload_button').on('click', function () {
+    state_change_after_upload();
+  });
+
+  $('#reject_delete_button').on('click', function () {
+    state_change_after_reject_delete();
+  });
+
+
 /*
 *   Buttons
 *     delete button
 *     requires selected_file object to be populated
 */
 
-  $('#delete_file_button').on('click', function () {
+  $('#confirm_delete_button').on('click', function () {
     var socketdata = {};
 
     // remove hidden image
-    document.getElementById(selected_file.image_id).remove();
-    // change toolbox to default
-    toolbox_change_to_default();
+    document.getElementById(image_to_delete.image_id).remove();
+    // change navigation container
+    state_change_after_delete();
     // remove select_image preview
-    document.getElementById('selected_image').src = '/images/1x1.png';
+    document.getElementById('delete_preview').src = '/images/1x1.png';
     // prepare data to send
-    socketdata.selected_filename = selected_file.image_filename;
-    socketdata.selected_id = selected_file.image_id;
+    socketdata.filename_to_delete = image_to_delete.image_filename;
+    socketdata.id_to_delete = image_to_delete.image_id;
     // send data to server
     socket.emit('clientemit_delete_image', socketdata);
-    clear_selected_file();
+    assign_first_image_to_selected_file();
   }); // end of delete.on.click
 
 
@@ -1234,8 +1100,8 @@ $(document).ready( function () {
 *     1. main event drag, for images
 *     2. interact('.drawing').gesturable, for touchscreen rotating and scaling
 *     3. -resize- mode, for stretching the x and y axes
-*     4. Toolbox.droppable, for preparing a dropped selected_file for handling (delete)
-*     5. toolbox_toggle_button.draggable, for dragging the toolbox_toggle_button around the edges
+*     4. garbage_can.droppable, for preparing a dropped selected_file for handling delete
+*     5. navigation_toggle_button.draggable, for dragging the navigation_toggle_button around the edges
 */
 
 /*
@@ -1260,7 +1126,7 @@ $(document).ready( function () {
     // draggable method from jquery.ui
     $(id).draggable(
       {
-        // snap: true, // FUTURE WORK: turn this on and off in toolbox; look up snap options
+        // snap: true, // FUTURE WORK: turn this on and off in options_container; look up snap options
         // refreshPositions: true, // maybe try this and see effect
         // containment: 'window',
         stack: '.drawing', // the stack option automatically adjusts z-indexes for all .drawing elements
@@ -1384,9 +1250,7 @@ $(document).ready( function () {
           selected_file.src = this.src;
           selected_file.image_id = this.getAttribute('id');
 
-          if (document.getElementById('toolbox-container').classList.contains('file_selection_ready') === false) {
-            set_dragger_locations(selected_file.image_id);
-          };
+          set_dragger_locations(selected_file.image_id);
         } // end of stop function  // end of draggable is below
       // end of draggable
       }).click( function () {
@@ -1593,208 +1457,68 @@ $(document).ready( function () {
     } // end of onend
   });
 
-
-
-
-
-
-
-
-
-/*
-*   main interactive methods
-*     4. Toolbox.droppable, for preparing a dropped selected_file for handling (delete)
-*/
+  /*
+  *   main interactive methods
+  *     4. garbage_can.droppable, for preparing a dropped image for delete handling
+  */
 
   // jquery-ui method
-  $('#toolbox-container').droppable({
+  $('#garbage_can').droppable({
     accept: '.drawing',
     // activeClass: 'tool_active_class',
-    // hoverClass: 'tool_hover_class',
-    tolerance: 'intersect',
+    hoverClass: 'garbage_hover',
+    tolerance: 'touch',
 
     over: function () {
-      // console.log('over toolbox-container');
-      toolbox_change_to_file_selected();
+      // console.log('over garbage cancel');
     },
     out: function () {
-      // console.log('back out over toolbox-container ');
-      toolbox_change_to_default();
+      // console.log('back out over garbage can ');
     },
     drop: function (event, ui) {
-      // console.log('Draggable drawing dropped on toolbox.');
-      var dragger_elements = {},
-        i = 0;
+      // console.log('Draggable drawing dropped on garbage can.');
 
       // gather data
-      selected_file.image_id = ui.draggable.attr('id');
-      selected_file.image_filename = ui.draggable.attr('title');
-      selected_file.src = ui.draggable.attr('src');
-      selected_file.width = ui.draggable.css('width');
-      selected_file.height = ui.draggable.css('height');
-      selected_file.zindex = ui.draggable.css('z-index');
+      image_to_delete.image_id = ui.draggable.attr('id');
+      image_to_delete.image_filename = ui.draggable.attr('title');
+      image_to_delete.src = ui.draggable.attr('src');
+      image_to_delete.width = ui.draggable.css('width');
+      image_to_delete.height = ui.draggable.css('height');
+      image_to_delete.zindex = ui.draggable.css('z-index');
 
       // hide original image
-      document.getElementById(selected_file.image_id).style.display = 'none';
+      document.getElementById(image_to_delete.image_id).style.display = 'none';
 
       // hide draggers
-      dragger_elements = document.getElementsByClassName('dragger');
-      for (i = 0; i < dragger_elements.length; i++) {
-        dragger_elements[i].style.display = 'none';
-      };
+      hide_draggers();
+
+      // show delete_preview_container
+      state_change_to_delete();
 
       // send socket to hide on other clients
-      socket.emit('clientemit_hide_image', selected_file.image_id);
-
-      // show and hide buttons
-      toolbox_change_to_file_selected();
-
-      //  put the selected image in the selected_image box
-      document.getElementById('selected_image').src = selected_file.src;
-
-      //* optional report box
-      clearreport();
-      report([[1, 'selected file: ' + selected_file.src]]);
-
-      // make image preview draggable
-      //    This is NOT a direct copy of ''/dragdrop'
-      //    start:  return to original size and z-index
-      //    stop:   get the left and top from window;
-      //            round the numbers, convert to strings
-      //            bring the original image id back with css data
-      $('#selected_image').draggable( {
-        scroll: true,
-        // snap: true, // FUTURE WORK: turn this on and off in toolbox; look up snap options
-        // refreshPositions: true, // maybe try this and see effect
-        // containment: 'window',
-        start:  function (event, ui) {
-          // console.log('Dragged back off');
-
-          // recoup for transformed objects
-          var left = parseInt( this.style.left , 10),
-            top = parseInt( this.style.top , 10);
-
-          left = isNaN(left) ? 0 : left;
-          top = isNaN(top) ? 0 : top;
-          this.recoupLeft = left - ui.position.left;
-          this.recoupTop = top - ui.position.top;
-
-          // restore image dimensions
-          this.style.maxHeight = 'none';
-          this.style.width = selected_file.width;
-          this.style.height = selected_file.height;
-          this.style.zIndex = selected_file.zindex;
-
-          //* optional report box
-          clearreport();
-          report([[1, 'Filename: ' + this.getAttribute('title')],
-                 [2, 'Z-index: ' + this.style.zIndex],
-                 [3, 'Start: Left: ' + this.style.left + ' Top: ' + this.style.top],
-                 [5, 'Stop: ']]);
-        }, // end of start
-        drag: function (event, ui) {
-          // recoup drag position
-          ui.position.left += this.recoupLeft;
-          ui.position.top += this.recoupTop;
-
-          //* optional report box
-          report([[4, 'Current: Left: ' + this.style.left + ' Top: ' + this.style.top]]);
-
-        }, // end of drag
-        stop: function () {
-          // console.log('stopped');
-          var data = {},
-            data_for_database = {},
-            i = 0,
-            selectcontainer_element = document.getElementById('selected_image_container'),
-            selectimage_element = document.getElementById('selected_image'),
-            newselectimage_element = document.createElement('img'),
-            drawing_elements = document.body.getElementsByClassName('drawing'),
-            selected_top = Math.round(this.getBoundingClientRect().top).toString(),
-            selected_left = Math.round(this.getBoundingClientRect().left).toString();
-
-          // reshow and reposition original image
-          document.getElementById(selected_file.image_id).style.display = 'block';
-          document.getElementById(selected_file.image_id).style.left = selected_left + 'px';
-          document.getElementById(selected_file.image_id).style.top = selected_top + 'px';
-
-          // show image on other clients
-          data.image_id = selected_file.image_id;
-          data.selected_left = selected_left;
-          data.selected_top = selected_top;
-
-          socket.emit('clientemit_show_image', data);
-
-          // change toolbox.  this will replace the selected image
-          toolbox_change_to_default();
-
-          // remove and replace selected_image
-          selectimage_element.remove();
-
-          newselectimage_element.setAttribute('id', 'selected_image');
-          newselectimage_element.src = '/images/1x1.png';
-          newselectimage_element.alt = 'selected image';
-          selectcontainer_element.appendChild(newselectimage_element);
-
-          //* optional report box
-          clearreport();
-          report([[2, 'Z-index: ' + document.getElementById(selected_file.image_id).style.zIndex],
-                 [5, 'Stop: Left: ' + document.getElementById(selected_file.image_id).style.left + ' Top: ' + document.getElementById(selected_file.image_id).style.top]]);
-
-          // partial copy from dragstop main event
-          data_for_database.domtags = [];
-          data_for_database.filenames = [];
-          data_for_database.z_indexes = [];
-          data_for_database.moved_file = document.getElementById(selected_file.image_id).getAttribute('title');
-          data_for_database.moved_posleft = document.getElementById(selected_file.image_id).style.left;
-          data_for_database.moved_postop = document.getElementById(selected_file.image_id).style.top;
-
-          // populate data_for_database
-          for (i = 0; i < drawing_elements.length; i++) {
-            data_for_database.domtags[i] = drawing_elements[i].getAttribute('id');
-            data_for_database.filenames[i] = drawing_elements[i].getAttribute('title');
-            data_for_database.z_indexes[i] = drawing_elements[i].style.zIndex;
-          };
-
-          console.log('---- data_for_database ----');
-          console.log(data_for_database);
-
-  // ajax post
-          $.ajax({
-            method: 'POST',
-            url: '/dragstop',
-            data: JSON.stringify( { data_for_database: data_for_database} ),
-            contentType: 'application/json'
-          }).done(function () {
-            console.log('successful ajax post after moving selected file.');
-          }); // end of ajax post to /dragdrop
-
-          // set dragger locations
-          set_dragger_locations(selected_file.image_id);
-        } // end of stop function
-      });
+      socket.emit('clientemit_hide_image', image_to_delete.image_id);
     } // end of drop
-  }); // end of toolbox droppable
+  }); // end of garbage can droppable
 
 
 
 /*
 *   main interactive methods
-*     5. toolbox_toggle_button.draggable, for dragging the toolbox_toggle_button around the edges
+*     5. navigation_toggle_button.draggable, for dragging the navigation_toggle_button around the edges
 */
 
-  $('#toolbox_toggle_container').draggable({
+  $('#navigation_toggle_button_container').draggable({
     cancel: true,
     containment: 'parent',
     scroll: false,
     start: function (event, ui) {
 
       // used to prevent click from registering
-      document.getElementById('toolbox_toggle_button').classList.add('dragging_no_click');
+      document.getElementById('navigation_toggle_button').classList.add('dragging_no_click');
 
       clearreport();
 
-      // store the starting position of the toolbox_toggle_container
+      // store the starting position of the navigation_toggle_button_container
       this.starting_position = ui.position;
 
       // get the starting size
@@ -1929,7 +1653,7 @@ $(document).ready( function () {
 
 /* FUTURE WORK
       // this was used by taphold to prevent taphold functionality when dragging
-      if (toolbox_button_is_stationary) {
+      if (navigation_toggle_button_is_stationary) {
 
         this.x_distance = (this.starting_position.left - ui.position.left);
         this.y_distance = (this.starting_position.top - ui.position.top);
@@ -1937,7 +1661,7 @@ $(document).ready( function () {
         if (   (this.x_distance >  5) || (this.y_distance >  5)
             || (this.x_distance < -5) || (this.y_distance < -5)   ) {
 
-          toolbox_button_is_stationary = false;
+          navigation_toggle_button_is_stationary = false;
         };
       };
 */
@@ -1947,14 +1671,14 @@ $(document).ready( function () {
 
       // this causes the class to be removed before the next click event begins
       setTimeout( function () {
-        document.getElementById('toolbox_toggle_button').classList.remove('dragging_no_click');
-        toolbox_button_is_stationary = true;
+        document.getElementById('navigation_toggle_button').classList.remove('dragging_no_click');
+        navigation_toggle_button_is_stationary = true;
       }, 200);
 
       // reset commit switch for next drag
       this.commit_switch = 1;
     } // end of stop
-  }); // end of toolbox_container draggable
+  }); // end of navigation_toggle_button_container draggable
 
 
 
@@ -2445,7 +2169,7 @@ $(document).ready( function () {
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
-    dragger_element.style.top     = inner_height / 3 + 'px';
+    dragger_element.style.top     = '0';
     dragger_element.style.display = 'block';
     // allow transitions
     setTimeout(function () {

@@ -99,115 +99,8 @@
 
       </div> {# end of images div #}
 
-      {# toolbox: main settings #}
-      <nav id="toolbox-container" class="toolbox_container">
-        <div class='col_1'>
-          <div class='row_1'>
-            <div id='mc1r1'></div>
-          </div>
-          <div class='row_2'>
-            <div id='mc1r2'></div>
-          </div>
-          <div class='row_3'>
-            <div id='mc1r3'></div>
-          </div>
-        </div>
-        <div class='col_2'>
-          <div id='mc2r0'>
-            <div class='row_1'>
-              <div id='mc2r1'></div>
-            </div>
-            <div class='row_2'>
-              <div id='mc2r2'></div>
-            </div>
-          </div>
-        </div>
-        <div class='col_3'>
-          <div class='row_1'>
-            <div id='mc3r1'></div>
-          </div>
-          <div class='row_2'>
-            <div id='mc3r2'></div>
-          </div>
-          <div class='row_3'>
-            <div id='mc3r3'></div>
-          </div>
-        </div>
-      </nav>
-      {# toolbox2: system settings #}
-      <nav id="toolbox2-container" class="toolbox_container">
-        <div class='col_1'>
-          <div class='row_1'>
-            <div id='sc1r1'></div>
-          </div>
-          <div class='row_2'>
-            <div id='sc1r2'></div>
-          </div>
-          <div class='row_3'>
-            <div id='sc1r3'></div>
-          </div>
-        </div>
-        <div class='col_2'>
-            <div class='row_1'>
-              <div id='sc2r1'></div>
-            </div>
-            <div class='row_2'>
-              <div id='sc2r2'></div>
-            </div>
-            <div class='row_3'>
-              <div id='sc2r3'></div>
-            </div>
-        </div>
-        <div class='col_3'>
-          <div class='row_1'>
-            <div id='mc3r1'></div>
-          </div>
-          <div class='row_2'>
-            <div id='mc3r2'></div>
-          </div>
-          <div class='row_3'>
-            <div id='mc3r3'></div>
-          </div>
-        </div>
-      </nav>
-      {# toolbox3: dragger settings #}
-      <nav id="toolbox3-container" class="toolbox_container">
-        <div class='col_1'>
-          <div class='row_1'>
-            <div id='dc1r1'></div>
-          </div>
-          <div class='row_2'>
-            <div id='dc1r2'></div>
-          </div>
-          <div class='row_3'>
-            <div id='dc1r3'></div>
-          </div>
-        </div>
-        <div class='col_2'>
-            <div class='row_1'>
-              <div id='dc2r1'></div>
-            </div>
-            <div class='row_2'>
-              <div id='dc2r2'></div>
-            </div>
-            <div class='row_3'>
-              <div id='dc2r3'></div>
-            </div>
-        </div>
-        <div class='col_3'>
-          <div class='row_1'>
-            <div id='dc3r1'></div>
-          </div>
-          <div class='row_2'>
-            <div id='dc3r2'></div>
-          </div>
-          <div class='row_3'>
-            <div id='dc3r3'></div>
-          </div>
-        </div>
-      </nav>
-      <div id='toolbox_toggle_container'>
-        <button id='toolbox_toggle_button'>
+      <div id='navigation_toggle_button_container'>
+        <button id='navigation_toggle_button'>
           <div id='line_one'>
           </div>
           <div id='line_two'>
@@ -216,6 +109,79 @@
           </div>
         </button>
       </div>
+
+      <div id='navigation_container'>
+        <div id='dragger_switches_button' class='button navigation_button'> draggers </div>
+        <div id='options_container_button' class='button navigation_button'> options </div>
+
+
+        <form id='upload_image_button' name='title' method='post'
+              enctype='multipart/form-data'
+              action='addfile/' runat='server'>
+          <div class='btn-file button navigation_button'> upload
+          <input id='fileselect' type='file' name='upl'>
+          </div>
+        </form>
+
+        <div id='garbage_can' class='button navigation_button'> garbage can </div>
+        <div id='secondbutton' class='button_no_show'></div>
+
+      </div>
+
+
+      <div id='options_container'>
+        <div id='drag_stretch_button' class='button options_button drag-is-open'> -drag- </div>
+        <div id='report_button' class='button options_button'> info is off </div>
+        <div id='reset_page_button' class='button options_button'> reset page </div>
+
+
+        <div id='nothing1' class='button_no_show'>  </div>
+        <div id='nothing2' class='button_no_show'>  </div>
+      </div>
+
+
+
+
+
+
+
+
+      <div id='upload_preview_container' class='rainbow_border'>
+        <img id='image_upload_preview' src='/images/1x1.png'/>
+        <div id='confirm_or_reject_container'>
+          <div id='confirm_upload_button' class='confirm_button'> Yes </div>
+          <div id='reject_upload_button' class='confirm_button'> No </div>
+        </div>
+        <div id='confirm_or_reject_container_info'> </div>
+      </div>
+
+      <div id='delete_preview_container' class='rainbow_border'>
+        <img id='delete_preview' src='/images/1x1.png'/>
+        <div id='delete_confirm_or_reject_container'>
+          <div id='confirm_delete_button' class='confirm_button'> Yes </div>
+          <div id='reject_delete_button' class='confirm_button'> No </div>
+        </div>
+        <div id='delete_confirm_or_reject_container_info'></div>
+      </div>
+
+
+
+
+
+
+
+      <div id='dragger_switches_container'>
+        <div id='dragger_all_switch' class='dragger_switch'> all </div>
+        <div id='resize_dragger_switch' class='dragger_switch'> resize </div>
+        <div id='rotation_dragger_switch' class='dragger_switch'> rotate </div>
+        <div id='opacity_dragger_switch' class='dragger_switch'> opacity </div>
+        <div id='blur_brightness_dragger_switch' class='dragger_switch'> blur <br> brightness </div>
+        <div id='contrast_saturate_dragger_switch' class='dragger_switch'> contrast <br> saturate </div>
+        <div id='grayscale_invert_dragger_switch' class='dragger_switch'> grayscale <br> invert </div>
+        <div id='party_dragger_switch' class='dragger_switch'> party </div>
+      </div>
+
+
     </div> {# wrapper #}
     {# main script #}
     <script>

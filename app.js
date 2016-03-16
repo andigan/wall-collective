@@ -260,11 +260,11 @@ io.on('connection', function (socket) {
   socket.on('clientemit_delete_image', function (data) {
     socket.broadcast.emit('broadcast_delete_image', data);
     console.log('----------- delete image socket -------------');
-    console.log(data.selected_filename);
+    console.log(data.filename_to_delete);
 
-    MaxImage.find({ filename: data.selected_filename }).remove().exec();
+    MaxImage.find({ filename: data.filename_to_delete }).remove().exec();
 
-    fs.unlink(path.join(__dirname, config.publicimagedir, data.selected_filename), function (err) {
+    fs.unlink(path.join(__dirname, config.publicimagedir, data.filename_to_delete), function (err) {
       if (err) throw err;
       console.log('successfully deleted file.');
     });
@@ -672,7 +672,7 @@ app.post('/addfile', function (req, res) {
                                       posleft  : '0px',
                                       postop   : '0px',
                                       width    : '75px',
-                                      height   : 'auto',
+                                      height   : '100px',
                                       matrix   : 'rotate(0deg) scale(1)',
                                       filter   : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
                                       opacity  : '100',
