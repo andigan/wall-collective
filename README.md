@@ -10,11 +10,13 @@ A real-time app for sharing, arranging, and transforming images.
 - Uses node.js express framework.
 - Uses MongoDB for persistent storage of element styles.
 - Uses socket.io to share style changes with other clients in real time.
+- Uses jQuery sparingly.
+- Uses Interact.js for touchscreen rotating and resizing.
 
 ## Functionality
 
 - Upload images.
-- Delete images by dropping them on the toolbox.
+- Delete images by dropping them on the garbage can.
 - Use **_draggers_** to modify:
   - size
   - rotation
@@ -46,6 +48,8 @@ A real-time app for sharing, arranging, and transforming images.
   config.publicimagedir = 'public/art';
   config.database_name = 'mydatabase';
   config.use_cdn = true;
+  config.database_name = 'collection_name';
+
   ```
 
 4. Run the app:
