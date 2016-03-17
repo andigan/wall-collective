@@ -128,17 +128,9 @@ $(document).ready( function () {
 */
 
   function draggers_setup() {
-    //           | dragger_name(for js) | background_color | box_shadow_color | name
-    dragger_setup('resize'              , 'lightblue'      , 'blue'           , 'resize'  );
-    dragger_setup('opacity'             , 'white'          , 'white'          , 'opacity' );
-    dragger_setup('rotation'            , 'lightgreen'     , 'green'          , 'rotate'  );
-    dragger_setup('blur_brightness'     , 'orange'         , 'yellow'         , 'blur'    );
-    dragger_setup('grayscale_invert'    , 'gray'           , 'gray'           , 'gray'    );
-    dragger_setup('contrast_saturate'   , 'pink'           , 'red'            , 'cont');
-    dragger_setup('party'               , 'violet'         , 'purple'         , 'party'   );
 
     // maintain persistent universal dragger statuses
-    if (resize_dragger_status            === 'block') { document.getElementById('resize_dragger_switch').classList.add('switchon');};
+    if (stretch_dragger_status            === 'block') { document.getElementById('stretch_dragger_switch').classList.add('switchon');};
     if (opacity_dragger_status           === 'block') { document.getElementById('opacity_dragger_switch').classList.add('switchon');};
     if (rotation_dragger_status          === 'block') { document.getElementById('rotation_dragger_switch').classList.add('switchon');};
     if (blur_brightness_dragger_status   === 'block') { document.getElementById('blur_brightness_dragger_switch').classList.add('switchon');};
@@ -153,25 +145,31 @@ $(document).ready( function () {
         dragger_elements = {},
         i = 0;
 
-      // toggle all_dragger switch
+      // toggle switchon class in dragger_all_switch
       this.classList.toggle('switchon');
       // if all_dragger has been switched on, add class 'switchon' to all class 'dragger_switch's and show draggers
       if (document.getElementById('dragger_all_switch').classList.contains('switchon')) {
         switch_elements = document.getElementsByClassName('dragger_switch');
+        // add switchon class to all elements with dragger_switch class
         for (i = 0; i < switch_elements.length; i++) {
           switch_elements[i].classList.add('switchon');
         };
+        // set dragger element locations
         set_dragger_locations(selected_file.image_id);
+        // show dragger elements
         dragger_elements = document.getElementsByClassName('dragger');
         for (i = 0; i < dragger_elements.length; i++) {
           dragger_elements[i].style.display = 'block';
         };
-      // if all_dragger has been switched off, remove class 'switchon' from all class 'dragger_switch's and hide draggers
+      // if all_dragger has been switched off, remove class 'switchon' from
+      // all elements with 'dragger_switch' class and hide draggers
       } else {
+        // remove switchon class from all elements with dragger_status class
         switch_elements = document.getElementsByClassName('dragger_switch');
         for (i = 0; i < switch_elements.length; i++) {
           switch_elements[i].classList.remove('switchon');
         };
+        // hide dragger elements
         dragger_elements = document.getElementsByClassName('dragger');
         for (i = 0; i < dragger_elements.length; i++) {
           dragger_elements[i].style.display = 'none';
@@ -191,6 +189,40 @@ $(document).ready( function () {
       }; // end of if
     }); // end of dragger_all_switch.click
     */
+
+
+    // set up dragger_switch functionalities
+    $('.dragger_switch').click(function () {
+      var dragger_name = this.getAttribute('id').replace('_switch', '');
+
+      // toggle dragger_switch
+      this.classList.toggle('switchon');
+
+      // if switched on, show dragger, change persistent status
+      if (this.classList.contains('switchon')) {
+        set_dragger_locations(selected_file.image_id);
+
+//        alert(this.getAttribute('id').replace('_switch', ''));
+        document.getElementById(dragger_name).style.display = 'block';
+
+
+        socket.emit('change_' + dragger_name + '_status', 'block');
+
+      // else hide dragger, change persistent status
+      } else {
+
+        document.getElementById(dragger_name).style.display = 'none';
+
+        socket.emit('change_' + dragger_name + '_status', 'none');
+
+      };
+    }); // end of dragger_switch.clicks
+
+
+
+
+
+
   };// end of dragger_setup
 
 /*
@@ -229,6 +261,9 @@ $(document).ready( function () {
     // make reportbox draggable
     $('#reportbox').draggable({
       containment: 'parent',
+      start: function () {
+        clearreport();
+      },
       drag: function () {
         var report_box_element = document.getElementById ('reportbox'),
         // tempcos is a DOMRect object with six properties: left, top, right, bottom, width, height
@@ -293,48 +328,6 @@ $(document).ready( function () {
   };
 
 /*
-*   dragger_setup
-*     draggers_setup to create draggers and add dragger_switch functionalities
-*/
-
-  function dragger_setup(dragger_name, background_color, box_shadow_color, name) {
-    var wrapper_element = document.getElementById('wrapper'),
-      dragger_element = document.createElement('div');
-
-    dragger_element.setAttribute('id', dragger_name + '_dragger');
-    dragger_element.classList.add('dragger', 'dragger_transitions');
-    dragger_element.style.height = dragger_height + 'px';
-    dragger_element.style.width = dragger_width + 'px';
-    dragger_element.style.boxShadow = '0 0 3px 3px ' + box_shadow_color;
-    dragger_element.style.lineHeight = dragger_height + 'px';
-    dragger_element.textContent = name;
-
-    // Add 'dragger_element' to 'wrapper'
-    wrapper_element.appendChild(dragger_element);
-
-    // FUTURE WORK: experimental mix-blend-mode
-    // $('#' + dragger_name + '_dragger').css('mix-blend-mode', 'difference');
-
-    // set up dragger_switch functionalities
-    $('#' + dragger_name + '_dragger_switch').click(function () {
-
-      // toggle dragger_switch
-      this.classList.toggle('switchon');
-
-      // if switched on, show dragger, change persistent status
-      if (this.classList.contains('switchon')) {
-        set_dragger_locations(selected_file.image_id);
-        document.getElementById(dragger_name + '_dragger').style.display = 'block';
-        socket.emit('change_' + dragger_name + '_dragger_status', 'block');
-      // else hide dragger, change persistent status
-      } else {
-        document.getElementById(dragger_name + '_dragger').style.display = 'none';
-        socket.emit('change_' + dragger_name + '_dragger_status', 'none');
-      };
-    }); // end of dragger_switch.clicks
-  }; // end of dragger_setup
-
-/*
 *   state change functions
 *     Functions to change the state of the containers and buttons
 *     in response to drags, uploads, etc
@@ -343,10 +336,12 @@ $(document).ready( function () {
   function state_change_to_close_all() {
     document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
     document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
     document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
     document.getElementById('options_container').classList.remove('options_container_is_open');
     // replace image_upload_preview
     document.getElementById('image_upload_preview').src = '/images/1x1.png';
+    document.getElementById('delete_preview').src = '/images/1x1.png';
   }
 
   function state_change_to_options() {
@@ -408,13 +403,11 @@ $(document).ready( function () {
       document.getElementById('delete_preview_container').style.display = 'block';
     }, 500);
 
-    // reshow hidden image, move it up a bit
-    document.getElementById(image_to_delete.image_id).style.top = '0px';
+    // reshow hidden image
     document.getElementById(image_to_delete.image_id).style.display = 'block';
 
     // show image on other clients
     data.image_id = image_to_delete.image_id;
-    data.selected_top = '0px';
 
     socket.emit('clientemit_show_image', data);
   }
@@ -618,7 +611,7 @@ $(document).ready( function () {
 *     Not currently using: this one fires when a connection is made:
 *    socket.on('connect', function(data) {
 *      $('#' + id).append(
-*        "<div id='resize_dragger_switch' class='button'> Dragger Off </div>");
+*        "<div id='stretch_dragger_switch' class='button'> Dragger Off </div>");
 *    });
 */
 
@@ -757,7 +750,7 @@ $(document).ready( function () {
   socket.on('broadcast_show_image', function (data) {
     document.getElementById(data.image_id).style.display = 'block';
 //    document.getElementById(data.image_id).style.left = data.selected_left + 'px';
-    document.getElementById(data.image_id).style.top = data.selected_top;
+//    document.getElementById(data.image_id).style.top = data.selected_top;
   });
 
 /*
@@ -1100,7 +1093,7 @@ $(document).ready( function () {
 *     1. main event drag, for images
 *     2. interact('.drawing').gesturable, for touchscreen rotating and scaling
 *     3. -resize- mode, for stretching the x and y axes
-*     4. garbage_can.droppable, for preparing a dropped selected_file for handling delete
+*     4. exit_door.droppable, for preparing a dropped selected_file for handling delete
 *     5. navigation_toggle_button.draggable, for dragging the navigation_toggle_button around the edges
 */
 
@@ -1152,6 +1145,7 @@ $(document).ready( function () {
           report([[1, 'Filename: ' + this.getAttribute('title')],
                  [2, 'Z-index: ' + this.style.zIndex],
                  [3, 'Start: Left: ' + this.style.left + ' Top: ' + this.style.top],
+                 [4, 'Current: '],
                  [5, 'Stop: ']]);
 
           // store the original z index
@@ -1189,7 +1183,7 @@ $(document).ready( function () {
           this.socketdata.image_left = this.style.left;
 
           //* optional report box
-          report([[3, 'Current: Left: ' + this.socketdata.image_left + ' Top: ' + this.socketdata.image_top]]);
+          report([[4, 'Current: Left: ' + this.socketdata.image_left + ' Top: ' + this.socketdata.image_top]]);
 
           // pass socket data to server
           socket.emit('clientemit_moving', this.socketdata);
@@ -1211,7 +1205,7 @@ $(document).ready( function () {
           socket.emit('clientemit_restore_filter', this.image_id);
 
           //* optional report box
-          report([[4, 'Stop: Left: ' + this.style.left + ' Top: ' + this.style.top]]);
+          report([[5, 'Stop: Left: ' + this.style.left + ' Top: ' + this.style.top]]);
 
           // send emit to unfreeze in other clients
           socket.emit('clientemit_unfreeze', this.image_id);
@@ -1459,14 +1453,14 @@ $(document).ready( function () {
 
   /*
   *   main interactive methods
-  *     4. garbage_can.droppable, for preparing a dropped image for delete handling
+  *     4. exit_door.droppable, for preparing a dropped image for delete handling
   */
 
   // jquery-ui method
-  $('#garbage_can').droppable({
+  $('#exit_door').droppable({
     accept: '.drawing',
     // activeClass: 'tool_active_class',
-    hoverClass: 'garbage_hover',
+    hoverClass: 'exit_door_hover',
     tolerance: 'touch',
 
     over: function () {
@@ -1693,7 +1687,7 @@ $(document).ready( function () {
 *     resize
 */
 
-  $('#resize_dragger').draggable({
+  $('#stretch_dragger').draggable({
     containment: 'parent',
     scroll: false,
     start: function () {
@@ -2067,8 +2061,8 @@ $(document).ready( function () {
 
   function set_dragger_locations(id) {
 
-    if (document.getElementById('resize_dragger_switch').classList.contains('switchon')) {
-      set_resize_dragger_to(id);
+    if (document.getElementById('stretch_dragger_switch').classList.contains('switchon')) {
+      set_stretch_dragger_to(id);
     };
     if (document.getElementById('opacity_dragger_switch').classList.contains('switchon')) {
       set_opacity_dragger_to(id);
@@ -2094,8 +2088,8 @@ $(document).ready( function () {
 *   Set dragger location
 */
 
-  function set_resize_dragger_to(id) {
-    var dragger_element = document.getElementById('resize_dragger'),
+  function set_stretch_dragger_to(id) {
+    var dragger_element = document.getElementById('stretch_dragger'),
       image_element     = document.getElementById(id),
       // get the width and height
       selected_image_width  = parseInt(image_element.style.width),
@@ -2115,7 +2109,7 @@ $(document).ready( function () {
     setTimeout(function () {
       dragger_element.classList.add('dragger_transitions');
     }, 0);
-  }; // end of set_resize_dragger_to()
+  }; // end of set_stretch_dragger_to()
 
   function set_opacity_dragger_to(id) {
     var dragger_element = document.getElementById('opacity_dragger'),

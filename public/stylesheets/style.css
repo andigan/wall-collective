@@ -3,11 +3,15 @@ z-indexes:
 
 
 
+dragger: 40000;
+
 dragger_switch: 50000;
+dragger_switches_container: 50000;
 navigation_container: 50000;
 
+dragged image: 60000;
+
 navigation_toggle_button_container: 80000;
-dragger: 85000;
 dragger_info: 86000;
 
 
@@ -23,11 +27,7 @@ margin:0;
 padding:0;
 }
 
-#garbage_can {
-
-}
-
-.garbage_hover {
+.exit_door_hover {
   background: yellow !important;
 }
 
@@ -38,28 +38,29 @@ padding:0;
   display: flex;
   height: 70vh;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-around;
   position: fixed;
   transform: scaleX(0);
   transition: transform 150ms ease-in-out;
+/*
   width: 25vw;
+*/
+  z-index: 50000;
 }
 
 .dragger_switches_container_is_open {
   transform: scaleX(1)!important;
 }
 
-.dragger_switch {
-  background-color: grey;
+.dragger_switch, .dragger_all_switch {
+  background-color: #736E6E;
   border-bottom-right-radius: 15px;
   border-top-right-radius: 15px;
   font-family:Courier New, Courier, monospace;
-  font-size: 1.75vh;
+  font-size: 2vh;
   font-weight: 700;
   height: 6vh;
-  margin-bottom: 1.5vh;
-  margin-top: 1.5vh;
-  width: 25vw;
+  padding: 5%;
   z-index: 50000;
 }
 
@@ -123,15 +124,30 @@ padding:0;
 
 }
 
+.icon_image {
+  height: 50%;
+  margin: auto;
+  width: 50%;
+}
+
+
+.confirm_yes {
+  background: #b4ddb4; /* Old browsers */
+background: -moz-linear-gradient(top, #b4ddb4 0%, #83c783 5%, #52b152 33%, #008a00 83%, #005700 100%, #002400 100%); /* FF3.6-15 */
+background: -webkit-linear-gradient(top, #b4ddb4 0%,#83c783 5%,#52b152 33%,#008a00 83%,#005700 100%,#002400 100%); /* Chrome10-25,Safari5.1-6 */
+background: linear-gradient(to bottom, #b4ddb4 0%,#83c783 5%,#52b152 33%,#008a00 83%,#005700 100%,#002400 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+}
+
+.confirm_no {
+  background: #a90329; /* Old browsers */
+  background: -moz-linear-gradient(top, #a90329 56%, #8f0222 78%, #6d0019 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #a90329 56%,#8f0222 78%,#6d0019 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #a90329 56%,#8f0222 78%,#6d0019 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+}
+
 
 
 .confirm_button {
-background:#5500ff;
-background: -webkit-gradient(linear, left top, left bottom, from(#0009ff), to(#5500ff));
-background: -webkit-linear-gradient(top, #0009ff, #5500ff);
-background: -moz-linear-gradient(top, #0009ff, #5500ff);
-background: -ms-linear-gradient(top, #0009ff, #5500ff);
-background: -o-linear-gradient(top, #0009ff, #5500ff);
 -moz-border-radius:7px;
 -webkit-border-radius:7px;
 border-radius:7px;
@@ -161,6 +177,12 @@ height: 10vh;
 width: 40%;
 
 
+/* vertical centering */
+display: flex;
+flex-direction: column;
+justify-content: center;
+
+
 }
 
 
@@ -171,7 +193,7 @@ width: 40%;
 
 .rainbow_border{
   border: 4px solid hsl(0, 100%, 50%);
-  -webkit-animation: rainbow 6s infinite alternate;
+  -webkit-animation: rainbow 4s infinite alternate;
 }
 
 
@@ -196,11 +218,10 @@ width: 40%;
 }
 
 .navigation_button {
-  background: #1e5799; /* Old browsers */
-background: -moz-linear-gradient(top, #1e5799 0%, #2989d8 50%, #207cca 51%, #7db9e8 100%); /* FF3.6-15 */
-background: -webkit-linear-gradient(top, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); /* Chrome10-25,Safari5.1-6 */
-background: linear-gradient(to bottom, #1e5799 0%,#2989d8 50%,#207cca 51%,#7db9e8 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
-}
+  background: #6db3f2; /* Old browsers */
+  background: -moz-linear-gradient(top, #6db3f2 0%, #54a3ee 21%, #54a3ee 21%, #3690f0 75%, #1e69de 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, #6db3f2 0%,#54a3ee 21%,#54a3ee 21%,#3690f0 75%,#1e69de 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, #6db3f2 0%,#54a3ee 21%,#54a3ee 21%,#3690f0 75%,#1e69de 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */}
 
 .options_button {
   background: #a90329; /* Old browsers */
@@ -486,13 +507,139 @@ border-radius:100%;
 color:#A9A9A9;
 display:none;
 font-family:Courier New, Courier, monospace;
-font-size:12px;
+font-size:24px;
 font-weight:700;
 position:fixed;
 text-align:center;
 top:0;
-z-index:85000;
+z-index:40000;
+
+
+line-height: 40px;
+height: 40px;
+width: 40px;
+
+
 }
+
+
+#stretch_dragger {
+  box-shadow: 0 0 3px 3px blue;
+  color: blue;
+}
+
+#stretch_dragger_switch::first-letter {
+  font-size: 150%;
+  color: blue;
+}
+
+#stretch_dragger_switch.switchon {
+  background-color: lightblue !important;
+}
+
+
+
+
+#opacity_dragger {
+  box-shadow: 0 0 3px 3px white;
+  color: white;
+}
+
+#opacity_dragger_switch::first-letter {
+  font-size: 150%;
+  color: white;
+}
+
+#opacity_dragger_switch.switchon {
+  background-color: silver !important;
+}
+
+
+
+
+#rotation_dragger {
+  box-shadow: 0 0 3px 3px green;
+  color: green;
+}
+
+#rotation_dragger_switch::first-letter {
+  font-size: 150%;
+  color: green;
+}
+
+#rotation_dragger_switch.switchon {
+  background-color: lightgreen !important;
+}
+
+
+
+
+#blur_brightness_dragger {
+  box-shadow: 0 0 3px 3px darkorange;
+  color: darkorange;
+}
+
+#blur_brightness_dragger_switch::first-letter {
+  font-size: 150%;
+  color: darkorange;
+}
+
+#blur_brightness_dragger_switch.switchon {
+  background-color: peachpuff !important;
+}
+
+
+
+#grayscale_invert_dragger {
+  box-shadow: 0 0 3px 3px silver;
+  color: silver;
+}
+
+#grayscale_invert_dragger_switch::first-letter {
+  font-size: 150%;
+  color: silver;
+}
+
+#grayscale_invert_dragger_switch.switchon {
+  background-color: #F3E13E !important;
+}
+
+
+
+
+#contrast_saturate_dragger {
+  box-shadow: 0 0 3px 3px crimson;
+  color: crimson;
+}
+
+#contrast_saturate_dragger_switch::first-letter {
+  font-size: 150%;
+  color: crimson;
+}
+
+#contrast_saturate_dragger_switch.switchon {
+  background-color: lightcoral !important;
+}
+
+
+
+
+#party_dragger {
+  box-shadow: 0 0 3px 3px purple;
+  color: purple;
+}
+
+#party_dragger_switch::first-letter {
+  font-size: 150%;
+  color: purple;
+}
+
+#party_dragger_switch.switchon {
+  background-color: plum !important;
+}
+
+
+
 
 .dragger_transitions {
 -webkit-transition:left .1s, top .1s, width .1s, height .1s, background-color .1s, 0 .1s;

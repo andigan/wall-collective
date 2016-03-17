@@ -16,9 +16,9 @@ A real-time app for sharing, arranging, and transforming images.
 ## Functionality
 
 - Upload images.
-- Delete images by dropping them on the garbage can.
+- Delete images by dropping them on the exit door.
 - Use **_draggers_** to modify:
-  - size
+  - height/width
   - rotation
   - opacity
   - blur/brightness

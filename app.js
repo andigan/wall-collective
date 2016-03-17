@@ -39,7 +39,7 @@
 *     config.logdir
 *     config.publicimagedir
 *     config.slashimagedirslash
-*     config.resize_dragger_status ||| 'block' or 'none'
+*     config.stretch_dragger_status ||| 'block' or 'none'
 *     config.use_cdn
 */
 var config = require('./config.js'),
@@ -303,7 +303,7 @@ io.on('connection', function (socket) {
 *     change dragger switch status
 */
 
-  socket.on('change_resize_dragger_status', function (data) { config.resize_dragger_status = data; });
+  socket.on('change_stretch_dragger_status', function (data) { config.stretch_dragger_status = data; });
   socket.on('change_opacity_dragger_status', function (data) { config.opacity_dragger_status = data; });
   socket.on('change_rotation_dragger_status', function (data) { config.rotation_dragger_status = data; });
   socket.on('change_blur_brightness_dragger_status', function (data) { config.blur_brightness_dragger_status = data; });

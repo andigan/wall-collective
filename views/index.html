@@ -71,7 +71,6 @@
   <body>
     <div id='wrapper'>
       <div id="images">
-
         {# for each filename in data_from_database
            assign the title to the filename
            id will be domtag, but could have been loop.index0
@@ -111,46 +110,45 @@
       </div>
 
       <div id='navigation_container'>
-        <div id='dragger_switches_button' class='button navigation_button'> draggers </div>
-        <div id='options_container_button' class='button navigation_button'> options </div>
+        <div id='dragger_switches_button' class='button navigation_button'> draggers
+          <img class='icon_image' src='/images/draggers_icon.png'>
 
+
+        </div>
+
+        <div id='options_container_button' class='button navigation_button'> options
+          <img class='icon_image' src='/images/options.png'>
+
+        </div>
 
         <form id='upload_image_button' name='title' method='post'
               enctype='multipart/form-data'
               action='addfile/' runat='server'>
           <div class='btn-file button navigation_button'> upload
-          <input id='fileselect' type='file' name='upl'>
+            <img class='icon_image' src='/images/camera_upload.png'>
+            <input id='fileselect' type='file' name='upl'>
           </div>
         </form>
 
-        <div id='garbage_can' class='button navigation_button'> garbage can </div>
-        <div id='secondbutton' class='button_no_show'></div>
-
+        <div id='exit_door' class='button navigation_button'> remove
+          <img class='icon_image' src='/images/exit_door.png'>
+        </div>
+        <div id='rightbutton' class='button_no_show'></div>
       </div>
-
 
       <div id='options_container'>
         <div id='drag_stretch_button' class='button options_button drag-is-open'> -drag- </div>
         <div id='report_button' class='button options_button'> info is off </div>
         <div id='reset_page_button' class='button options_button'> reset page </div>
-
-
         <div id='nothing1' class='button_no_show'>  </div>
         <div id='nothing2' class='button_no_show'>  </div>
       </div>
 
-
-
-
-
-
-
-
       <div id='upload_preview_container' class='rainbow_border'>
         <img id='image_upload_preview' src='/images/1x1.png'/>
         <div id='confirm_or_reject_container'>
-          <div id='confirm_upload_button' class='confirm_button'> Yes </div>
-          <div id='reject_upload_button' class='confirm_button'> No </div>
+          <div id='confirm_upload_button' class='confirm_button confirm_yes'> Confirm Upload </div>
+          <div id='reject_upload_button' class='confirm_button confirm_no'> Cancel </div>
         </div>
         <div id='confirm_or_reject_container_info'> </div>
       </div>
@@ -158,34 +156,39 @@
       <div id='delete_preview_container' class='rainbow_border'>
         <img id='delete_preview' src='/images/1x1.png'/>
         <div id='delete_confirm_or_reject_container'>
-          <div id='confirm_delete_button' class='confirm_button'> Yes </div>
-          <div id='reject_delete_button' class='confirm_button'> No </div>
+          <div id='confirm_delete_button' class='confirm_button confirm_yes'> Confirm Delete </div>
+          <div id='reject_delete_button' class='confirm_button confirm_no'> Cancel </div>
         </div>
         <div id='delete_confirm_or_reject_container_info'></div>
       </div>
 
-
-
-
-
-
-
       <div id='dragger_switches_container'>
-        <div id='dragger_all_switch' class='dragger_switch'> all </div>
-        <div id='resize_dragger_switch' class='dragger_switch'> resize </div>
-        <div id='rotation_dragger_switch' class='dragger_switch'> rotate </div>
-        <div id='opacity_dragger_switch' class='dragger_switch'> opacity </div>
-        <div id='blur_brightness_dragger_switch' class='dragger_switch'> blur <br> brightness </div>
-        <div id='contrast_saturate_dragger_switch' class='dragger_switch'> contrast <br> saturate </div>
-        <div id='grayscale_invert_dragger_switch' class='dragger_switch'> grayscale <br> invert </div>
-        <div id='party_dragger_switch' class='dragger_switch'> party </div>
+        <div id='dragger_all_switch' class='dragger_all_switch'><span> -All- </span></div>
+        <div id='stretch_dragger_switch' class='dragger_switch'><span> Stretch </span></div>
+        <div id='rotation_dragger_switch' class='dragger_switch'><span> Rotate </span></div>
+        <div id='opacity_dragger_switch' class='dragger_switch'><span> Opacity </span></div>
+        <div id='blur_brightness_dragger_switch' class='dragger_switch'><span> Blur <br> Brightness </span></div>
+        <div id='contrast_saturate_dragger_switch' class='dragger_switch'><span> Contrast <br> Saturation </span></div>
+        <div id='grayscale_invert_dragger_switch' class='dragger_switch'><span> Grayscale <br> Inversion </span></div>
+        <div id='party_dragger_switch' class='dragger_switch'><span> Party </span></div>
       </div>
-
-
+{#
+      <div id='draggers_container'>
+#}
+          <div id='stretch_dragger' class='dragger dragger_transitions'> S </div>
+          <div id='rotation_dragger' class='dragger dragger_transitions'> R </div>
+          <div id='opacity_dragger' class='dragger dragger_transitions'> O </div>
+          <div id='blur_brightness_dragger' class='dragger dragger_transitions'> B </div>
+          <div id='contrast_saturate_dragger' class='dragger dragger_transitions'> C </div>
+          <div id='grayscale_invert_dragger' class='dragger dragger_transitions'> G </div>
+          <div id='party_dragger' class='dragger dragger_transitions'> P </div>
+{#
+      </div>
+#}
     </div> {# wrapper #}
     {# main script #}
     <script>
-      var resize_dragger_status = '{{config.resize_dragger_status}}',
+      var stretch_dragger_status = '{{config.stretch_dragger_status}}',
         opacity_dragger_status = '{{config.opacity_dragger_status}}',
         rotation_dragger_status = '{{config.rotation_dragger_status}}',
         blur_brightness_dragger_status = '{{config.blur_brightness_dragger_status}}',
