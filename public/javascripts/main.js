@@ -15,6 +15,10 @@
 // 15. draggers will probably fail if the page is empty because selected_file will be empty
 // ---------------------------------------START--------------------------------------------------------------------
 
+// git checkout branch co - checkout up -b
+// git push origin branch
+// git checkout -b newbranch
+
 /*
 * WhataDrag.js
 *
@@ -366,7 +370,7 @@ $(document).ready( function () {
     }, 500);
 
     // replace image_upload_preview
-     document.getElementById('image_upload_preview').src = '/images/1x1.png';
+    document.getElementById('image_upload_preview').src = '/images/1x1.png';
   }
 
   function state_change_to_delete() {
@@ -851,7 +855,7 @@ $(document).ready( function () {
         };
 
         // reset button containers
-          state_change_to_close_all();
+        state_change_to_close_all();
 
       // if no button containers are open, open them all
       } else {
