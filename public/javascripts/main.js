@@ -15,6 +15,8 @@
 // 15. draggers will probably fail if the page is empty because selected_file will be empty
 // ---------------------------------------START--------------------------------------------------------------------
 
+// new lines
+
 /*
 * WhataDrag.js
 *
