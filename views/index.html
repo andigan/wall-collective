@@ -138,7 +138,7 @@
 
       <div id='options_container'>
         <div id='drag_stretch_button' class='button options_button drag-is-open'> -drag- </div>
-        <div id='report_button' class='button options_button'> info is off </div>
+        <div id='debug_button' class='button options_button'> info is off </div>
         <div id='reset_page_button' class='button options_button'> reset page </div>
         <div id='nothing1' class='button_no_show'>  </div>
         <div id='nothing2' class='button_no_show'>  </div>
@@ -188,14 +188,7 @@
     </div> {# wrapper #}
     {# main script #}
     <script>
-      var stretch_dragger_status = '{{config.stretch_dragger_status}}',
-        opacity_dragger_status = '{{config.opacity_dragger_status}}',
-        rotation_dragger_status = '{{config.rotation_dragger_status}}',
-        blur_brightness_dragger_status = '{{config.blur_brightness_dragger_status}}',
-        grayscale_invert_dragger_status = '{{config.grayscale_invert_dragger_status}}',
-        contrast_saturate_dragger_status = '{{config.contrast_saturate_dragger_status}}',
-        party_dragger_status = '{{config.party_dragger_status}}',
-        image_dir = {{config.slashimagedirslash}};
+      var image_dir = {{config.slashimagedirslash}};
     </script>
     <script src="javascripts/main.js"></script>
   </body>
