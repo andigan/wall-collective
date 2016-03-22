@@ -3,4 +3,4 @@
 /bin
 /routes
 /node_modules
-/public/javascripts/cdn_locals
+/public/js/cdn_locals

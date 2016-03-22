@@ -1,50 +1,28 @@
-// TO DO
-// 1. imagick
-// 2. graphicsmagick ::
-// 3. gm
-//        look to see if the image is on the CDN,
-//        if it doesn't already exist,
-//        create it using libraries above
-// 4. image processing microservice
-//    goal: npm install
-//    serverside outputs images and json
-// 5. learn streams, pipes, buffers
-// 6. create new directory for imagedir in config file
-//    permission changes necessary
-//    for now, make sure the directory in config exists.
-// 7. console.dir(tempfile);
+// WhataDrag.js
+//
+// Version: 0.6.0
+// Requires: jQuery v1.7+
+//           jquery-ui
+//           jquery.form
+//           jquery.mobile-events
+//           jquery.ui.touch-punch
+//           socket.io v1.3.7+
+//           interact.js
+//
+// Copyright (c) 2016 Andrew Nease (andrew.nease.code@gmail.com)
+
+// --Config setup
+//     config.js file contains:
+//        config.port
+//        config.logdir
+//        config.publicimagedir
+//        config.slashimagedirslash
+//        config.use_cdn
+
+//     config_dragger_status.js contains:
+//        config_dragger_status.stretch = 'block' || 'none'. etc.
 
 
-// ---------------------------------------START--------------------------------------------------------------------
-
-/*
-* WhataDrag.js // Server
-*
-* Version: 0.6.0
-* Requires: jQuery v1.7+
-*           jquery-ui
-*           jquery.form
-*           jquery.mobile-events
-*           jquery.ui.touch-punch
-*           socket.io v1.3.7+
-*           interact.js
-*
-* Copyright (c) 2016 Andrew Nease (andrew.nease.code@gmail.com)
-*/
-
-/*
-*   Config setup
-*     config.js file contains:
-*     config.port
-*     config.logdir
-*     config.publicimagedir
-*     config.slashimagedirslash
-*     config.use_cdn
-
-*     config_dragger_status.stretch = 'block' || 'none'
-
-
-*/
 var config = require('./config/config.js'),
   config_dragger_status = require('./config/config_dragger_status'),
   // set the port
@@ -74,9 +52,7 @@ var config = require('./config/config.js'),
   // it splits the request object. e.g. req.body   req.files
   multiparty = require('connect-multiparty');
 
-/*
-*     required for busboy?
-*/
+// required for busboy?
 multipartyMiddleware = multiparty();
 
 // view directory setup
@@ -100,27 +76,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 // methodOverride middleware allows request method to be specified
 app.use(methodOverride());
 
-// BOOKMARK_C error handling
-
 // Initialize server
 var server = app.listen(port, function() {
 //    console.log('\033[2J'); // clear console
   console.log('Listening on port %d', server.address().port);
 });
 
-
-
-
-
-
 // socket io
 var io = require('socket.io').listen(server);
 
-/*
-*   Socket.io
-*/
 
-
+// --Socket.io   Socket.io
 io.on('connection', function (socket) {
   var dragger_status = {};
 
@@ -136,33 +102,14 @@ io.on('connection', function (socket) {
   dragger_status.party = config_dragger_status.party;
   socket.emit('connect_assign_dragger_status', dragger_status);
 
-
-  /*
-  *   Socket.io
-  *     change dragger switch status
-  */
-
-    socket.on('change_stretch_dragger_status', function (data) { config_dragger_status.stretch = data; });
-    socket.on('change_opacity_dragger_status', function (data) { config_dragger_status.opacity = data; });
-    socket.on('change_rotation_dragger_status', function (data) { config_dragger_status.rotation = data; });
-    socket.on('change_blur_brightness_dragger_status', function (data) { config_dragger_status.blur_brightness = data; });
-    socket.on('change_grayscale_invert_dragger_status', function (data) { config_dragger_status.grayscale_invert = data; });
-    socket.on('change_contrast_saturate_dragger_status', function (data) { config_dragger_status.contrast_saturate = data; });
-    socket.on('change_party_dragger_status', function (data) { config_dragger_status.party = data; });
-
-
-
-
-
-
-  // console.log(socket);
-
-/*
-*   Socket.io
-*     image changes
-*     Listen for changes and modify target
-*/
-
+  // change dragger_switch_status
+  socket.on('change_stretch_dragger_status', function (data) { config_dragger_status.stretch = data; });
+  socket.on('change_opacity_dragger_status', function (data) { config_dragger_status.opacity = data; });
+  socket.on('change_rotation_dragger_status', function (data) { config_dragger_status.rotation = data; });
+  socket.on('change_blur_brightness_dragger_status', function (data) { config_dragger_status.blur_brightness = data; });
+  socket.on('change_grayscale_invert_dragger_status', function (data) { config_dragger_status.grayscale_invert = data; });
+  socket.on('change_contrast_saturate_dragger_status', function (data) { config_dragger_status.contrast_saturate = data; });
+  socket.on('change_party_dragger_status', function (data) { config_dragger_status.party = data; });
 
 
   socket.on('clientemit_moving', function (data) {
@@ -180,15 +127,21 @@ io.on('connection', function (socket) {
   socket.on('clientemit_store_resized', function (data) {
 
     MaxImage.update(
-     { filename : data.image_filename }  ,            // filter
-      { $set: {   transform : data.image_transform,   // set
-                  posleft   : data.image_left,
-                  postop    : data.image_top,
-                  width   : data.image_width,
-                  height  : data.image_height }
+      // filter
+      { filename : data.image_filename
       },
-      { upsert: true //                               // options
-      }, function (err) {
+      // set
+      { $set: { transform : data.image_transform,
+                posleft   : data.image_left,
+                postop    : data.image_top,
+                width     : data.image_width,
+                height    : data.image_height }
+      },
+      // options
+      { upsert: true // if query isn't met, creates new document
+      },
+      // callback
+      function (err) {
         if (err) return console.error(err);           // callback
       }
     ); // end of MaxImage.update
@@ -197,22 +150,20 @@ io.on('connection', function (socket) {
 
   socket.on('clientemit_store_scale_angle', function (data) {
 
-    console.log(data.scale);
-    console.log(data.angle);
-
     MaxImage.update(
-      { filename : data.image_filename }  ,             // filter
-      { $set: {   scale : data.scale,
-                  angle : data.angle  }
+      { filename : data.image_filename
       },
-      { upsert: true // if query isn't met, creates new document        // options
-      }, function (err) {
+      { $set: { scale : data.scale,
+                angle : data.angle
+      }
+      },
+      { upsert: true
+      },
+      function (err) {
         if (err) return console.error(err);
       }
     ); // end of MaxImage.update
 
-  //    console.log(data.image_filename);
-  //    console.log(data.scale);
     socket.broadcast.emit('broadcast_scaled_angled', data);
   });
 
@@ -222,11 +173,13 @@ io.on('connection', function (socket) {
 
   socket.on('clientemit_store_transformed', function (data) {
     MaxImage.update(
-     { filename : data.image_filename }  ,             // filter
-      { $set: {   matrix  : data.image_transform }
+      { filename : data.image_filename
       },
-      { upsert: true // if query isn't met, creates new document        // options
-      }, function (err) {
+      { $set: { matrix : data.image_transform }
+      },
+      { upsert: true
+      },
+      function (err) {
         if (err) return console.error(err);
       }
     ); // end of MaxImage.update
@@ -239,11 +192,13 @@ io.on('connection', function (socket) {
 
   socket.on('clientemit_store_opacity', function (data) {
     MaxImage.update(
-      { filename : data.image_filename }  ,             // filter
-      { $set: {   opacity : data.current_opacity }
+      { filename : data.image_filename
       },
-      { upsert: true // if query isn't met, creates new document        // options
-      }, function (err) {
+      { $set: { opacity : data.current_opacity }
+      },
+      { upsert: true
+      },
+      function (err) {
         if (err) return console.error(err);
       }
     ); // end of MaxImage.update
@@ -255,31 +210,21 @@ io.on('connection', function (socket) {
 
   socket.on('clientemit_store_filter', function (data) {
     MaxImage.update(
-      { filename : data.image_filename }  ,             // filter
-      { $set: {   filter : data.current_filter }
+      { filename : data.image_filename
       },
-      { upsert: true // if query isn't met, creates new document        // options
-      }, function (err) {
+      { $set: { filter : data.current_filter }
+      },
+      { upsert: true
+      },
+      function (err) {
         if (err) return console.error(err);
       }
     ); // end of MaxImage.update
   });
 
-/*
-*   Socket.io
-*     page changes
-*     Listen for reset page, and reload the page
-*/
-
   socket.on('clientemit_resetpage', function () {
     socket.broadcast.emit('broadcast_resetpage');
   });
-
-/*
-*   Socket.io
-*     upload and delete
-*     Handle uploads and deletions
-*/
 
   socket.on('clientemit_share_upload', function (data) {
     var data_from_database = {};
@@ -308,11 +253,6 @@ io.on('connection', function (socket) {
     });
   }); // end of socket
 
-/*
-*   Socket.io
-*     additional helpers
-*/
-
   socket.on('clientemit_remove_filter', function (data) {
     socket.broadcast.emit('broadcast_remove_filter', data);
   });
@@ -338,10 +278,8 @@ io.on('connection', function (socket) {
 
 }); // end of io.on
 
-/*
-*   Mongo.db
-*     change dragger switch status
-*/
+
+// --MongoDB
 
 mongoose.connect('mongodb://localhost/' + config.database_name); // connects to max database
 
@@ -391,9 +329,7 @@ function image_check(filename) {
   } else return false;
 };
 
-/*
-*   Main render get
-*/
+// --Main render get
 
 app.get('/', function (req, res) {
 
@@ -454,17 +390,15 @@ app.get('/', function (req, res) {
   }); // end of MaxImagefind
 }); // end of app.get('/')
 
-/*
-*   Drag post
-*     accept the post from the stop function of the jquery drag event in main.js
-*     variables sent by main.js:
-*       req.body.domtags
-*               .filenames
-*              .z_indexes
-*              .moved_file
-*              .moved_posleft
-*              .moved_postop
-*/
+// --Drag post
+//     accept the post from the stop function of the jquery drag event in main.js
+//     variables sent by main.js:
+//       req.body.domtags
+//               .filenames
+//              .z_indexes
+//              .moved_file
+//              .moved_posleft
+//              .moved_postop
 
 app.post('/dragstop', bodyParser.json(), function (req, res) {
   var i = 0;
@@ -486,12 +420,14 @@ app.post('/dragstop', bodyParser.json(), function (req, res) {
   // this is a mongoose method
   // update left/top positions for moved_file's filename
   MaxImage.update(
-   { filename : req.body.data_for_database.moved_file}  ,             // filter
+    { filename : req.body.data_for_database.moved_file
+    },
     { $set: {   posleft  : req.body.data_for_database.moved_posleft,
                 postop   : req.body.data_for_database.moved_postop }
     },
-    { upsert: true // if query isn't met, creates new document        // options
-    }, function (err) {
+    { upsert: true
+    },
+    function (err) {
       if (err) return console.error(err);
     }
   ); // end of MaxImage.update
@@ -500,11 +436,12 @@ app.post('/dragstop', bodyParser.json(), function (req, res) {
   for (i = 0; i < req.body.data_for_database.filenames.length; i++) {
 
     MaxImage.update(
-     { filename : req.body.data_for_database.filenames[i]},             // filter
-      { $set: { domtag : req.body.data_for_database.domtags[i],         // operator
-                zindex   : req.body.data_for_database.z_indexes[i],}
+      { filename : req.body.data_for_database.filenames[i]
       },
-      { upsert: true                                                    // options
+      { $set: { domtag : req.body.data_for_database.domtags[i],
+                zindex   : req.body.data_for_database.z_indexes[i]}
+      },
+      { upsert: true
       }, function (err) {
         if (err) return console.error(err);
       }
@@ -512,11 +449,9 @@ app.post('/dragstop', bodyParser.json(), function (req, res) {
   }; // end of for loop
 }); // end of app.post('dragstop') callback
 
-/*
-*   Reset page get
-*     this route reads the directory, assigns id, sorts by date, clears database,
-*     and repopulates database
-*/
+// --Reset page get
+//     this route reads the directory, assigns id, sorts by date, clears database,
+//     and repopulates database
 
 app.get('/resetpage', function (req, res) {
   var i = 0;
@@ -606,9 +541,7 @@ app.get('/resetpage', function (req, res) {
   }); // end of fs.readdir callback
 }); // end of app.get('resetpage') callback
 
-/*
-*   add file post
-*/
+// --Add file post
 
 // app.post('/addfile', function (req, res, next) {
 app.post('/addfile', function (req, res) {
@@ -619,10 +552,6 @@ app.post('/addfile', function (req, res) {
 
   // pipe the request into busboy
   req.pipe(busboy);
-//  console.log('util.inspect busboy');
-//  console.log(util.inspect(busboy));
-
-
 
   // busboy receives req and emits a 'file' event
   busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
@@ -692,7 +621,8 @@ app.post('/addfile', function (req, res) {
                         };
 
                         MaxImage.update(
-                          {           idtag    : ajax_post_response_data.idtag }, // filter
+                          {           idtag    : ajax_post_response_data.idtag
+                          },
                           { $set: {   domtag   : ajax_post_response_data.domtag,
                                       filename : ajax_post_response_data.image_filename,
                                       posleft  : '0px',
@@ -705,44 +635,29 @@ app.post('/addfile', function (req, res) {
                                       zindex   : ajax_post_response_data.z_index,
                                       scale    : '1',
                                       angle    : '0'
-                                    }
+                                  }
                           },
-                          { upsert: true },
-                            function (err) {
-                              if (err) return console.error(err);
+                          { upsert: true
+                          },
+                          function (err) {
+                            if (err) return console.error(err);
 
-                              console.log(ajax_post_response_data.image_filename + ' added to database.');
+                            console.log(ajax_post_response_data.image_filename + ' added to database.');
 
-                              // res.writeHead(303, { Connection: 'close', Location: '/' });
-
-                              res.set( { Connection: 'close', Location: '/' });
-                              res.send(ajax_post_response_data);
-                            } // end of update callback
+                            res.set( { Connection: 'close', Location: '/' });
+                            res.send(ajax_post_response_data);
+                          } // end of update callback
                         ); // end of MaxImage.update
                       }); // end of maximage findOne dom
                     }); // end of maximage findOne zindex
                   }); // end of fs.rename and it's callback
-
-                  // res.writeHead(303, { Connection: 'close', Location: '/' });
-                  // res.end();
       }); // end of file.on(end)
     }; // end of validation if
   }); // end of busboy.on(file)
 
   busboy.on('finish', function () {
     console.log('Done parsing form, says busboy.on.finish!');
-    // res.writeHead(303, { Connection: 'close', Location: '/' });
-    // res.end();
   });
-
-
-  // FUTURE WORK: these currently aren't doing anything
-  // busboy.on('field', function(fieldname, val, fieldnameTruncated, valTruncated, encoding, mimetype) {
-  //  console.log('Field [' + fieldname + ']: value: '); // + util.inspect(val));
-  // });
-  // busboy.on('finish', function() {
-  //  console.log('Done parsing form!  Close connection.');
-  // });
 }); // end of app.post addfile
 
 module.exports = app;
