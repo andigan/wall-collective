@@ -13,6 +13,7 @@
 // 10. draggers will probably fail if the page is empty because selected_file will be empty
 // ---------------------------------------START--------------------------------------------------------------------
 
+<<<<<<< HEAD
 // WhataDrag.js
 //
 // Version: 0.6.0
@@ -30,6 +31,33 @@
 // Variables recieved from index.html (via config from app.js):
 //    image_dir = '/directory_name/'
 //    draggername_dragger_status = 'block' or 'none'
+=======
+// git checkout branch co - checkout up -b
+// git push origin branch
+// git checkout -b newbranch
+
+/*
+* WhataDrag.js
+*
+* Version: 0.6.0
+* Requires: jQuery v1.7+
+*           jquery-ui
+*           jquery.form
+*           jquery.mobile-events
+*           jquery.ui.touch-punch
+*           socket.io v1.3.7+
+*           interact.js
+*
+* Copyright (c) 2016 Andrew Nease (andrew.nease.code@gmail.com)
+*
+*
+*
+*   Variables recieved from index.html (via config from app.js):
+*
+*     image_dir = '/directory_name/'
+*     draggername_dragger_status = 'block' or 'none'
+*/
+>>>>>>> master
 
 $(document).ready( function () {
 // --Development Helpers
@@ -321,7 +349,7 @@ $(document).ready( function () {
     }, 500);
 
     // replace image_upload_preview
-     document.getElementById('image_upload_preview').src = '/images/1x1.png';
+    document.getElementById('image_upload_preview').src = '/images/1x1.png';
   }
 
   function state_change_to_delete() {
@@ -833,7 +861,7 @@ $(document).ready( function () {
         };
 
         // reset button containers
-          state_change_to_close_all();
+        state_change_to_close_all();
 
       // if no button containers are open, open them all
       } else {
