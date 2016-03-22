@@ -16,7 +16,7 @@ dragger_info: 86000;
 
 
 upload_preview_container: 90000;
-reportbox: 90000;
+debug_box: 90000;
 fullscreenmaskclass: 90000;
  */
 
@@ -342,7 +342,7 @@ margin-top: 2vh;
   width: 50%;
 }
 
-#reportbox {
+#debug_box {
 background-color:transparent;
 border:1px dashed white;
 color:white;
@@ -427,6 +427,7 @@ opacity:1;
 }
 
 #wrapper {
+background-color: black;
 display:block;
 height:100vh;
 left:0;

@@ -1,20 +1,37 @@
-// TO DO
-// 1. z-index system: have more formal control over z-indexes on the page and with other clients
-// 2. change posts to sockets (maybe)
-// 3. Make sure deletes and uploads aren't ruined by simultaneous requests
-// 6. Implement module system
-// 7. on stop drag, send all z_indexes to switch them in clients
-// 8. if second image is dropped on garbage can, return the first to the page.
-// 9. change resize dragger to lock_axis
-// 10. performance seems severely dependent on image sizes on screen.
+// TO DO LIST
+// 1.  z-index system: have more formal control over z-indexes on the page and with other clients
+// 1a. on stop drag, send all z_indexes to switch them in clients
+// 2.  change posts to sockets (maybe)
+// 3.  Make sure deletes and uploads aren't ruined by simultaneous requests
+// 4.  Implement module system
+// 5.  if second image is dropped on exit door, return the first to the page.
+// 6.  change resize dragger to lock_axis
+// 7.  performance seems severely dependent on image sizes on screen.
 //     work to reduce image size to something more appropriate
-// 11. Implement flat mode.  remove all angles, disallow rotations, and allow stretch mode
-// 12. handle zero images on page // DONE Doublecheck
-// 13. change .textContent to .innerText
-// 14. fix upload dimensions
-// 15. draggers will probably fail if the page is empty because selected_file will be empty
+// 8.  Implement flat mode.  remove all angles, disallow rotations, and allow stretch mode
+// 9.  fix upload dimensions
+// 10. draggers will probably fail if the page is empty because selected_file will be empty
 // ---------------------------------------START--------------------------------------------------------------------
 
+<<<<<<< HEAD
+// WhataDrag.js
+//
+// Version: 0.6.0
+// Requires: jQuery v1.7+
+//           jquery-ui
+//           jquery.form
+//           jquery.mobile-events
+//           jquery.ui.touch-punch
+//           socket.io v1.3.7+
+//           interact.js
+//
+// Copyright (c) 2016 Andrew Nease (andrew.nease.code@gmail.com)
+//
+//
+// Variables recieved from index.html (via config from app.js):
+//    image_dir = '/directory_name/'
+//    draggername_dragger_status = 'block' or 'none'
+=======
 // git checkout branch co - checkout up -b
 // git push origin branch
 // git checkout -b newbranch
@@ -40,47 +57,24 @@
 *     image_dir = '/directory_name/'
 *     draggername_dragger_status = 'block' or 'none'
 */
+>>>>>>> master
 
 $(document).ready( function () {
-/*
-*   Development Helpers
-*/
-
+// --Development Helpers
   // setTimeout(function () { $( '#navigation_toggle_button' ).trigger( 'click' ); }, 0);
   // setTimeout(function () { $( '#dragger_switches_button' ).trigger( 'click' ); }, 0);
-  // setTimeout(function () { $( '#report_button' ).trigger( 'click' ); }, 0);
+  // setTimeout(function () { $( '#debug_button' ).trigger( 'click' ); }, 0);
   // setTimeout(function () { $( '#drag_stretch_button' ).trigger( 'click' ); }, 0);
-
-  //
-  // change color for debug
-  // setTimeout(function(){$('.col_2').css('background-color', 'pink');}, 5000);
   // setTimeout(function() { $('#wrapper').css('background-color', 'blue'); },0);
   // setTimeout(function() { $('#wrapper').css('background-color', 'yellow'); },1500);
-  //
-  // alert an object
-  // alert(JSON.stringify(object, null, 4));
 
-/*
-*   Setup functions/configs
-*     calculate and set variables
-*/
+// --Setup and Configure Variables
 
-  // set socket location
-  // -- typical values: io.connect('http://localhost:8000');
-  //                    io.connect('http://www.domain_name.com');
+  // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
   var socket = io.connect(window.location.href),
 
-    // set dragger sizes
-    dragger_width = 40,
-    dragger_height = 40,
-
-    // calculate app size variables; used throughout page
-    mainwide     = $(window).width(),
-    mainhigh     = $(window).height(),
-    mainwidepx   = mainwide.toString().concat('px'),
-    mainhighpx   = mainhigh.toString().concat('px'),
-    inner_width  = mainwide - dragger_width,
-    inner_height = mainhigh - dragger_height,
+    // set debug box usage
+    debug_on = true,
 
     // set upload placement
     upload_top = '0px',
@@ -94,67 +88,60 @@ $(document).ready( function () {
     contrast_level = 10,
     saturate_level = 10,
 
-    // used when an image is clicked or dragged, especially by draggers
+
+    // retrieve dragger sizes
+    dragger_width = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width),
+    dragger_height = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).height),
+
+    // retrieve window size variables; used throughout main.js
+    mainwide     = $(window).width(),
+    mainhigh     = $(window).height(),
+    inner_width  = mainwide - dragger_width,
+    inner_height = mainhigh - dragger_height,
+
+    // assigned when an image is clicked or dragged; used by draggers
     selected_file = {},
 
-    // used by delete button
+    // assigned when an image is dragged onto the exit door; used by delete_button
     image_to_delete = {},
 
-    // used by the upload counter (TO BE REPLACED)
-    uploadtotal = 0,
+    // assigned by initial socket connection; used by draggers_setup
+    dragger_status = {},
 
-    // previously used by navigation_toggle_button_container.draggable
-    // navigation_toggle_button_is_stationary = true,
+    // used by the upload counter.  FUTURE WORK: replace
+    uploadtotal = 0;
 
-      // used by report box
-    report_on = true;
 
-  // FUTURE WORK: this is to define report_on if it is undeclared/undefined
-  if (typeof(report_on) === 'undefined') {
-    report_on = false;
+  // FUTURE WORK: this is to define debug_on if it is undeclared/undefined
+  if (typeof(debug_on) === 'undefined') {
+    debug_on = false;
   };
 
-  // calculate wrapper size
-  document.getElementById('wrapper').style.width = mainwidepx;
-  document.getElementById('wrapper').style.height = mainhighpx;
-  document.getElementById('wrapper').style.backgroundColor = 'black';
+////////////////  // calculate wrapper size;
+//  document.getElementById('wrapper').style.width = $(window).width().toString().concat('px');
+//  document.getElementById('wrapper').style.height = $(window).height().toString().concat('px');
 
-  // call setup functions
-  create_reportbox(); // create report box, make it draggable
+// --Call Setup Functions
+  create_debug_box(); // create report box, make it draggable
   assigndrag();     // initial assign drag to all .drawing elements
   draggers_setup();  // setup dragger buttons
   assign_first_image_to_selected_file();
 
-/*
-*   Setup functions/configs
-*     draggers set up
-*     configure dragger colors and names
-*/
-
+// --Draggers Set Up
   function draggers_setup() {
 
-    // maintain persistent universal dragger statuses
-    if (stretch_dragger_status            === 'block') { document.getElementById('stretch_dragger_switch').classList.add('switchon');};
-    if (opacity_dragger_status           === 'block') { document.getElementById('opacity_dragger_switch').classList.add('switchon');};
-    if (rotation_dragger_status          === 'block') { document.getElementById('rotation_dragger_switch').classList.add('switchon');};
-    if (blur_brightness_dragger_status   === 'block') { document.getElementById('blur_brightness_dragger_switch').classList.add('switchon');};
-    if (grayscale_invert_dragger_status  === 'block') { document.getElementById('grayscale_invert_dragger_switch').classList.add('switchon');};
-    if (contrast_saturate_dragger_status === 'block') { document.getElementById('contrast_saturate_dragger_switch').classList.add('switchon');};
-    if (party_dragger_status             === 'block') { document.getElementById('party_dragger_switch').classList.add('switchon');};
-
-    // set up all_dragger button functionality
-    // *!* javascript version:
+    // set up all_dragger button to toggle all dragger switches
     $('#dragger_all_switch').click(function () {
-      var switch_elements = {},
-        dragger_elements = {},
-        i = 0;
+      var i = 0,
+        switch_elements = {},
+        dragger_elements = {};
 
-      // toggle switchon class in dragger_all_switch
+      // toggle 'switchon' class in the dragger_all_switch
       this.classList.toggle('switchon');
-      // if all_dragger has been switched on, add class 'switchon' to all class 'dragger_switch's and show draggers
+      // if dragger_all_switch has been switched on, add class 'switchon' to all class 'dragger_switch's and show draggers
       if (document.getElementById('dragger_all_switch').classList.contains('switchon')) {
+        // To all elements with 'dragger_switch' class, add 'switchon' class
         switch_elements = document.getElementsByClassName('dragger_switch');
-        // add switchon class to all elements with dragger_switch class
         for (i = 0; i < switch_elements.length; i++) {
           switch_elements[i].classList.add('switchon');
         };
@@ -229,49 +216,41 @@ $(document).ready( function () {
 
   };// end of dragger_setup
 
-/*
-*   Setup helper functions
-*     create button for location id
-*     A function to create specific buttons to div ids
-*/
+// --Setup helper functions
+//    debug box functions and draggable
 
-/*
-*   Setup helper functions
-*     report box functions and draggable
-*/
+  function create_debug_box() {
+    var i = 0,
+      info_element = {},
+      wrapper_element = document.getElementById('wrapper'),
 
-  function create_reportbox() {
-    info_element = {},
-    i = 0,
-    wrapper_element = document.getElementById('wrapper'),
+      // create a new div id='debug_box'
+      debug_box_element = document.createElement('div');
 
-    // create a new div id='reportbox'
-    report_box_element = document.createElement('div');
+    debug_box_element.setAttribute('id', 'debug_box');
+    debug_box_element.style.display = 'none';
 
-    report_box_element.setAttribute('id', 'reportbox');
-    report_box_element.style.display = 'none';
-
-    // create 10 new sub divs id='info#' and attach to 'reportbox'
+    // create 10 new sub divs id='info#' and attach to 'debug_box'
     for (i = 1; i <= 10; i++) {
       info_element = document.createElement('div');
       info_element.setAttribute('id', 'info' + i);
       info_element.classList.add('info');
-      report_box_element.appendChild(info_element);
+      debug_box_element.appendChild(info_element);
     };
 
-    // Add 'reportbox' to 'wrapper'
-    wrapper_element.appendChild(report_box_element);
+    // Add 'debug_box' to 'wrapper'
+    wrapper_element.appendChild(debug_box_element);
 
-    // make reportbox draggable
-    $('#reportbox').draggable({
+    // make debug_box draggable
+    $('#debug_box').draggable({
       containment: 'parent',
       start: function () {
-        clearreport();
+        clear_debug_box();
       },
       drag: function () {
-        var report_box_element = document.getElementById ('reportbox'),
+        var debug_box_element = document.getElementById ('debug_box'),
         // tempcos is a DOMRect object with six properties: left, top, right, bottom, width, height
-          report_box_coords = report_box_element.getBoundingClientRect();
+          debug_box_coords = debug_box_element.getBoundingClientRect();
 
         report([[7, 'screen.width      :' + screen.width.toString()],
                 [9, 'screen.availWidth :' + screen.availWidth.toString()],
@@ -280,34 +259,34 @@ $(document).ready( function () {
                 [2, '--100px'],
                 [5, 'this div width: ' + $(this).css('width')],
                 [3, $(this).css('left') + ' <css> ' + $(this).css('right')],
-                [4, report_box_coords.left.toString() + ' <dom> ' + report_box_coords.right.toString()]]);
+                [4, debug_box_coords.left.toString() + ' <dom> ' + debug_box_coords.right.toString()]]);
 
-        if (report_on === true) {
+        if (debug_on === true) {
           document.getElementById('info1').style.display = 'block';
           document.getElementById('info1').style.height = '5px';
           document.getElementById('info1').style.width = '100px';
           document.getElementById('info1').style.backgroundColor = 'white';
         };
       } // end of drag
-    }); // end of reportbox draggable
-  } // end of create_reportbox()
+    }); // end of debug_box draggable
+  } // end of create_debug_box()
 
   // requires multidimensional array with number from 1-10 and strings [[1, string], [2, string]];
   function report(report_strings) {
     var i = 0;
 
-    if (report_on === true) {
+    if (debug_on === true) {
       for (i = 0; i < report_strings.length; i++) {
         document.getElementById('info' + report_strings[i][0]).textContent = report_strings[i][1];
       };
     };
   }
 
-  function clearreport() {
+  function clear_debug_box() {
     var i = 0,
       info_elements = {};
 
-    if (report_on === true) {
+    if (debug_on === true) {
       info_elements = document.getElementsByClassName('info');
       for (i = 0; i < info_elements.length; i++) {
         info_elements[i].textContent = '';
@@ -324,7 +303,7 @@ $(document).ready( function () {
           [5, 'window.innerWidth :' + window.innerWidth.toString()],
           [3, 'wrapper width     :' + $('#wrapper').css('width')],
           [2, '--100px']]);
-  if (report_on === true) {
+  if (debug_on === true) {
     document.getElementById('info1').style.display = 'block';
     document.getElementById('info1').style.height = '5px';
     document.getElementById('info1').style.width = '100px';
@@ -467,19 +446,17 @@ $(document).ready( function () {
   window.addEventListener('resize', function () {
     mainwide = $(window).width();
     mainhigh = $(window).height();
-    mainwidepx = mainwide.toString().concat('px');
-    mainhighpx = mainhigh.toString().concat('px');
     inner_width  = mainwide - dragger_width;
     inner_height = mainhigh - dragger_height;
 
     // set wrapper size
-    document.getElementById('wrapper').style.width = mainwidepx;
-    document.getElementById('wrapper').style.height = mainhighpx;
+    document.getElementById('wrapper').style.width = $(window).width().toString().concat('px');
+    document.getElementById('wrapper').style.height = $(window).height().toString().concat('px');
 
     //* optional report box
-    clearreport();
-    report([[1, 'resize: new width : ' + mainwidepx],
-            [2, 'resize: new height : ' + mainhighpx]]);
+    clear_debug_box();
+    report([[1, 'resize: new width : ' + $(window).width().toString().concat('px')],
+            [2, 'resize: new height : ' + $(window).height().toString().concat('px')]]);
   // bubbling phase (ahem)
   }, false); // end of addEventListener.resize
 
@@ -624,6 +601,35 @@ $(document).ready( function () {
 *     image changes
 *     Listen for changes and modify target
 */
+
+
+  socket.on('connect_assign_dragger_status', function (data) {
+
+
+
+    console.log(data);
+    console.log(data.stretch);
+
+    dragger_status.stretch = data.stretch;
+
+    console.log(dragger_status.stretch);
+
+
+    console.log(dragger_status.stretch);
+
+    // maintain persistent universal dragger statuses
+    if (data.stretch           === 'block') { document.getElementById('stretch_dragger_switch').classList.add('switchon');};
+    if (data.opacity         === 'block') { document.getElementById('opacity_dragger_switch').classList.add('switchon');};
+    if (data.rotation          === 'block') { document.getElementById('rotation_dragger_switch').classList.add('switchon');};
+    if (data.blur_brightness  === 'block') { document.getElementById('blur_brightness_dragger_switch').classList.add('switchon');};
+    if (data.grayscale_invert  === 'block') { document.getElementById('grayscale_invert_dragger_switch').classList.add('switchon');};
+    if (data.contrast_saturate === 'block') { document.getElementById('contrast_saturate_dragger_switch').classList.add('switchon');};
+    if (data.party           === 'block') { document.getElementById('party_dragger_switch').classList.add('switchon');};
+
+
+
+
+  });
 
   // on moving, move target
   socket.on('broadcast_moving', function (data) {
@@ -874,25 +880,25 @@ $(document).ready( function () {
 
 /*
 *   Buttons
-*     reportbox button
+*     debug_box button
 */
 
-  // on click, toggle reportbox
-  $('#report_button').on('click', function () {
-    // if report_box is open, hide it
-    if (  document.body.classList.contains('report_on') ) {
-      report_on = false;
-      document.body.classList.remove('report_on');
-      document.getElementById('reportbox').style.display = 'none';
-      document.getElementById('report_button').textContent = 'info is off';
-    // if report_box is closed, show it
+  // on click, toggle debug_box
+  $('#debug_button').on('click', function () {
+    // if debug_box is open, hide it
+    if (  document.body.classList.contains('debug_on') ) {
+      debug_on = false;
+      document.body.classList.remove('debug_on');
+      document.getElementById('debug_box').style.display = 'none';
+      document.getElementById('debug_button').textContent = 'info is off';
+    // if debug_box is closed, show it
     } else {
-      report_on = true;
-      document.body.classList.add('report_on');
-      document.getElementById('reportbox').style.display = 'block';
-      document.getElementById('report_button').textContent = 'info is on';
+      debug_on = true;
+      document.body.classList.add('debug_on');
+      document.getElementById('debug_box').style.display = 'block';
+      document.getElementById('debug_button').textContent = 'info is on';
     }; // end of if
-  }); // end of #report_button.on(click)
+  }); // end of #debug_button.on(click)
 
 /*
 *   Buttons
@@ -1145,7 +1151,7 @@ $(document).ready( function () {
           this.recoupTop = top - ui.position.top;
 
           //* optional report box
-          clearreport();
+          clear_debug_box();
           report([[1, 'Filename: ' + this.getAttribute('title')],
                  [2, 'Z-index: ' + this.style.zIndex],
                  [3, 'Start: Left: ' + this.style.left + ' Top: ' + this.style.top],
@@ -1260,7 +1266,7 @@ $(document).ready( function () {
 
 /*
         //* optional report box
-        clearreport();
+        clear_debug_box();
         report([[1, 'Filename: ' + this.getAttribute('title')],
                [2, 'Z-index: ' + this.style.zIndex],
                [3, 'Start: Left: ' + this.style.left + ' Top: ' + this.style.top],
@@ -1317,7 +1323,7 @@ $(document).ready( function () {
       this.socketdata.image_id = this.image_id;
       this.socketdata.image_filename = this.image_element.getAttribute('title');
 
-      // clearreport();
+      // clear_debug_box();
     },
     onmove: function (event) {
       // retrieve scale and angle from event object
@@ -1388,7 +1394,7 @@ $(document).ready( function () {
       this.scale = this.image_element.getAttribute('data-scale');
 
       //* optional report box
-      // clearreport();
+      // clear_debug_box();
       // report([[1, 'Drag Id: ' + this.image_id]]);
       // report([[2, 'scale: ' + this.scale]]);
       // report([[3, 'angle: ' + this.angle]]);
@@ -1514,7 +1520,7 @@ $(document).ready( function () {
       // used to prevent click from registering
       document.getElementById('navigation_toggle_button').classList.add('dragging_no_click');
 
-      clearreport();
+      clear_debug_box();
 
       // store the starting position of the navigation_toggle_button_container
       this.starting_position = ui.position;

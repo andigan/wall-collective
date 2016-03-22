@@ -39,10 +39,14 @@
 *     config.logdir
 *     config.publicimagedir
 *     config.slashimagedirslash
-*     config.stretch_dragger_status ||| 'block' or 'none'
 *     config.use_cdn
+
+*     config_dragger_status.stretch = 'block' || 'none'
+
+
 */
-var config = require('./config.js'),
+var config = require('./config/config.js'),
+  config_dragger_status = require('./config/config_dragger_status'),
   // set the port
   port    =   process.env.PORT || config.port,
   // use express as the framwork
@@ -118,7 +122,39 @@ var io = require('socket.io').listen(server);
 
 
 io.on('connection', function (socket) {
+  var dragger_status = {};
+
   console.log('socket connected...');
+
+  // send dragger_statuses to connected client
+  dragger_status.stretch = config_dragger_status.stretch;
+  dragger_status.opacity = config_dragger_status.opacity;
+  dragger_status.rotation = config_dragger_status.rotation;
+  dragger_status.blur_brightness = config_dragger_status.blur_brightness;
+  dragger_status.grayscale_invert = config_dragger_status.grayscale_invert;
+  dragger_status.contrast_saturate = config_dragger_status.contrast_saturate;
+  dragger_status.party = config_dragger_status.party;
+  socket.emit('connect_assign_dragger_status', dragger_status);
+
+
+  /*
+  *   Socket.io
+  *     change dragger switch status
+  */
+
+    socket.on('change_stretch_dragger_status', function (data) { config_dragger_status.stretch = data; });
+    socket.on('change_opacity_dragger_status', function (data) { config_dragger_status.opacity = data; });
+    socket.on('change_rotation_dragger_status', function (data) { config_dragger_status.rotation = data; });
+    socket.on('change_blur_brightness_dragger_status', function (data) { config_dragger_status.blur_brightness = data; });
+    socket.on('change_grayscale_invert_dragger_status', function (data) { config_dragger_status.grayscale_invert = data; });
+    socket.on('change_contrast_saturate_dragger_status', function (data) { config_dragger_status.contrast_saturate = data; });
+    socket.on('change_party_dragger_status', function (data) { config_dragger_status.party = data; });
+
+
+
+
+
+
   // console.log(socket);
 
 /*
@@ -126,6 +162,8 @@ io.on('connection', function (socket) {
 *     image changes
 *     Listen for changes and modify target
 */
+
+
 
   socket.on('clientemit_moving', function (data) {
     socket.broadcast.emit('broadcast_moving', data);
@@ -298,18 +336,6 @@ io.on('connection', function (socket) {
     socket.broadcast.emit('broadcast_show_image', data);
   });
 
-/*
-*   Socket.io
-*     change dragger switch status
-*/
-
-  socket.on('change_stretch_dragger_status', function (data) { config.stretch_dragger_status = data; });
-  socket.on('change_opacity_dragger_status', function (data) { config.opacity_dragger_status = data; });
-  socket.on('change_rotation_dragger_status', function (data) { config.rotation_dragger_status = data; });
-  socket.on('change_blur_brightness_dragger_status', function (data) { config.blur_brightness_dragger_status = data; });
-  socket.on('change_grayscale_invert_dragger_status', function (data) { config.grayscale_invert_dragger_status = data; });
-  socket.on('change_contrast_saturate_dragger_status', function (data) { config.contrast_saturate_dragger_status = data; });
-  socket.on('change_party_dragger_status', function (data) { config.party_dragger_status = data; });
 }); // end of io.on
 
 /*
