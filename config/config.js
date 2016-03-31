@@ -4,17 +4,14 @@ var config = {};
 config.port = 8000;
 
 // set mongDB database
-config.database_name = 'max';
+config.database_name = 'database_name';
 
-// set use_cdn to use cdns rather than local modules
-config.use_cdn = false;
+// set use_cdn to use CDNs rather than local modules
+config.use_cdn = true;
 
-// set image directories
-config.logdir              = 'logs/filelog';
-// NOTICE: config.publicimagedir can only accept one directory path, e.g. 'public/onenameonly'
-config.publicimagedir      = 'public/art';
-
-// ignore
-config.slashimagedirslash  = '/' + config.publicimagedir.split('/')[1] + '/';
+// set directories
+config.image_dir        = '/art/';
+config.static_image_dir = 'public/art';
+config.logdir           = 'logs/filelog';
 
 module.exports = config;

@@ -141,6 +141,10 @@ transition:transform 150ms ease-in-out;
 z-index:50000;
 }
 
+#exit_door {
+  transition:transform 150ms ease-in-out;
+}
+
 #grayscale_invert_dragger {
 box-shadow:0 0 3px 3px silver;
 color:silver;
@@ -260,7 +264,7 @@ color:white;
 font-size:150%;
 }
 
-#options_container {
+#tools_container {
 background-color:transparent;
 bottom:0;
 display:flex;
@@ -339,6 +343,20 @@ color:blue;
 font-size:150%;
 }
 
+#threeD_dragger {
+  box-shadow: 0 0 3px 3px deeppink;
+  color: deeppink;
+}
+
+#threeD_dragger_switch::first-letter {
+  font-size: 150%;
+  color: deeppink;
+}
+
+#threeD_dragger_switch.switchon {
+  background-color: lightpink !important;
+}
+
 #upload_preview_container {
 background-color:black;
 border:.5px solid white;
@@ -355,11 +373,9 @@ z-index:90000;
 #wrapper {
 background-color:black;
 display:block;
-height:100vh;
 left:0;
 position:absolute;
 top:0;
-width:100vw;
 }
 
 /* opacity is the primary feature of this functionality. */
@@ -518,7 +534,8 @@ position:absolute;
 }
 
 .exit_door_hover {
-background:yellow!important;
+-webkit-transform: scale(2);
+transform: scale(1.5);
 }
 
 .hline {
@@ -549,14 +566,14 @@ font-size:1.75vh;
 transform:scaleY(1)!important;
 }
 
-.options_button {
-  background: #a90329; /* Old browsers */
-  background: -moz-linear-gradient(top, #a90329 0%, #8f0222 44%, #6d0019 100%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top, #a90329 0%,#8f0222 44%,#6d0019 100%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom, #a90329 0%,#8f0222 44%,#6d0019 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+.tools_button {
+  background: #feccb1; /* Old browsers */
+  background: -moz-linear-gradient(top,  #feccb1 0%, #f17432 0%, #fb955e 99%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top,  #feccb1 0%,#f17432 0%,#fb955e 99%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom,  #feccb1 0%,#f17432 0%,#fb955e 99%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
-.options_container_is_open {
+.tools_container_is_open {
 transform:scaleY(1)!important;
 }
 
