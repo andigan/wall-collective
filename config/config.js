@@ -3,7 +3,7 @@ var config = {};
 // set port
 config.port = 8000;
 
-// set mongDB database
+// set mongoDB database
 config.database_name = 'database_name';
 
 // set use_cdn to use CDNs rather than local modules
