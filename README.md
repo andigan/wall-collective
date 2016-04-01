@@ -3,7 +3,7 @@
 
 # whatadrag
 
-A real-time app for sharing, arranging, and transforming images.
+A real-time app for concurrently sharing, arranging, and transforming images.
 
 ## Features  
 

@@ -1,7 +1,7 @@
 {
   "name": "WhataDrag",
   "version": "0.6.0",
-  "description": "A realtime app for sharing, arranging, and transforming images.",
+  "description": "A realtime app for concurrently sharing, arranging, and transforming images.",
   "author": "Andrew Nease <andrew.nease.code@gmail.com",
   "private": true,
   "scripts": {

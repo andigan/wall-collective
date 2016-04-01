@@ -602,7 +602,7 @@ width:1px;
 }
 
 body {
-background-color:white!important;
+background-color: black;
 overflow-x:hidden;
 overflow-y:hidden;  /* fixed the scrolling problem */
 position:fixed;

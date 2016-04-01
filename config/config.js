@@ -4,8 +4,8 @@ var config = {};
 config.port = 8000;
 
 // set mongoDB database
-config.database_name = 'database_name';
-
+config.database_name = 'mydatabase';
+config.collection_name = 'mycollection';
 // set use_cdn to use CDNs rather than local modules
 config.use_cdn = true;
 

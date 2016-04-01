@@ -61,7 +61,7 @@ $(document).ready( function () {
     image_dir = String,
 
     // assigned by initial socket; used by upload counter
-    unique_id = String,
+    client_id = String,
 
     // used by the upload counter
     uploadtotal = 0;
@@ -369,11 +369,11 @@ $(document).ready( function () {
 //     });
 
   // initial set up.  assign unique identifier to client.  used by upload counter
-  // hack: Problem:  busboy stream begins receiving file stream before the unique_id, which was passed as data value in the ajax submit
-  //       Solution: change the HTML 'name' attribute of the form's input to the unique_id
-  socket.on('connect_assign_unique_id', function (data) {
-    unique_id = data;
-    document.getElementById('fileselect').setAttribute('name', unique_id);
+  // hack: Problem:  busboy stream begins receiving file stream before the client_id, which was passed as data value in the ajax submit
+  //       Solution: change the HTML 'name' attribute of the form's input to the client_id
+  socket.on('connect_assign_client_id', function (data) {
+    client_id = data;
+    document.getElementById('fileselect').setAttribute('name', client_id);
   });
 
   // initial set up.  assign image_directory from config file
@@ -514,7 +514,7 @@ $(document).ready( function () {
 
   // if this client is the uploader, show upload statistics from busboy
   socket.on('broadcast_chunk_sent', function (uploaddata) {
-    if (uploaddata.uploader_unique_id === unique_id) {
+    if (uploaddata.client_id === client_id) {
       uploadtotal += uploaddata.chunk_size;
       document.getElementById('confirm_or_reject_container_info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
       debug_report([[10, 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.']]);
@@ -862,7 +862,7 @@ $(document).ready( function () {
         },
         stop: function () {
           // prepare data to send to ajax post, get all drawing elements
-          var data_for_database = {},
+          var drag_post_data = {},
             i = 0,
             drawing_elements = document.body.getElementsByClassName('drawing');
 
@@ -882,25 +882,25 @@ $(document).ready( function () {
           socket.emit('clientemit_unfreeze', this.image_id);
 
           // prepare data to send to server
-          data_for_database.dom_ids = [];
-          data_for_database.filenames = [];
-          data_for_database.z_indexes = [];
-          data_for_database.moved_file = this.getAttribute('title');
-          data_for_database.moved_posleft = this.style.left;
-          data_for_database.moved_postop = this.style.top;
+          drag_post_data.dom_ids = [];
+          drag_post_data.filenames = [];
+          drag_post_data.z_indexes = [];
+          drag_post_data.moved_file = this.getAttribute('title');
+          drag_post_data.moved_posleft = this.style.left;
+          drag_post_data.moved_postop = this.style.top;
 
-          // populate data_for_database
+          // populate drag_post_data
           for (i = 0; i < drawing_elements.length; i++) {
-            data_for_database.dom_ids[i] = drawing_elements[i].getAttribute('id');
-            data_for_database.filenames[i] = drawing_elements[i].getAttribute('title');
-            data_for_database.z_indexes[i] = drawing_elements[i].style.zIndex;
+            drag_post_data.dom_ids[i] = drawing_elements[i].getAttribute('id');
+            drag_post_data.filenames[i] = drawing_elements[i].getAttribute('title');
+            drag_post_data.z_indexes[i] = drawing_elements[i].style.zIndex;
           };
 
           // ajax post from jquery.  FUTURE WORK: replace with a socket
           $.ajax({
             method: 'POST',
             url: '/dragstop',
-            data: JSON.stringify( { data_for_database: data_for_database} ),
+            data: JSON.stringify( { drag_post_data: drag_post_data} ),
             contentType: 'application/json'
           }).done(function () {
           });
