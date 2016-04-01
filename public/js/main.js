@@ -229,8 +229,8 @@ $(document).ready( function () {
     document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
     document.getElementById('tools_container').classList.remove('tools_container_is_open');
     // replace image_upload_preview image and delete_preview image
-    document.getElementById('image_upload_preview').src = '/images/1x1.png';
-    document.getElementById('delete_preview').src = '/images/1x1.png';
+    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
+    document.getElementById('delete_preview').src = '/icons/1x1.png';
   }
 
   function state_change_to_tools() {
@@ -260,7 +260,7 @@ $(document).ready( function () {
       document.getElementById('confirm_or_reject_container').style.display = 'flex';
     }, 500);
     // replace image_upload_preview image
-    document.getElementById('image_upload_preview').src = '/images/1x1.png';
+    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
   }
 
   function state_change_to_delete() {
@@ -284,7 +284,7 @@ $(document).ready( function () {
       document.getElementById('delete_preview_container').style.display = 'block';
     }, 500);
     // replace delete_preview
-    document.getElementById('delete_preview').src = '/images/1x1.png';
+    document.getElementById('delete_preview').src = '/icons/1x1.png';
   }
 
   function state_change_after_reject_delete() {

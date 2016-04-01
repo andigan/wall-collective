@@ -53,7 +53,7 @@
     {% endif %}
 
     {# bookmark icon link #}
-    <link rel="apple-touch-icon" href="images/apple-touch-icon.png" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
   </head>
 
@@ -96,23 +96,23 @@
       {# containers #}
       <div id='navigation_container'>
         <div id='dragger_switches_button' class='button navigation_button'> draggers
-          <img class='icon_image' src='/images/draggers_icon.png'>
+          <img class='icon_image' src='/icons/draggers_icon.png'>
         </div>
 
         <div id='tools_container_button' class='button navigation_button'> tools
-          <img class='icon_image' src='/images/tools.png'>
+          <img class='icon_image' src='/icons/tools.png'>
         </div>
 
         <form id='upload_image_button' name='title' method='post'
               enctype='multipart/form-data'
               action='addfile/' runat='server'>
           <div class='btn-file button navigation_button'> upload
-            <img class='icon_image' src='/images/camera_upload.png'>
+            <img class='icon_image' src='/icons/camera_upload.png'>
             <input id='fileselect' type='file' name='client_id_goes_here'>
           </div>
         </form>
         <div id='exit_door' class='button navigation_button'> remove
-          <img class='icon_image' src='/images/exit_door.png'>
+          <img class='icon_image' src='/icons/exit_door.png'>
         </div>
         <div id='rightbutton' class='button_no_show'></div>
 
@@ -127,7 +127,7 @@
       </div>
 
       <div id='upload_preview_container' class='rainbow_border'>
-        <img id='image_upload_preview' src='/images/1x1.png'/>
+        <img id='image_upload_preview' src='/icons/1x1.png'/>
         <div id='confirm_or_reject_container'>
           <div id='confirm_upload_button' class='confirm_button confirm_yes'> Confirm Upload </div>
           <div id='reject_upload_button' class='confirm_button confirm_no'> Cancel </div>
@@ -136,7 +136,7 @@
       </div>
 
       <div id='delete_preview_container' class='rainbow_border'>
-        <img id='delete_preview' src='/images/1x1.png'/>
+        <img id='delete_preview' src='/icons/1x1.png'/>
         <div id='delete_confirm_or_reject_container'>
           <div id='confirm_delete_button' class='confirm_button confirm_yes'> Confirm Delete </div>
           <div id='reject_delete_button' class='confirm_button confirm_no'> Cancel </div>
