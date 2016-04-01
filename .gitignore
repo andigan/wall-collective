@@ -2,3 +2,4 @@
 /public/art/*.*
 /node_modules
 /public/js/cdn_locals
+/routes
