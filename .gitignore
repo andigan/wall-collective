@@ -1,7 +1,4 @@
 /logs
 /public/art/*.*
-/bin
-/routes
 /node_modules
 /public/js/cdn_locals
-/config
