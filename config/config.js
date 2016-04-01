@@ -10,8 +10,8 @@ config.collection_name = 'mycollection';
 config.use_cdn = true;
 
 // set directories
-config.image_dir        = '/art/';
-config.static_image_dir = 'public/art';
+config.image_dir        = '/images/';
+config.static_image_dir = 'public/images';
 config.logdir           = 'logs/filelog';
 
 module.exports = config;
