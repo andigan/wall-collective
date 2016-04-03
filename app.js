@@ -46,14 +46,14 @@ var config = require('./config/config.js'),
   dragger_status = {};
 
 // initial dragger status display
-dragger_status.stretch           = false;
+dragger_status.stretch           = true;
 dragger_status.opacity           = false;
-dragger_status.rotation          = false;
+dragger_status.rotation          = true;
 dragger_status.blur_brightness   = false;
 dragger_status.grayscale_invert  = false;
 dragger_status.contrast_saturate = false;
 dragger_status.party             = false;
-dragger_status.threeD            = false;
+dragger_status.threeD            = true;
 dragger_status.newer             = false;
 
 // express method to set 'views' directory string.
@@ -274,6 +274,7 @@ io.on('connection', function (socket) {
       if (err) throw err;
       console.log('successfully deleted file.');
     });
+
   });
 
   socket.on('clientemit_remove_filter', function (data) {
