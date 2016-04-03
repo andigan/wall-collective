@@ -831,6 +831,8 @@ $(document).ready( function () {
           // assign temporary z-index
           this.style.zIndex = 60000;
 
+          hide_draggers();
+
           // remove filter
           // --this is necessary because dragging images with filter causes too much rendering lag
           this.setAttribute('data-filter', this.style.webkitFilter);
@@ -935,6 +937,8 @@ $(document).ready( function () {
 
       this.image_id = event.target.getAttribute('id');
       this.image_element = event.target;
+
+      hide_draggers();
 
       // retrieve original angle and scale
       this.angle = parseFloat(this.image_element.getAttribute('data-angle'));
@@ -1159,12 +1163,30 @@ $(document).ready( function () {
   });
 
 
+
+// hide all draggers except the one being dragged
+function hide_other_draggers (id) {
+  var dragger_elements = document.getElementsByClassName('dragger'),
+    i = 0;
+
+  for (i = 0; i < dragger_elements.length; i++) {
+    if (dragger_elements[i].getAttribute('id') !== id) {
+      dragger_elements[i].style.display = 'none';
+    };
+  };
+};
+
+
+
+
 // --Draggers
 
   $('#stretch_dragger').draggable({
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1220,6 +1242,8 @@ $(document).ready( function () {
       // restore filter
       this.image_element.style.WebkitFilter = this.image_element.getAttribute('data-filter');
       this.image_element.removeAttribute('data-filter');
+      // show draggers
+      set_dragger_locations(this.image_id);
       // socket to other clients
       socket.emit('clientemit_restore_filter', this.image_id);
       // save to database
@@ -1233,6 +1257,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1263,9 +1289,10 @@ $(document).ready( function () {
       remove_grid();
       // allow transitions
       this.classList.add('dragger_transitions');
+      // show draggers
+      set_dragger_locations(this.image_id);
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
-      //      this.socketdata.current_opacity = this.percentage_wide;
       socket.emit('clientemit_store_opacity', this.socketdata);
     }
   });
@@ -1274,6 +1301,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1323,6 +1352,8 @@ $(document).ready( function () {
       // store angle in data-angle
       this.image_element.setAttribute('data-angle', this.new_rotation.toFixed(2));
       this.image_element.setAttribute('data-rotatez', this.new_rotateZ.toFixed(2));
+      // show draggers
+      set_dragger_locations(this.image_id);
       // send to socket
       this.socketdata.angle = this.new_rotation.toString();
       this.socketdata.scale = this.image_element.getAttribute('data-scale');
@@ -1337,6 +1368,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1369,6 +1402,8 @@ $(document).ready( function () {
       remove_grid();
       // allow transitions
       this.classList.add('dragger_transitions');
+      // show draggers
+      set_dragger_locations(this.image_id);
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_filter', this.socketdata);
@@ -1379,6 +1414,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1411,6 +1448,8 @@ $(document).ready( function () {
       remove_grid();
       // allow transitions
       this.classList.add('dragger_transitions');
+      // show draggers
+      set_dragger_locations(this.image_id);
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_filter', this.socketdata);
@@ -1421,6 +1460,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1453,6 +1494,8 @@ $(document).ready( function () {
       remove_grid();
       // allow transitions
       this.classList.add('dragger_transitions');
+      // show draggers
+      set_dragger_locations(this.image_id);
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_filter', this.socketdata);
@@ -1463,6 +1506,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1498,6 +1543,8 @@ $(document).ready( function () {
       remove_grid();
       // allow transitions
       this.classList.add('dragger_transitions');
+      // show draggers
+      set_dragger_locations(this.image_id);
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       this.socketdata.image_id = this.image_id;
@@ -1510,6 +1557,8 @@ $(document).ready( function () {
     containment: 'parent',
     scroll: false,
     start: function () {
+      // hide other draggers
+      hide_other_draggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
       this.image_id      = selected_file.image_id;
       this.image_element = document.getElementById(selected_file.image_id);
@@ -1553,6 +1602,8 @@ $(document).ready( function () {
       // store rotate in data-rotateX,Y
       this.image_element.setAttribute('data-rotateX', this.new_rotate_x.toFixed(2));
       this.image_element.setAttribute('data-rotateY', this.new_rotate_y.toFixed(2));
+      // show draggers
+      set_dragger_locations(this.image_id);
 
       // send to socket
       this.socketdata.scale = this.image_element.getAttribute('data-scale');
