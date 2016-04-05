@@ -1,7 +1,7 @@
 {
-  "name": "WhataDrag",
+  "name": "wall-collective",
   "version": "0.6.0",
-  "description": "A realtime app for concurrently sharing, arranging, and transforming images.",
+  "description": "A multi-user responsive real-time web app for sharing, arranging, and transforming images collaboratively on your laptop or phone.",
   "author": "Andrew Nease <andrew.nease.code@gmail.com",
   "private": true,
   "scripts": {
@@ -16,5 +16,10 @@
     "serve-favicon": "^2.3.0",
     "shortid": "^2.2.4",
     "socket.io": "^1.0.6"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-autoprefixer": "^3.1.0",
+    "gulp-uglify": "^1.5.3"
   }
 }
