@@ -17,7 +17,7 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
 
 - Upload images.
 - Delete images by dropping them on the exit door.
-- Use **_draggers_** to modify:
+- Use **_draggers_** to modify: 
   - height/width
   - rotation
   - opacity
