@@ -1,4 +1,4 @@
-// WhataDrag.js
+// wall-collective
 //
 // Version: 0.6.0
 // Requires: jQuery v1.7+
@@ -205,6 +205,19 @@ $(document).ready( function () {
       dragger_elements[i].style.display = 'none';
     };
   }
+
+  // hide all draggers except the one being dragged
+  function hide_other_draggers(id) {
+    var dragger_elements = document.getElementsByClassName('dragger'),
+      i = 0;
+
+    for (i = 0; i < dragger_elements.length; i++) {
+      if (dragger_elements[i].getAttribute('id') !== id) {
+        dragger_elements[i].style.display = 'none';
+      };
+    };
+  };
+
 
   // used by delete image button
   function clear_selected_file() {
@@ -1163,22 +1176,6 @@ $(document).ready( function () {
   });
 
 
-
-// hide all draggers except the one being dragged
-function hide_other_draggers (id) {
-  var dragger_elements = document.getElementsByClassName('dragger'),
-    i = 0;
-
-  for (i = 0; i < dragger_elements.length; i++) {
-    if (dragger_elements[i].getAttribute('id') !== id) {
-      dragger_elements[i].style.display = 'none';
-    };
-  };
-};
-
-
-
-
 // --Draggers
 
   $('#stretch_dragger').draggable({
@@ -1351,7 +1348,7 @@ function hide_other_draggers (id) {
       socket.emit('clientemit_store_transformed', this.socketdata);
       // store angle in data-angle
       this.image_element.setAttribute('data-angle', this.new_rotation.toFixed(2));
-      this.image_element.setAttribute('data-rotatez', this.new_rotateZ.toFixed(2));
+      this.image_element.setAttribute('data-rotateZ', this.new_rotateZ.toFixed(2));
       // show draggers
       set_dragger_locations(this.image_id);
       // send to socket
@@ -1693,7 +1690,7 @@ function hide_other_draggers (id) {
       image_element = document.getElementById(id),
       // calculate the dragger location
       dragger_location_left = parseFloat(image_element.getAttribute('data-angle') / 360 * inner_width),
-      dragger_location_top = parseFloat(image_element.getAttribute('data-rotatez') / 360 * inner_height);
+      dragger_location_top = parseFloat(image_element.getAttribute('data-rotateZ') / 360 * inner_height);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -1805,8 +1802,8 @@ function hide_other_draggers (id) {
     var dragger_element = document.getElementById('threeD_dragger'),
       image_element = document.getElementById(id),
       // calculate the dragger location
-      dragger_location_top = inner_height - ((( 180 + parseFloat(image_element.getAttribute('data-rotatex')) ) / 360) * inner_height),
-      dragger_location_left = (( 180 + parseFloat(image_element.getAttribute('data-rotatey')) ) / 360) * inner_width;
+      dragger_location_top = inner_height - ((( 180 + parseFloat(image_element.getAttribute('data-rotateX')) ) / 360) * inner_height),
+      dragger_location_left = (( 180 + parseFloat(image_element.getAttribute('data-rotateY')) ) / 360) * inner_width;
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';

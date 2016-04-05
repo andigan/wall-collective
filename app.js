@@ -1,6 +1,6 @@
 
 
-// WhataDrag.js
+// wall-collective
 //
 // Version: 0.6.0
 // Requires: jQuery v1.7+
@@ -48,13 +48,12 @@ var config = require('./config/config.js'),
 // initial dragger status display
 dragger_status.stretch           = true;
 dragger_status.opacity           = false;
-dragger_status.rotation          = true;
+dragger_status.rotation          = false;
 dragger_status.blur_brightness   = false;
 dragger_status.grayscale_invert  = false;
 dragger_status.contrast_saturate = false;
 dragger_status.party             = false;
 dragger_status.threeD            = true;
-dragger_status.newer             = false;
 
 // express method to set 'views' directory string.
 // path.join is merging __dirname (the main directory) and the string 'views'
@@ -274,7 +273,6 @@ io.on('connection', function (socket) {
       if (err) throw err;
       console.log('successfully deleted file.');
     });
-
   });
 
   socket.on('clientemit_remove_filter', function (data) {
@@ -318,7 +316,7 @@ app.get('/', function (req, res) {
     // render index.html (using nunjucks templating)
     res.render('index.html', {
 
-      title               : 'WhataDrag',
+      title               : 'wall-collective',
       database_result     : database_result,
       image_count         : database_result.length,
       image_dir           : config.image_dir,
@@ -430,22 +428,22 @@ app.get('/resetpage', function (req, res) {
         // create a new document using the ImageDocuments model, then save it to the database
         temp_document = new ImageDocuments(
 
-          { sort_id  : sorted_ids_filenames[i][0],
-            dom_id   : i,
-            filename : sorted_ids_filenames[i][1],
-            posleft  : '10px',
-            postop   : '10px',
-            zindex   : i,
-            width    : '75px',
-            height   : '100px',
-            transform   : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
-            opacity  : '1',
-            filter   : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
-            scale    : '1',
-            angle    : '0',
-            rotateX  : '0deg',
-            rotateY  : '0deg',
-            rotateZ  : '0deg'
+          { sort_id   : sorted_ids_filenames[i][0],
+            dom_id    : i,
+            filename  : sorted_ids_filenames[i][1],
+            posleft   : '10px',
+            postop    : '10px',
+            zindex    : i,
+            width     : '75px',
+            height    : '100px',
+            transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+            opacity   : '1',
+            filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+            scale     : '1',
+            angle     : '0',
+            rotateX   : '0deg',
+            rotateY   : '0deg',
+            rotateZ   : '0deg'
           });
         // .save is a mongoose method for model prototypes .save(function (err, tempfile) { });
         temp_document.save(function (err) { if (err) return console.error(err); });
@@ -532,22 +530,22 @@ app.post('/addfile', function (req, res) {
                         };
 
                         ImageDocuments.update(
-                          {           sort_id  : fs.statSync(config.static_image_dir + '/' + newfilename).mtime.toISOString().concat( newfilename ) },
-                          { $set: {   dom_id   : upload_response.dom_id,
-                                      filename : upload_response.image_filename,
-                                      posleft  : '0px',
-                                      postop   : '0px',
-                                      width    : '75px',
-                                      height   : '100px',
-                                      transform   : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
-                                      filter   : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
-                                      opacity  : '1',
-                                      zindex   : upload_response.z_index,
-                                      scale    : '1',
-                                      angle    : '0',
-                                      rotateX  : '0deg',
-                                      rotateY  : '0deg',
-                                      rotateZ  : '0deg' } },
+                          {           sort_id   : fs.statSync(config.static_image_dir + '/' + newfilename).mtime.toISOString().concat( newfilename ) },
+                          { $set: {   dom_id    : upload_response.dom_id,
+                                      filename  : upload_response.image_filename,
+                                      posleft   : '0px',
+                                      postop    : '0px',
+                                      width     : '75px',
+                                      height    : '100px',
+                                      transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+                                      filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+                                      opacity   : '1',
+                                      zindex    : upload_response.z_index,
+                                      scale     : '1',
+                                      angle     : '0',
+                                      rotateX   : '0deg',
+                                      rotateY   : '0deg',
+                                      rotateZ   : '0deg' } },
                           { upsert: true },
                           function (err) {
                             if (err) return console.error(err);
