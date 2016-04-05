@@ -12,6 +12,6 @@ config.use_cdn = true;
 // set directories
 config.image_dir        = '/images/';
 config.static_image_dir = 'public/images';
-config.logdir           = 'logs/filelog';
+config.logdir           = 'logs';
 
 module.exports = config;
