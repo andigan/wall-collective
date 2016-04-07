@@ -924,7 +924,7 @@ $(document).ready( function () {
           selected_file.src = this.src;
           selected_file.image_id = this.getAttribute('id');
 
-          set_dragger_locations(selected_file.image_id);
+//          set_dragger_locations(selected_file.image_id);
         }
       }).click( function () {
 
@@ -1008,7 +1008,7 @@ $(document).ready( function () {
       event.target.setAttribute('data-angle', this.angle.toFixed(2));
 
       // reset draggers
-      set_dragger_locations(this.image_id);
+//      set_dragger_locations(this.image_id);
     }
   });
 
