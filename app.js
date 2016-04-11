@@ -43,7 +43,9 @@ var config = require('./config/config.js'),
   // mongoDB driver
   mongoose = require('mongoose'),
   // dragger status.  used to set dragger switches on/off when client loads page
-  dragger_status = {};
+  dragger_status = {},
+  // an array of current client_ids that are connected
+  connected_clients = [];
 
 // initial dragger status display
 dragger_status.stretch           = true;
@@ -78,9 +80,10 @@ var server = app.listen(port, function() {
 
 // image verification
 function image_check(filename) {
-  if (path.extname(filename) == '.jpg'
-   || path.extname(filename) == '.jpeg'
-   || path.extname(filename) == '.png') {
+  if (path.extname(filename) === '.jpg'
+   || path.extname(filename) === '.jpeg'
+   || path.extname(filename) === '.png'
+   || path.extname(filename) === '.gif') {
     return true;
   } else return false;
 };
@@ -134,21 +137,56 @@ var ImageDocumentsSchema = new mongoose.Schema({
   // Create a Model 'we can work with' using the collection name and schema.
   ImageDocuments = mongoose.model(config.collection_name, ImageDocumentsSchema);
 
-
 // --Socket.io
 var io = require('socket.io').listen(server);
 
+// an instance of this function and its variables are created for each client connected
 io.on('connection', function (socket) {
-  console.log('socket connected...');
+  var client_id = '';
+
+  // check to see if the client is new or revisiting with a cookie
+  socket.on('clientemit_client_id_check', function (client_id_cookie) {
+    client_id = client_id_cookie;
+
+    // if the client is revisiting, send client_id to client
+    if (client_id !== '') {
+
+      console.log(client_id + ' reconnected.');
+      socket.emit('connect_assign_client_id', client_id);
+
+    // else when client is new, generate a new client_id
+    } else {
+      client_id = shortid.generate();
+      console.log(client_id + ' connected for first time.');
+      socket.emit('connect_assign_client_id', client_id);
+    };
+
+    // add client_id to connected_clients array
+    connected_clients.push(client_id);
+
+    // change user count on all clients
+    io.sockets.emit('broadcast_change_user_count', connected_clients);
+  });
+
+  // on disconnect
+  socket.on('disconnect', function () {
+    var index_of_client_id = 0;
+
+    console.log(client_id + ' disconnected...');
+
+    // remove client_id from connected_clients array
+    index_of_client_id = connected_clients.indexOf(client_id);
+    connected_clients.splice(index_of_client_id, 1);
+
+    // change user count on remaining clients
+    socket.broadcast.emit('broadcast_change_user_count', connected_clients);
+  });
 
   // initial set up.  send dragger_status to connected client
   socket.emit('connect_assign_dragger_status', dragger_status);
 
   // initial set up.  send image directory to connected client
   socket.emit('connect_assign_image_dir', config.image_dir);
-
-  // initial set up.  send unique client_id to client
-  socket.emit('connect_assign_client_id', shortid.generate());
 
   // receive sockets from client
   socket.on('change_stretch_dragger_status', function (data) { dragger_status.stretch = data; });
