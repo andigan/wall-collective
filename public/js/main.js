@@ -218,7 +218,6 @@ $(document).ready( function () {
     };
   };
 
-
   // used by delete image button
   function clear_selected_file() {
     selected_file.image_id        = '';
@@ -229,6 +228,37 @@ $(document).ready( function () {
     selected_file.transform       = '';
     selected_file.zindex          = '';
   };
+
+  // cookie setter
+  function setCookie(cookie_name, cookie_value, days_til_expire) {
+    var expires_string = '',
+      d = new Date();
+
+    d.setTime(d.getTime() + (days_til_expire * 24 * 60 * 60 * 1000));
+    expires_string = 'expires=' + d.toUTCString();
+    document.cookie = cookie_name + '=' + cookie_value + '; ' + expires_string;
+  }
+
+  // cookie value getter
+  function getCookie(cookie_name) {
+    var i = 0,
+      cookie_element = '',
+      // create an array of key=value pairs e.g. ['name=Shannon', 'client_id=Vy94J6V1W']
+      cookie_array = document.cookie.split(';');
+
+    for ( i = 0; i < cookie_array.length; i++) {
+      cookie_element = cookie_array[i];
+
+      // remove leading empty characters from cookie element
+      while (cookie_element.charAt(0) === ' ') cookie_element = cookie_element.substring(1);
+
+      // if the cookie_name can be found in the element, return the key portion of the element
+      if (cookie_element.indexOf(cookie_name) === 0)
+        return cookie_element.substring(cookie_name.length + 1, cookie_element.length);
+    };
+    // else return empty string
+    return '';
+  }
 
 
 // --State Change functions
@@ -381,12 +411,22 @@ $(document).ready( function () {
 //       use data
 //     });
 
-  // initial set up.  assign unique identifier to client.  used by upload counter
+
+  // on initial connect, check for a client_id cookie and send result to server
+  socket.on('connect', function () {
+    var client_id_cookie = getCookie('client_id');
+
+    socket.emit ('clientemit_client_id_check', client_id_cookie);
+  });
+
+  // initial set up.  assign unique identifier to client.  used by upload counter and user_count
+  // use cookie value for client_id or ask server to generate a new one.
   // hack: Problem:  busboy stream begins receiving file stream before the client_id, which was passed as data value in the ajax submit
   //       Solution: change the HTML 'name' attribute of the form's input to the client_id
   socket.on('connect_assign_client_id', function (data) {
     client_id = data;
     document.getElementById('fileselect').setAttribute('name', client_id);
+    setCookie('client_id', client_id, 7);
   });
 
   // initial set up.  assign image_directory from config file
@@ -406,13 +446,25 @@ $(document).ready( function () {
     if (dragger_status.party) { document.getElementById('party_dragger_switch').classList.add('switchon');};
   });
 
-  // on moving, move target
+  // display the number of connected clients: 👥👥👥...
+  socket.on('broadcast_change_user_count', function (data) {
+    var i = 0,
+      content = '';
+
+    // for each connected_client, add an icon
+    for ( i = 0; i < data.length; i++ ) {
+      content = content + '👥';
+    };
+    document.getElementById('connect_info').textContent = content;
+  });
+
+  // on another client moving an image, move target
   socket.on('broadcast_moving', function (data) {
     document.getElementById(data.image_id).style.top  = data.image_top;
     document.getElementById(data.image_id).style.left = data.image_left;
   });
 
-  // on resizing, resize target
+  // on another client resizing an image, resize target
   socket.on('broadcast_resizing', function (data) {
     document.getElementById(data.image_id).style.transform = data.image_transform;
     document.getElementById(data.image_id).style.top       = data.image_top;

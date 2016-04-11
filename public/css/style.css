@@ -55,6 +55,16 @@ color:white;
 position:absolute;
 }
 
+#connect_info {
+  bottom: 12%;
+  color: white;
+  height: 10%;
+  left: 25px;
+  line-height: 50%;
+  position: fixed;
+  width: 80%;
+}
+
 #contrast_saturate_dragger {
 box-shadow:0 0 3px 3px crimson;
 color:crimson;
@@ -535,7 +545,8 @@ position:absolute;
 
 .exit_door_hover {
 -webkit-transform: scale(2);
-transform: scale(1.5);
+transform: scale(2);
+opacity: .75;
 }
 
 .hline {
