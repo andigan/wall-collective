@@ -427,7 +427,7 @@ text-align:center; /* horizontal centering */
 text-decoration:none;
 text-shadow:rgba(0,0,0,.4) 0 1px 0;
 vertical-align:middle;
-width: 15vw;
+width: 10vh;
 
 /* vertical centering */
 display: flex;
