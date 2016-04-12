@@ -56,13 +56,15 @@ position:absolute;
 }
 
 #connect_info {
-  bottom: 12%;
-  color: white;
-  height: 10%;
-  left: 25px;
-  line-height: 50%;
+  background-color: transparent;
+  bottom: 1vh;
+  height: 3vh;
+  left: 2vw;
   position: fixed;
-  width: 80%;
+  transform:scaleY(0);
+  transition:transform 150ms ease-in-out;
+  width: 80vw;
+  z-index:60000;
 }
 
 #contrast_saturate_dragger {
@@ -496,6 +498,10 @@ width:40%;
   background: linear-gradient(to bottom, #b4ddb4 0%,#83c783 5%,#52b152 33%,#008a00 83%,#005700 100%,#002400 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
+.connect_info_is_open {
+transform:scaleY(1)!important;
+}
+
 .delete_preview_container_is_open {
 transform:scaleY(1)!important;
 }
@@ -575,6 +581,11 @@ font-size:1.75vh;
 
 .navigation_container_is_open {
 transform:scaleY(1)!important;
+}
+
+.person_icon {
+  height: 3vh;
+  width: 1.5vh;
 }
 
 .tools_button {

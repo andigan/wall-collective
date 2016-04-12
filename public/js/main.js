@@ -271,6 +271,7 @@ $(document).ready( function () {
     document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
     document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
     document.getElementById('tools_container').classList.remove('tools_container_is_open');
+    document.getElementById('connect_info').classList.remove('connect_info_is_open');
     // replace image_upload_preview image and delete_preview image
     document.getElementById('image_upload_preview').src = '/icons/1x1.png';
     document.getElementById('delete_preview').src = '/icons/1x1.png';
@@ -446,16 +447,17 @@ $(document).ready( function () {
     if (dragger_status.party) { document.getElementById('party_dragger_switch').classList.add('switchon');};
   });
 
-  // display the number of connected clients: 👥👥👥...
+  // display the number of connected clients
   socket.on('broadcast_change_user_count', function (data) {
     var i = 0,
-      content = '';
+      content = '',
+      connect_info_element = document.getElementById('connect_info');
 
     // for each connected_client, add an icon
     for ( i = 0; i < data.length; i++ ) {
-      content = content + '👥';
+      content = content + "<img src='icons/person_icon.png' class='person_icon' />";
     };
-    document.getElementById('connect_info').textContent = content;
+    connect_info_element.innerHTML = content;
   });
 
   // on another client moving an image, move target
@@ -623,6 +625,8 @@ $(document).ready( function () {
         // open the navigation container
         document.getElementById('navigation_container').classList.add('navigation_container_is_open');
         document.body.classList.add('button_container_is_open');
+        document.getElementById('connect_info').classList.add('connect_info_is_open');
+
         // animate close hamburgers
         document.getElementById('line_one').style.top = '35%';
         document.getElementById('line_three').style.top = '65%';
@@ -1019,6 +1023,7 @@ $(document).ready( function () {
     },
     onmove: function (event) {
       // retrieve scale and angle from event object
+      // event.ds is scale difference; event.da is the angle difference
       this.scale = this.scale * (1 + event.ds);
       this.angle += event.da;
 
