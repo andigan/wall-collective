@@ -58,6 +58,7 @@ position:absolute;
 #connect_info {
   background-color: transparent;
   bottom: 1vh;
+  color: white;
   height: 3vh;
   left: 2vw;
   position: fixed;
