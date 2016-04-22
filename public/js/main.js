@@ -63,6 +63,9 @@ $(document).ready( function () {
     // assigned by initial socket; used by upload counter
     client_id = String,
 
+    // used with a cookie to store which draggers are active for individual persistence
+    switches_status = String,
+
     // used by the upload counter
     uploadtotal = 0;
 
@@ -413,38 +416,42 @@ $(document).ready( function () {
 //     });
 
 
-  // on initial connect, check for a client_id cookie and send result to server
+  // on initial connect, retrieve client_id cookie and send results to server
   socket.on('connect', function () {
-    var client_id_cookie = getCookie('client_id');
+    var client_vars = {};
 
-    socket.emit ('clientemit_client_id_check', client_id_cookie);
+    client_vars.client_id = getCookie('client_id');
+    socket.emit ('clientemit_client_id_check', client_vars);
   });
 
-  // initial set up.  assign unique identifier to client.  used by upload counter and user_count
-  // use cookie value for client_id or ask server to generate a new one.
-  // hack: Problem:  busboy stream begins receiving file stream before the client_id, which was passed as data value in the ajax submit
-  //       Solution: change the HTML 'name' attribute of the form's input to the client_id
-  socket.on('connect_assign_client_id', function (data) {
-    client_id = data;
-    document.getElementById('fileselect').setAttribute('name', client_id);
+  // initial set up for all visits.
+  socket.on('connect_set_client_vars', function (client_vars) {
+    var i = 0,
+      switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
+
+    // assign the image directory from config.js
+    image_dir = client_vars.image_dir;
+
+    // assign client_id.  used by upload_counter and user_count
+    // the server sends a unique id or the previous id from the cookie
+    client_id = client_vars.client_id;
+
+    // set or reset client_id cookie
     setCookie('client_id', client_id, 7);
-  });
 
-  // initial set up.  assign image_directory from config file
-  socket.on('connect_assign_image_dir', function (data) {
-    image_dir = data;
-  });
+    // hack: Problem:  busboy stream received the file stream before the client_id, which was passed as a data value in the ajax submit
+    //       Solution: change the HTML 'name' attribute of the form's input to the client_id, which always arrives concurrently
+    document.getElementById('fileselect').setAttribute('name', client_id);
 
-  // initial set up of dragger switches.  Universal persistent.
-  socket.on('connect_assign_dragger_status', function (dragger_status) {
-    if (dragger_status.stretch) { document.getElementById('stretch_dragger_switch').classList.add('switchon');};
-    if (dragger_status.opacity) { document.getElementById('opacity_dragger_switch').classList.add('switchon');};
-    if (dragger_status.rotation) { document.getElementById('rotation_dragger_switch').classList.add('switchon');};
-    if (dragger_status.blur_brightness) { document.getElementById('blur_brightness_dragger_switch').classList.add('switchon');};
-    if (dragger_status.grayscale_invert) { document.getElementById('grayscale_invert_dragger_switch').classList.add('switchon');};
-    if (dragger_status.contrast_saturate) { document.getElementById('contrast_saturate_dragger_switch').classList.add('switchon');};
-    if (dragger_status.threeD) { document.getElementById('threeD_dragger_switch').classList.add('switchon');};
-    if (dragger_status.party) { document.getElementById('party_dragger_switch').classList.add('switchon');};
+    // switches_status cookie stores which draggers are activated when the page loads; capital letters denote an activated dragger
+    if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgTp', 7);
+
+    switches_status = getCookie('switches_status');
+
+    // if the switches_status character is uppercase, switch on the corresponding dragger_switch
+    for ( i = 0; i < switches.length; i++ ) {
+      if (switches_status[i] === switches_status[i].toUpperCase()) document.getElementById(switches[i] + '_dragger_switch').classList.add('switchon');
+    };
   });
 
   // display the number of connected clients
@@ -453,9 +460,11 @@ $(document).ready( function () {
       content = '',
       connect_info_element = document.getElementById('connect_info');
 
-    // for each connected_client, add an icon
+    // for each connected_client, add an icon to connect_info element
     for ( i = 0; i < data.length; i++ ) {
       content = content + "<img src='icons/person_icon.png' class='person_icon' />";
+      // debug: report client_id rather than image. underline connected client_id
+      // if (data[i] === client_id) content = content + '<u>'; content = content + '  ' + data[i]; if (data[i] === client_id) content = content + '</u>';
     };
     connect_info_element.innerHTML = content;
   });
@@ -680,6 +689,9 @@ $(document).ready( function () {
           dragger_elements[i].style.display = 'block';
         };
       };
+      // set cookie to all uppercase
+      setCookie('switches_status', 'SROBCGTP', 7);
+      switches_status = 'SROBCGTP';
     // else when dragger_all_switch has been switched off
     } else {
       // remove 'switchon' class from dragger_status elements
@@ -692,16 +704,23 @@ $(document).ready( function () {
       for (i = 0; i < dragger_elements.length; i++) {
         dragger_elements[i].style.display = 'none';
       };
+      // set cookie to all lowercase
+      setCookie('switches_status', 'srobcgtp', 7);
+      switches_status = 'srobcgtp';
     };
   });
 
   // set up dragger_switch functionalities
   $('.dragger_switch').click(function () {
-    // this uses id='stretch_dragger_switch' to get 'stretch_dragger'
-    var dragger_name = this.getAttribute('id').replace('_switch', '');
+    var switch_status_array = [],
+    // use id='stretch_dragger_switch' to get 'stretch_dragger'
+      dragger_name = this.getAttribute('id').replace('_switch', '');
 
     // toggle dragger_switch
     this.classList.toggle('switchon');
+
+    // convert d_status string to array
+    switch_status_array = switches_status.split('');
 
     // if switched on
     if (this.classList.contains('switchon')) {
@@ -711,15 +730,20 @@ $(document).ready( function () {
       if (selected_file.image_id) {
         document.getElementById(dragger_name).style.display = 'block';
       };
-      // change persisitent status
-      socket.emit('change_' + dragger_name + '_status', 'on');
+      // use first letter of dragger_name to find corresponding character in array and replace it
+      // with uppercase character to indicate dragger_switch is on
+      switch_status_array[switch_status_array.indexOf(dragger_name[0])] = dragger_name[0].toUpperCase();
     // else when switched off
     } else {
       // hide dragger
       document.getElementById(dragger_name).style.display = 'none';
-      // change persistent status
-      socket.emit('change_' + dragger_name + '_status', 'off');
+      // use first letter of dragger_name to find corresponding character in array and replace it
+      // with lowercase character to indicate dragger_switch is off
+      switch_status_array[switch_status_array.indexOf(dragger_name[0].toUpperCase())] = dragger_name[0].toLowerCase();
     };
+    // convert switch_status_array back to string and set cookie
+    switches_status = switch_status_array.join('');
+    setCookie('switches_status', switches_status, 7);
   });
 
   // dragger_switches button

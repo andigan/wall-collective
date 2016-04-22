@@ -42,20 +42,9 @@ var config = require('./config/config.js'),
   Busboy = require('busboy'),
   // mongoDB driver
   mongoose = require('mongoose'),
-  // dragger status.  used to set dragger switches on/off when client loads page
-  dragger_status = {},
+
   // an array of current client_ids that are connected
   connected_clients = [];
-
-// initial dragger status display
-dragger_status.stretch           = true;
-dragger_status.opacity           = false;
-dragger_status.rotation          = false;
-dragger_status.blur_brightness   = false;
-dragger_status.grayscale_invert  = false;
-dragger_status.contrast_saturate = false;
-dragger_status.party             = false;
-dragger_status.threeD            = true;
 
 // express method to set 'views' directory string.
 // path.join is merging __dirname (the main directory) and the string 'views'
@@ -145,20 +134,22 @@ io.on('connection', function (socket) {
   var client_id = '';
 
   // check to see if the client is new or revisiting with a cookie
-  socket.on('clientemit_client_id_check', function (client_id_cookie) {
-    client_id = client_id_cookie;
+  socket.on('clientemit_client_id_check', function (client_vars) {
+    client_id = client_vars.client_id;
+    // add the image_dir to the object to pass to client
+    client_vars.image_dir = config.image_dir;
 
-    // if the client is revisiting, send client_id to client
-    if (client_id !== '') {
-
+    // if the client is revisiting, send original client_id to client
+    if (client_id !== '' && client_id !== 'null' && client_id !== '[object Object]') {
       console.log(client_id + ' reconnected.');
-      socket.emit('connect_assign_client_id', client_id);
+      socket.emit('connect_set_client_vars', client_vars);
 
     // else when client is new, generate a new client_id
     } else {
       client_id = shortid.generate();
       console.log(client_id + ' connected for first time.');
-      socket.emit('connect_assign_client_id', client_id);
+      client_vars.client_id = client_id;
+      socket.emit('connect_set_client_vars', client_vars);
     };
 
     // add client_id to connected_clients array
@@ -170,34 +161,14 @@ io.on('connection', function (socket) {
 
   // on disconnect
   socket.on('disconnect', function () {
-    var index_of_client_id = 0;
-
     console.log(client_id + ' disconnected...');
-
     // remove client_id from connected_clients array
-    index_of_client_id = connected_clients.indexOf(client_id);
-    connected_clients.splice(index_of_client_id, 1);
-
+    connected_clients.splice(connected_clients.indexOf(client_id), 1);
     // change user count on remaining clients
     socket.broadcast.emit('broadcast_change_user_count', connected_clients);
   });
 
-  // initial set up.  send dragger_status to connected client
-  socket.emit('connect_assign_dragger_status', dragger_status);
-
-  // initial set up.  send image directory to connected client
-  socket.emit('connect_assign_image_dir', config.image_dir);
-
-  // receive sockets from client
-  socket.on('change_stretch_dragger_status', function (data) { dragger_status.stretch = data; });
-  socket.on('change_opacity_dragger_status', function (data) { dragger_status.opacity = data; });
-  socket.on('change_rotation_dragger_status', function (data) { dragger_status.rotation = data; });
-  socket.on('change_blur_brightness_dragger_status', function (data) { dragger_status.blur_brightness = data; });
-  socket.on('change_grayscale_invert_dragger_status', function (data) { dragger_status.grayscale_invert = data; });
-  socket.on('change_contrast_saturate_dragger_status', function (data) { dragger_status.contrast_saturate = data; });
-  socket.on('change_threeD_dragger_status', function (data) { dragger_status.threeD = data; });
-  socket.on('change_party_dragger_status', function (data) { dragger_status.party = data; });
-
+  // sockets to share image transformations
   socket.on('clientemit_moving', function (data) {
     socket.broadcast.emit('broadcast_moving', data);
   });
