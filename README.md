@@ -7,9 +7,9 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
 
 ## Features  
 
-- Uses node.js express framework.
+- Uses Node.js express framework.
 - Uses MongoDB for persistent storage of element styles.
-- Uses socket.io to share style changes with other clients in real time.
+- Uses Socket.IO to share style changes with other clients in real time.
 - Uses jQuery sparingly.
 - Uses Interact.js for touchscreen rotating and resizing.
 - Uses HTTP cookie to remember which draggers are activated.
