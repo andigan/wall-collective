@@ -1,8 +1,5 @@
 
-
 <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/wall-collective.jpg" width="100" />
-
-
 
 # wall-collective
 
