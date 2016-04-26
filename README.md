@@ -1,5 +1,8 @@
 
-![bookmark image](https://raw.githubusercontent.com/andigan/whatadrag/master/wall-collective.jpg)
+
+<img src="https://raw.githubusercontent.com/andigan/whatadrag/master/wall-collective.jpg" width="200" height="200" />
+
+
 
 # wall-collective
 
