@@ -1,6 +1,6 @@
 
 
-<img src="https://raw.githubusercontent.com/andigan/whatadrag/master/wall-collective.jpg" width="200" />
+<img src="https://raw.githubusercontent.com/andigan/whatadrag/master/wall-collective.jpg" width="200" align="middle" />
 
 
 
