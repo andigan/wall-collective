@@ -12,6 +12,7 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
 - Uses socket.io to share style changes with other clients in real time.
 - Uses jQuery sparingly.
 - Uses Interact.js for touchscreen rotating and resizing.
+- Uses HTTP cookie to remember which draggers are activated.
 
 ## Functionality
 
@@ -25,6 +26,7 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
   - grayscale/inversion
   - contrast/saturation
   - hue-rotation
+- Number of currently connected clients indicated by <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /> icons.
 - Optional: On a touchscreen, use pinch gesture to change an image size and angle.
 
 ## Installation
