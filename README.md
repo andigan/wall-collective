@@ -23,8 +23,9 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
   - rotation
   - opacity
   - blur/brightness
-  - grayscale/inversion
   - contrast/saturation
+  - grayscale/inversion
+  - 3D rotation
   - hue-rotation
 - Number of currently connected clients indicated by <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /> icons.
 - Optional: On a touchscreen, use pinch gesture to change an image size and angle.
