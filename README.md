@@ -7,12 +7,14 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
 
 ## Features  
 
-- Uses Node.js express framework.
-- Uses MongoDB for persistent storage of element styles.
-- Uses Socket.IO to share style changes with other clients in real time.
-- Uses jQuery sparingly.
-- Uses Interact.js for touchscreen rotating and resizing.
-- Uses HTTP cookie to remember which draggers are activated.
+Uses:
+
+- Node.js express framework.
+- MongoDB for persistent storage of element styles.
+- Socket.IO to share style changes with other clients in real time.
+- jQuery sparingly.
+- Interact.js for touchscreen rotating and resizing.
+- HTTP cookie to remember which draggers are activated.
 
 ## Functionality
 
@@ -28,6 +30,7 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
   - 3D rotation
   - hue-rotation
 - Number of currently connected clients indicated by <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /> icons.
+- Reset page to remove image transformations.
 - Optional: On a touchscreen, use pinch gesture to change an image size and angle.
 
 ## Installation
