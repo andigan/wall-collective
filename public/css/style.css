@@ -577,9 +577,7 @@ fullscreenmaskclass: 90000;
 }
 
 .exit_door_hover {
-  -webkit-transform: scale(2);
-  transform: scale(2);
-  opacity: .75;
+  -webkit-filter: brightness(2);  
 }
 
 .hline {
