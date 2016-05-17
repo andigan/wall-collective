@@ -86,7 +86,6 @@ $(document).ready( function () {
   // assign draggable to all .drawing elements
   assigndrag();
 
-
 // --Debug functions
 
   // create debug box, make it draggable
@@ -422,6 +421,7 @@ $(document).ready( function () {
 
     client_vars.client_id = getCookie('client_id');
     socket.emit ('clientemit_client_id_check', client_vars);
+
   });
 
   // initial set up for all visits.
@@ -444,7 +444,7 @@ $(document).ready( function () {
     document.getElementById('fileselect').setAttribute('name', client_id);
 
     // switches_status cookie stores which draggers are activated when the page loads; capital letters denote an activated dragger
-    if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgTp', 7);
+    if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgtp', 7);
 
     switches_status = getCookie('switches_status');
 
@@ -874,7 +874,6 @@ $(document).ready( function () {
     clear_selected_file();
   });
 
-
 // --Main drag function
 
   // use this function to assign draggable to all '.drawing' elements
@@ -1004,13 +1003,24 @@ $(document).ready( function () {
           selected_file.src = this.src;
           selected_file.image_id = this.getAttribute('id');
 
+
 //          set_dragger_locations(selected_file.image_id);
         }
       }).click( function () {
 
-        // set the dragger locations
+        // if selected_file is not empty, remove selected_file class
+        if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
+          document.getElementById(selected_file.image_id).classList.remove('flash_selected_file');
+        };
+
+        // set the selected_file
         selected_file.src = this.src;
         selected_file.image_id = this.getAttribute('id');
+
+        // add the selected_file class to flash outline
+        document.getElementById(selected_file.image_id).classList.add('flash_selected_file');
+
+
         set_dragger_locations(selected_file.image_id);
 
         clear_debug_box();
@@ -1103,13 +1113,13 @@ $(document).ready( function () {
     tolerance: 'pointer',
 
     over: function () {
-      // console.log('over exit door');
+//       console.log('over exit door');
     },
     out: function () {
-      // console.log('back out over exit door ');
+//       console.log('back out over exit door ');
     },
     drop: function (event, ui) {
-      // console.log('Draggable drawing dropped on exit door.');
+//       console.log('Draggable drawing dropped on exit door.');
 
       // gather data
       image_to_delete.image_id = ui.draggable.attr('id');
