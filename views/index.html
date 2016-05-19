@@ -10,6 +10,7 @@
         image_dir       = String
         database_result = Object
         image_count     = Number
+        instagram_id    = String
     #}
 
     <title>{{ title }}</title>
@@ -69,7 +70,7 @@
               src='{{image_dir}}{{database_result[i].filename}}'
               id={{database_result[i].dom_id}}
               class='drawing'
-              style='z-index: {{database_result[i].z_index}};
+              style='z-index: {{database_result[i].zindex}};
                          top: {{database_result[i].postop}};
                         left: {{database_result[i].posleft}};
                        width: {{database_result[i].width}};
@@ -130,6 +131,8 @@
         <div id='nothing2' class='button_no_show'>  </div>
         <div id='nothing3' class='button_no_show'>  </div>
       </div>
+
+
 
       <div id='upload_preview_container' class='rainbow_border'>
         <img id='image_upload_preview' src='/icons/1x1.png'/>
