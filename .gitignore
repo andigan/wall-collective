@@ -1,4 +1,5 @@
 /logs
+/public/images/*.*
 /public/art/*.*
 /node_modules
 /public/js/cdn_locals
