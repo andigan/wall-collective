@@ -577,7 +577,7 @@ fullscreenmaskclass: 90000;
 }
 
 .exit_door_hover {
-  -webkit-filter: brightness(2);  
+  -webkit-filter: brightness(2);
 }
 
 .hline {
@@ -669,11 +669,13 @@ body {
 }
 
 @-webkit-keyframes blink {
-  0% { outline: 200px solid white; }
-  100% { outline: 0 solid white; }
+  0%   { outline: 1px solid white; }
+  33%  { outline: 1px solid white; }
+  100% { outline: 1px solid transparent; }
 }
 
-.flash_selected_file {
-  -webkit-animation-name: blink;
-  -webkit-animation-duration: .2s;
+.selected_file_animation {
+  outline: 1px solid transparent;
+  -webkit-animation: blink 2s ease-out 0s 1;
+  animation: blink 2s ease-out 0s 1;
 }
