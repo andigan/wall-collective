@@ -67,7 +67,11 @@ $(document).ready( function () {
     switches_status = String,
 
     // used by the upload counter
-    uploadtotal = 0;
+    uploadtotal = 0,
+
+    // used when an image is clicked more than once
+    click_count = 0,
+    previous_clicked_ids = '';
 
   // set wrapper size; (css vh and vw were not working with mobile safari)
   document.getElementById('wrapper').style.width = window.innerWidth + 'px';
@@ -169,8 +173,12 @@ $(document).ready( function () {
   // process any click on the wrapper
   $('#wrapper').on('click touchstart', function (event) {
     var dragger_elements = {};
+
     // DEBUG: this line will log whichever element is clicked on
     // console.log(event.target.getAttribute('id'));
+    // console.log(document.querySelectorAll( ":hover" ));
+    // DEBUG: this line will log whichever elements are clicked on. ONLY WORKS WITH CHROME
+    // console.log(document.elementsFromPoint(event.pageX, event.pageY));
 
     // if the images div alone is clicked...
     if (event.target.getAttribute('id') === 'images') {
@@ -421,7 +429,6 @@ $(document).ready( function () {
 
     client_vars.client_id = getCookie('client_id');
     socket.emit ('clientemit_client_id_check', client_vars);
-
   });
 
   // initial set up for all visits.
@@ -621,7 +628,7 @@ $(document).ready( function () {
         // close all containers
         state_change_to_close_all();
         document.body.classList.remove('button_container_is_open');
-        // animate open hamburgers
+        // animate close hamburgers
         document.getElementById('line_one').style.top = '40%';
         document.getElementById('line_three').style.top = '60%';
         // show selected_file in case it was removed by being dragged onto the exit door
@@ -636,9 +643,11 @@ $(document).ready( function () {
         document.body.classList.add('button_container_is_open');
         document.getElementById('connect_info').classList.add('connect_info_is_open');
 
-        // animate close hamburgers
+        // animate open hamburgers
         document.getElementById('line_one').style.top = '35%';
         document.getElementById('line_three').style.top = '65%';
+
+        hide_draggers();
       };
     };
   });
@@ -874,6 +883,18 @@ $(document).ready( function () {
     clear_selected_file();
   });
 
+
+  $('#instagram_login').on('click', function () {
+  });
+
+
+  $('#instagram_logout').on('click', function () {
+
+
+});
+
+
+
 // --Main drag function
 
   // use this function to assign draggable to all '.drawing' elements
@@ -999,26 +1020,100 @@ $(document).ready( function () {
           }).done(function () {
           });
 
-          // set dragger locations
-          selected_file.src = this.src;
+          // for set dragger locations
           selected_file.image_id = this.getAttribute('id');
 
+          // reset click count
+          click_count = 0;
 
 //          set_dragger_locations(selected_file.image_id);
         }
       }).click( function () {
+        var i = 0,
+          image_objects = document.getElementsByClassName('drawing'),
+          id_and_zindex = [],
+          clicked_ids_zindexes = [],
+          clickX = event.pageX,
+          clickY = event.pageY,
+          offset_left = 0,
+          offset_top = 0,
+          image_px_range = {},
+          clicked_ids = '';
 
-        // if selected_file is not empty, remove selected_file class
-        if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
-          document.getElementById(selected_file.image_id).classList.remove('flash_selected_file');
+        // for each .drawing on the page...
+        for (i = 0; i < image_objects.length; i ++) {
+
+          // calculate the range of pixels it occupies on the page...
+          offset_left = image_objects[i].getBoundingClientRect().left + document.body.scrollLeft;
+          offset_top = image_objects[i].getBoundingClientRect().top + document.body.scrollTop;
+          image_px_range = { x: [ offset_left, offset_left + image_objects[i].offsetWidth ],
+                             y: [ offset_top, offset_top + image_objects[i].offsetHeight] };
+
+          // if the click is within the image's range, add the .drawing id and z-index to an array.
+          if ( (clickX >= image_px_range.x[0] && clickX <= image_px_range.x[1]) && (clickY >= image_px_range.y[0] && clickY <= image_px_range.y[1]) ) {
+            id_and_zindex = [ image_objects[i].id, image_objects[i].style.zIndex ];
+            clicked_ids_zindexes.push(id_and_zindex);
+          };
         };
 
-        // set the selected_file
-        selected_file.src = this.src;
-        selected_file.image_id = this.getAttribute('id');
+        // sort the array by z-index, highest to lowest.
+        clicked_ids_zindexes.sort(function (a, b) {
+          return b[1] - a[1];
+        });
 
-        // add the selected_file class to flash outline
-        document.getElementById(selected_file.image_id).classList.add('flash_selected_file');
+        // if selected_file is not empty, remove selected_file_animation class
+        if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
+          document.getElementById(selected_file.image_id).classList.remove('selected_file_animation');
+          // css-trick: this will 'trigger a reflow' which will allow the class to be added again before the animation ends.
+          document.getElementById(selected_file.image_id).offsetWidth;
+        };
+
+        // if one image is clicked...
+        if (clicked_ids_zindexes.length === 1) {
+
+          // set the selected_file
+          selected_file.image_id = this.getAttribute('id');
+
+          // add the selected_file_animation class
+          // this setTimeout allows time for the class 'selected_file_animation' to be removed (above) before adding it again.
+          document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+
+          // reset the click count
+          click_count = 0;
+          // console.log('click count: ' + click_count);
+
+        // else when more than one image is clicked...
+        } else {
+          // create a string of clicked ids
+          for (i = 0; i < clicked_ids_zindexes.length; i++) {
+            clicked_ids = clicked_ids + clicked_ids_zindexes[i][0];
+          };
+          // if the clicked_ids have changed, reset the click_count to 0
+          if ((clicked_ids !== previous_clicked_ids) || (previous_clicked_ids === '')) click_count = 0;
+
+          // add a click
+          click_count++;
+          // console.log('click_count: ' + click_count);
+          // console.log((click_count - 1) % clicked_ids_zindexes.length);
+
+          // set the selected image to an id in the clicked array using the remainder of the click_count divided by the number of clicked images
+          selected_file.image_id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
+          setTimeout(function () { document.getElementById(selected_file.image_id).classList.add('selected_file_animation'); },0);
+
+          // store clicked ids in a global string.  Note: Can't use an array as global variable.  Primitives are passed by value.  Objects are passed by 'copy of a reference'.
+          previous_clicked_ids = clicked_ids;
+        };
+
+
+
+
+
+
+
+
+
+// HAVE FIGURED OUT THE SELECTED FILE BEFORE MOVING ON.
+
 
 
         set_dragger_locations(selected_file.image_id);
@@ -1100,6 +1195,10 @@ $(document).ready( function () {
 
       // reset draggers
 //      set_dragger_locations(this.image_id);
+
+      // reset click count
+      click_count = 0;
+
     }
   });
 
@@ -1338,6 +1437,8 @@ $(document).ready( function () {
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       // socket to other clients
       socket.emit('clientemit_store_resized', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1382,6 +1483,8 @@ $(document).ready( function () {
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_opacity', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1449,6 +1552,8 @@ $(document).ready( function () {
       this.socketdata.rotateY = this.image_element.getAttribute('data-rotateY');
       this.socketdata.rotateZ = this.image_element.getAttribute('data-rotateZ');
       socket.emit('clientemit_store_data_attributes', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1495,6 +1600,8 @@ $(document).ready( function () {
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_filter', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1541,6 +1648,8 @@ $(document).ready( function () {
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_filter', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1587,6 +1696,8 @@ $(document).ready( function () {
       // save to database
       this.socketdata.image_filename  = this.image_element.getAttribute('title');
       socket.emit('clientemit_store_filter', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1638,6 +1749,8 @@ $(document).ready( function () {
       this.socketdata.image_id = this.image_id;
       socket.emit('clientemit_store_opacity', this.socketdata);
       socket.emit('clientemit_store_filter', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
@@ -1700,6 +1813,8 @@ $(document).ready( function () {
       this.socketdata.rotateY = this.image_element.getAttribute('data-rotateY');
       this.socketdata.rotateZ = this.image_element.getAttribute('data-rotateZ');
       socket.emit('clientemit_store_data_attributes', this.socketdata);
+      // reset click count
+      click_count = 0;
     }
   });
 
