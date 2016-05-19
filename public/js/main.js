@@ -1075,12 +1075,10 @@ $(document).ready( function () {
           selected_file.image_id = this.getAttribute('id');
 
           // add the selected_file_animation class
-          // this setTimeout allows time for the class 'selected_file_animation' to be removed (above) before adding it again.
           document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
 
           // reset the click count
           click_count = 0;
-          // console.log('click count: ' + click_count);
 
         // else when more than one image is clicked...
         } else {
@@ -1093,8 +1091,6 @@ $(document).ready( function () {
 
           // add a click
           click_count++;
-          // console.log('click_count: ' + click_count);
-          // console.log((click_count - 1) % clicked_ids_zindexes.length);
 
           // set the selected image to an id in the clicked array using the remainder of the click_count divided by the number of clicked images
           selected_file.image_id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
@@ -1103,18 +1099,6 @@ $(document).ready( function () {
           // store clicked ids in a global string.  Note: Can't use an array as global variable.  Primitives are passed by value.  Objects are passed by 'copy of a reference'.
           previous_clicked_ids = clicked_ids;
         };
-
-
-
-
-
-
-
-
-
-// HAVE FIGURED OUT THE SELECTED FILE BEFORE MOVING ON.
-
-
 
         set_dragger_locations(selected_file.image_id);
 
