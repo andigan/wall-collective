@@ -14,7 +14,7 @@ Uses:
 - Socket.IO to share style changes with other clients in real time.
 - jQuery sparingly.
 - Interact.js for touchscreen rotating and resizing.
-- HTTP cookie to remember which draggers are activated.
+- HTTP cookies to remember which draggers are activated.
 
 ## Functionality
 
