@@ -615,10 +615,10 @@ fullscreenmaskclass: 90000;
 }
 
 .tools_button {
-  background: #feccb1; /* Old browsers */
-  background: -moz-linear-gradient(top,  #feccb1 0%, #f17432 0%, #fb955e 99%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top,  #feccb1 0%,#f17432 0%,#fb955e 99%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom,  #feccb1 0%,#f17432 0%,#fb955e 99%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background: rgb(180,221,180); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(180,221,180,1) 0%, rgba(82,177,82,1) 33%, rgba(0,138,0,1) 67%, rgba(0,87,0,1) 100%, rgba(0,36,0,1) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(180,221,180,1) 0%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 100%,rgba(0,36,0,1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(180,221,180,1) 0%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 100%,rgba(0,36,0,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
 .tools_container_is_open {
@@ -669,13 +669,26 @@ body {
 }
 
 @-webkit-keyframes blink {
-  0%   { outline: 1px solid white; }
-  33%  { outline: 1px solid white; }
-  100% { outline: 1px solid transparent; }
+  0%   { outline: 1px solid white;
+         z-index: 90000;  }
+  33%  { outline: 1px solid white;
+    z-index: 90000;  }
+  100% { outline: 1px solid transparent;
+    z-index: 90000;  }
 }
 
 .selected_file_animation {
   outline: 1px solid transparent;
   -webkit-animation: blink 2s ease-out 0s 1;
   animation: blink 2s ease-out 0s 1;
+}
+@-webkit-keyframes temp_fade {
+  0%   { opacity: .50; }
+  33%  { opacity: .50; }
+  100% { opacity: .50; }
+}
+
+.temp_fade {
+  -webkit-animation: temp_fade 2s ease-out 0s 1;
+  animation: temp_fade 2s ease-out 0s 1;
 }

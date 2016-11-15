@@ -24,7 +24,8 @@ $(document).ready( function () {
 // --Setup and configure variables
 
   // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
-  var socket = io.connect(window.location.href),
+//  var socket = io.connect(window.location.href),
+  var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
 
     // set debug box on or off
     debug_on = true,
@@ -199,8 +200,10 @@ $(document).ready( function () {
     // set wrapper size
     document.getElementById('wrapper').style.width = window.innerWidth + 'px',
     document.getElementById('wrapper').style.height = window.innerHeight + 'px',
-    // position the navigation_toggle_button_container on the bottom on startup.
+    // position the navigation_toggle_button_container on the bottom right on startup.
     document.getElementById('navigation_toggle_button_container').style.top = (mainhigh - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).height) + 'px');
+    document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
+
     clear_debug_box();
     debug_report([[1, 'resize: new width : ' + window.innerWidth + 'px'],
                   [2, 'resize: new height : ' + window.innerHeight + 'px']]);
@@ -285,6 +288,12 @@ $(document).ready( function () {
     // replace image_upload_preview image and delete_preview image
     document.getElementById('image_upload_preview').src = '/icons/1x1.png';
     document.getElementById('delete_preview').src = '/icons/1x1.png';
+    // close navigation button
+    document.body.classList.remove('button_container_is_open');
+    // animate close hamburgers
+    document.getElementById('line_one').style.top = '40%';
+    document.getElementById('line_three').style.top = '60%';
+
   }
 
   function state_change_to_tools() {
@@ -547,7 +556,7 @@ $(document).ready( function () {
     image_element.style.zIndex = data.z_index;
     image_element.style.top = upload_top;
     image_element.style.left = upload_left;
-    images_element.style.opacity = 1;
+    image_element.style.opacity = 1;
     image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
     image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
 
@@ -627,10 +636,7 @@ $(document).ready( function () {
       if ( document.body.classList.contains('button_container_is_open') ) {
         // close all containers
         state_change_to_close_all();
-        document.body.classList.remove('button_container_is_open');
-        // animate close hamburgers
-        document.getElementById('line_one').style.top = '40%';
-        document.getElementById('line_three').style.top = '60%';
+
         // show selected_file in case it was removed by being dragged onto the exit door
         // except when no file is selected: selected_file.image_id is undefined or ''
         if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
@@ -659,13 +665,13 @@ $(document).ready( function () {
       debug_on = false;
       document.body.classList.remove('debug_on');
       document.getElementById('debug_box').style.display = 'none';
-      document.getElementById('debug_button').textContent = 'info is off';
+      document.getElementById('debug_button').innerHTML = "report is off <img class='icon_image' src='/icons/debug_icon.png'>";
     // else when debug_box is closed, show it
     } else {
       debug_on = true;
       document.body.classList.add('debug_on');
       document.getElementById('debug_box').style.display = 'block';
-      document.getElementById('debug_button').textContent = 'info is on';
+      document.getElementById('debug_button').innerHTML = "report is on <img class='icon_image' src='/icons/debug_icon.png'>";
     };
   });
 
@@ -771,7 +777,9 @@ $(document).ready( function () {
     $.get('/resetpage', function () {
       socket.emit('clientemit_resetpage');
       // reload the page
-      window.location.reload(true);
+      //window.location.reload(true);
+      window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
+
     });
   });
 
@@ -1084,17 +1092,35 @@ $(document).ready( function () {
         } else {
           // create a string of clicked ids
           for (i = 0; i < clicked_ids_zindexes.length; i++) {
-            clicked_ids = clicked_ids + clicked_ids_zindexes[i][0];
+            clicked_ids = clicked_ids + '.' + clicked_ids_zindexes[i][0];
+            // remove temp_fade from all clicked images
+            document.getElementById(clicked_ids_zindexes[i][0]).classList.remove('temp_fade');
+            document.getElementById(clicked_ids_zindexes[i][0]).offsetWidth;
+
           };
           // if the clicked_ids have changed, reset the click_count to 0
           if ((clicked_ids !== previous_clicked_ids) || (previous_clicked_ids === '')) click_count = 0;
 
           // add a click
           click_count++;
+          // console.log('click_count: ' + click_count);
+          // console.log((click_count - 1) % clicked_ids_zindexes.length);
+
 
           // set the selected image to an id in the clicked array using the remainder of the click_count divided by the number of clicked images
           selected_file.image_id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
-          setTimeout(function () { document.getElementById(selected_file.image_id).classList.add('selected_file_animation'); },0);
+          document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+
+          // add temp_fade class to all clicked images other than the one selected
+          for (i = 0; i < clicked_ids_zindexes.length; i++) {
+
+            // don't add temp_fade class to selected_file, or to an image already faded, or if the selected_file is already on top
+            if ((clicked_ids_zindexes[i][0] !== selected_file.image_id) && (document.getElementById(clicked_ids_zindexes[i][0]).style.opacity > 0.50)
+               && ( (click_count % clicked_ids_zindexes.length) !== 1 )) {
+              document.getElementById(clicked_ids_zindexes[i][0]).classList.add('temp_fade');
+            };
+          };
+
 
           // store clicked ids in a global string.  Note: Can't use an array as global variable.  Primitives are passed by value.  Objects are passed by 'copy of a reference'.
           previous_clicked_ids = clicked_ids;
