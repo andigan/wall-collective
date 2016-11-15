@@ -72,7 +72,8 @@ function image_check(filename) {
   if (path.extname(filename) === '.jpg'
    || path.extname(filename) === '.jpeg'
    || path.extname(filename) === '.png'
-   || path.extname(filename) === '.gif') {
+   || path.extname(filename) === '.gif')
+    {
     return true;
   } else return false;
 };
