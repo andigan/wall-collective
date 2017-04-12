@@ -5,4 +5,4 @@
 /public/js/cdn_locals
 /routes
 /_notes
-/i-gram/secrets.js
+/i-gram/config/secrets.js
