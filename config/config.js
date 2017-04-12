@@ -1,17 +1,13 @@
-var config = {};
+module.exports = {
+  port: 8000,
 
-// set port
-config.port = 8000;
+  // settings
+  use_cdn: true, // use CDNs rather than local modules
+  i_gram: true, // enable instagram integration
 
-// set mongoDB database
-config.database_name = 'mydatabase';
-config.collection_name = 'mycollection';
-// set use_cdn to use CDNs rather than local modules
-config.use_cdn = true;
+  // set directories
+  image_dir: '/images/',
+  static_image_dir: 'public/images',
+  logdir: 'logs'
 
-// set directories
-config.image_dir        = '/images/';
-config.static_image_dir = 'public/images';
-config.logdir           = 'logs';
-
-module.exports = config;
+};
