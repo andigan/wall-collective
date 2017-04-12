@@ -1,4 +1,6 @@
 var config = require('../config/config'),
+    shortid = require('shortid'),
+    fs = require('fs'),
     mongoose = require('mongoose'),
     InstaSessions = mongoose.model('insta_sessions'),
     ImageDocuments = mongoose.model('images');
@@ -34,7 +36,7 @@ module.exports = function (socket, client_id, download, adapters) {
       if (err) { console.log(err); };
 
       // fetch the instagram data
-      adapters.fetch_instagram_data(session.inst_access_token).then(function (results) {
+      adapters.fetchInstaData(session.inst_access_token).then(function (results) {
         // socket.emit('check_out', results;
         // insta_step 9: Send results to client
         socket.emit('add_content_to_insta_div', results);
@@ -52,7 +54,7 @@ module.exports = function (socket, client_id, download, adapters) {
     new_file.image_index = dragged_image_info.id;
 
     // download dragged instagram image
-    download(dragged_image_info.src, config.static_image_dir + '/' + new_file.newfilename, function () {
+    download(dragged_image_info.src, config.staticImageDir + '/' + new_file.newfilename, function () {
       console.log(new_file.newfilename + ' added to directory from instagram feed.');
 
       // insta_step 14: Send newfilename and index to client
@@ -68,6 +70,7 @@ module.exports = function (socket, client_id, download, adapters) {
     var insta_database_parameters = {
       insta_id       : insta_drop_data.insta_id,
       insta_filename : insta_drop_data.insta_filename,
+      location       : config.imageDir,
       posleft        : insta_drop_data.posleft + 'px',
       postop         : insta_drop_data.postop + 'px',
       width          : insta_drop_data.insta_width,
@@ -76,18 +79,18 @@ module.exports = function (socket, client_id, download, adapters) {
     };
 
     // find the highest z-index
-    ImageDocuments.findOne().sort('-zindex').exec(function (err, highzitem) {
+    ImageDocuments.findOne().sort('-zindex').exec(function (err, highZItem) {
       if (err) return console.error(err);
 
       // find the highest dom_id
-      ImageDocuments.findOne().sort('-dom_id').exec(function (err, highdomitem) {
+      ImageDocuments.findOne().sort('-dom_id').exec(function (err, highDOMItem) {
 
         if (err) return console.error(err);
 
         // if there are z-index results, add 1
-        if (highzitem !== null) {
-          insta_database_parameters.dom_id = highdomitem.dom_id + 1;
-          insta_database_parameters.z_index = highzitem.zindex + 1;
+        if (highZItem !== null) {
+          insta_database_parameters.dom_id = highDOMItem.dom_id + 1;
+          insta_database_parameters.z_index = highZItem.zindex + 1;
         // else if there are no results, assign value of 1
         } else {
           insta_database_parameters.dom_id = 1;
@@ -95,9 +98,10 @@ module.exports = function (socket, client_id, download, adapters) {
         };
 
         ImageDocuments.update(
-          {           sort_id    : fs.statSync(config.static_image_dir + '/' + insta_drop_data.insta_filename).mtime.toISOString().concat( insta_drop_data.insta_filename ) },
+          {           sort_id    : fs.statSync(config.staticImageDir + '/' + insta_drop_data.insta_filename).mtime.toISOString().concat( insta_drop_data.insta_filename ) },
           { $set: {   dom_id     : insta_database_parameters.dom_id,
                       filename   : insta_drop_data.insta_filename,
+                      location   : config.imageDir,
                       posleft    : insta_drop_data.posleft + 'px',
                       postop     : insta_drop_data.postop + 'px',
                       width      : insta_drop_data.insta_width,

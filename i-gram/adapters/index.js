@@ -2,7 +2,7 @@ getContent = require('../../adapters/native-get');
 instaOptions = require('../config/fetch-options');
 
 module.exports = {
-  fetch_instagram_data: function (access_token) {
+  fetchInstaData: function (access_token) {
     // use the client_id's access_token (insta_step 3) to get an endpoint from Instagram...
     return getContent(instaOptions.url + access_token + '&count=' + instaOptions.count)
       .then(function (result) {

@@ -1,3 +1,5 @@
+url = require('url');
+
 // get without dependencies
 // https://www.tomas-dvorak.cz/posts/nodejs-request-without-dependencies/
   const getContent = function(url) {

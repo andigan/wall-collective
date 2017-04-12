@@ -56,16 +56,13 @@ $(document).ready( function () {
     selected_file = {},
 
     // assigned when an image is dragged onto the exit_door icon; used by delete_button
-    image_to_delete = {},
-
-    // assigned by initial socket
-    image_dir = String,
+    imageToDelete = {},
 
     // assigned by initial socket; used by upload counter
     client_id = String,
 
     // assigned by initial socket; used by instagram link
-    insta_app_id = String,
+    instaAppID = String,
 
     // used with a cookie to store which draggers are active for individual persistence
     switches_status = String,
@@ -290,7 +287,7 @@ $(document).ready( function () {
   // used by delete image button
   function clear_selected_file() {
     selected_file.image_id        = '';
-    selected_file.image_filename  = '';
+    selected_file.imageFilename  = '';
     selected_file.src             = '';
     selected_file.width           = '';
     selected_file.height          = '';
@@ -410,7 +407,7 @@ $(document).ready( function () {
   function state_change_to_delete() {
     // show elements
     document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
-    document.getElementById('delete_preview').src = image_to_delete.src;
+    document.getElementById('delete_preview').src = imageToDelete.src;
     // hide element
     document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
   }
@@ -443,10 +440,10 @@ $(document).ready( function () {
       document.getElementById('delete_preview_container').style.display = 'block';
     }, 500);
     // reshow hidden image that wasn't deleted
-    document.getElementById(image_to_delete.image_id).style.display = 'block';
+    document.getElementById(imageToDelete.image_id).style.display = 'block';
     // show image on other clients
-    data.image_id = image_to_delete.image_id;
-    socket.emit('clientemit_show_image', data);
+    data.image_id = imageToDelete.image_id;
+    socket.emit('c-e:  show_image', data);
   }
 
 
@@ -509,17 +506,17 @@ $(document).ready( function () {
 //     These functions receive an emit from the server,
 //     recognize its name, receive its data, and do something with the data.
 //
-//     socket.on('broadcast_name', function(data) {
+//     socket.on('bc: name', function(data) {
 //       use data
 //     });
 
 
   // on initial connect, retrieve client_id cookie and send results to server
   socket.on('connect', function () {
-    var client_vars = {};
+    var clientVars = {};
 
-    client_vars.client_id = getCookie('client_id');
-    socket.emit ('clientemit_client_id_check', client_vars);
+    clientVars.client_id = getCookie('client_id');
+    socket.emit ('c-e:  client_id_check', clientVars);
 
   });
 
@@ -535,20 +532,17 @@ $(document).ready( function () {
   });
 
   // initial set up for all visits.
-  socket.on('connect_set_client_vars', function (client_vars) {
+  socket.on('connect_set_clientVars', function (clientVars) {
     var i = 0,
       switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
 
-    // assign the image directory from config.js
-    image_dir = client_vars.image_dir;
-
     // assign client_id.  used by upload_counter and user_count
     // the server sends a unique id or the previous id from the cookie
-    client_id = client_vars.client_id;
+    client_id = clientVars.client_id;
 
-    insta_app_id = client_vars.insta_app_id;
+    instaAppID = clientVars.instaAppID;
 
-//    insta_access_ready = client_vars.clients_insta_access_ready;
+//    insta_access_ready = clientVars.clients_insta_access_ready;
 
     // set or reset client_id cookie
     setCookie('client_id', client_id, 7);
@@ -569,7 +563,7 @@ $(document).ready( function () {
   });
 
   // display the number of connected clients
-  socket.on('broadcast_change_user_count', function (data) {
+  socket.on('bc: change_user_count', function (data) {
     var i = 0,
       content = '',
       connect_info_element = document.getElementById('connect_info');
@@ -584,13 +578,13 @@ $(document).ready( function () {
   });
 
   // on another client moving an image, move target
-  socket.on('broadcast_moving', function (data) {
+  socket.on('bc: moving', function (data) {
     document.getElementById(data.image_id).style.top  = data.image_top;
     document.getElementById(data.image_id).style.left = data.image_left;
   });
 
   // on another client resizing an image, resize target
-  socket.on('broadcast_resizing', function (data) {
+  socket.on('bc: resizing', function (data) {
     document.getElementById(data.image_id).style.transform = data.image_transform;
     document.getElementById(data.image_id).style.top       = data.image_top;
     document.getElementById(data.image_id).style.left      = data.image_left;
@@ -599,7 +593,7 @@ $(document).ready( function () {
   });
 
   // on resize stop, resize target with new parameters
-  socket.on('broadcast_resized', function (data) {
+  socket.on('bc: resized', function (data) {
     document.getElementById(data.image_id).style.transform = data.image_transform;
     document.getElementById(data.image_id).style.top       = data.image_top;
     document.getElementById(data.image_id).style.left      = data.image_left;
@@ -608,12 +602,12 @@ $(document).ready( function () {
   });
 
   // on transforming, transform target
-  socket.on('broadcast_transforming', function (data) {
+  socket.on('bc: transforming', function (data) {
     document.getElementById(data.image_id).style.transform = data.image_transform;
   });
 
   // on transform changes, modify data attributes used by set_dragger_locations
-  socket.on('broadcast_change_data_attributes', function (data) {
+  socket.on('bc: change_data_attributes', function (data) {
     document.getElementById(data.image_id).setAttribute('data-scale', data.scale);
     document.getElementById(data.image_id).setAttribute('data-angle', data.angle);
     document.getElementById(data.image_id).setAttribute('data-rotateX', data.rotateX);
@@ -622,29 +616,29 @@ $(document).ready( function () {
   });
 
   // on opacity changing, adjust target
-  socket.on('broadcast_opacity_changing', function (data) {
+  socket.on('bc: opacity_changing', function (data) {
     document.getElementById(data.image_id).style.opacity = data.current_opacity;
   });
 
   // on filter changing, adjust target
-  socket.on('broadcast_filter_changing', function (data) {
+  socket.on('bc: filter_changing', function (data) {
     document.getElementById(data.image_id).style.WebkitFilter = data.current_filter;
   });
 
   // reset page across all clients
-  socket.on('broadcast_resetpage', function () {
+  socket.on('bc: resetpage', function () {
     window.location.reload(true);
   });
 
   // add uploaded image
-  socket.on('broadcast_add_upload', function (data) {
+  socket.on('bc: add_upload', function (data) {
     var images_element = document.getElementById('images'),
       image_element = document.createElement('img');
 
     image_element.setAttribute('id', data.dom_id);
-    image_element.src = image_dir + data.image_filename;
+    image_element.src = data.location + data.imageFilename;
     image_element.classList.add('drawing');
-    image_element.setAttribute('title', data.image_filename);
+    image_element.setAttribute('title', data.imageFilename);
     image_element.setAttribute('data-scale', '1');
     image_element.setAttribute('data-angle', '0');
     image_element.setAttribute('data-rotateX', '0');
@@ -665,7 +659,7 @@ $(document).ready( function () {
   });
 
   // remove deleted image
-  socket.on('broadcast_delete_image', function (data) {
+  socket.on('bc: delete_image', function (data) {
     document.getElementById(data.id_to_delete).remove();
     if (data.id_to_delete === selected_file.image_id) {
       clear_selected_file();
@@ -674,38 +668,38 @@ $(document).ready( function () {
   });
 
   // remove filter
-  socket.on('broadcast_remove_filter', function (data) {
+  socket.on('bc: remove_filter', function (data) {
     document.getElementById(data).setAttribute('data-filter', document.getElementById(data).style.WebkitFilter);
     document.getElementById(data).style.WebkitFilter = '';
   });
   // replace filter
-  socket.on('broadcast_restore_filter', function (data) {
+  socket.on('bc: restore_filter', function (data) {
     document.getElementById(data).style.WebkitFilter = document.getElementById(data).getAttribute('data-filter');
     document.getElementById(data).removeAttribute('data-filter');
   });
 
   // disable dragging; other client is moving image
-  socket.on('broadcast_freeze', function (data) {
+  socket.on('bc: freeze', function (data) {
     $('#' + data).draggable ( 'disable' );
   });
   // enable dragging; other client has stopped moving image
-  socket.on('broadcast_unfreeze', function (data) {
+  socket.on('bc: unfreeze', function (data) {
     $('#' + data).draggable ( 'enable' );
   });
 
   // hide element; other client has primed image for deletion
-  socket.on('broadcast_hide_image', function (data) {
+  socket.on('bc: hide_image', function (data) {
     document.getElementById(data).style.display = 'none';
   });
   // show element; other client has cancelled deletion
-  socket.on('broadcast_show_image', function (data) {
+  socket.on('bc: show_image', function (data) {
     document.getElementById(data.image_id).style.display = 'block';
   });
 
   // if this client is the uploader, show upload statistics from busboy
-  socket.on('broadcast_chunk_sent', function (uploaddata) {
+  socket.on('bc: chunk_sent', function (uploaddata) {
     if (uploaddata.client_id === client_id) {
-      uploadtotal += uploaddata.chunk_size;
+      uploadtotal += uploaddata.chunkSize;
       document.getElementById('confirm_or_reject_container_info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
       debug_report([[10, 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.']]);
     } else {
@@ -863,7 +857,7 @@ socket.on('insta_download_ready', function (new_file) {
     var image_element = document.getElementById(insta_database_parameters.insta_id);
 
     image_element.setAttribute('id', insta_database_parameters.dom_id);
-    image_element.src = image_dir + insta_database_parameters.insta_filename;
+    image_element.src = insta_database_parameters.location + insta_database_parameters.insta_filename;
     image_element.classList.add('drawing');
     image_element.style.width = insta_database_parameters.width;
     image_element.style.height = insta_database_parameters.height;
@@ -891,7 +885,7 @@ socket.on('insta_download_ready', function (new_file) {
 
     image_element.setAttribute('id', insta_database_parameters.dom_id);
     image_element.setAttribute('title', insta_database_parameters.insta_filename);
-    image_element.src = image_dir + insta_database_parameters.insta_filename;
+    image_element.src = insta_database_parameters.location + insta_database_parameters.insta_filename;
     image_element.classList.add('drawing');
     image_element.style.width = insta_database_parameters.width;
     image_element.style.height = insta_database_parameters.height;
@@ -1089,7 +1083,7 @@ socket.on('insta_download_ready', function (new_file) {
   // uses jquery $.get to reset the page, and sends socket to other clients to reset as well
   $('#reset_page_button').on('click', function () {
     $.get('/resetpage', function () {
-      socket.emit('clientemit_resetpage');
+      socket.emit('c-e:  resetpage');
       // reload the page
       window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
     });
@@ -1154,9 +1148,9 @@ socket.on('insta_download_ready', function (new_file) {
 
         // create new image
         image_element.setAttribute('id', response.dom_id);
-        image_element.setAttribute('title', response.image_filename);
+        image_element.setAttribute('title', response.imageFilename);
         image_element.classList.add('drawing');
-        image_element.src = image_dir + response.image_filename;
+        image_element.src = response.location + response.imageFilename;
         image_element.setAttribute('data-scale', '1');
         image_element.setAttribute('data-angle', '0');
         image_element.setAttribute('data-rotateX', '0');
@@ -1179,8 +1173,8 @@ socket.on('insta_download_ready', function (new_file) {
         // change navigation container and remove upload_preview
         state_change_after_upload();
         // emit to other clients
-        socketdata.uploaded_filename = response.image_filename;
-        socket.emit('clientemit_share_upload', socketdata);
+        socketdata.uploadedFilename = response.imageFilename;
+        socket.emit('c-e:  share_upload', socketdata);
 
         uploadtotal = 0;
       }
@@ -1200,15 +1194,15 @@ socket.on('insta_download_ready', function (new_file) {
       delete_element = document.getElementById(selected_file.image_id);
 
       // gather data
-      image_to_delete.image_id = selected_file.image_id;
-      image_to_delete.image_filename = delete_element.getAttribute('title');
-      image_to_delete.src = delete_element.src;
-      image_to_delete.width = delete_element.style.width;
-      image_to_delete.height = delete_element.style.height;
-      image_to_delete.zindex = delete_element.style.zIndex;
+      imageToDelete.image_id = selected_file.image_id;
+      imageToDelete.imageFilename = delete_element.getAttribute('title');
+      imageToDelete.src = delete_element.src;
+      imageToDelete.width = delete_element.style.width;
+      imageToDelete.height = delete_element.style.height;
+      imageToDelete.zindex = delete_element.style.zIndex;
 
       // hide original image
-      document.getElementById(image_to_delete.image_id).style.display = 'none';
+      document.getElementById(imageToDelete.image_id).style.display = 'none';
 
       // hide draggers
       hide_draggers();
@@ -1217,7 +1211,7 @@ socket.on('insta_download_ready', function (new_file) {
       state_change_to_delete();
 
       // send socket to hide on other clients
-      socket.emit('clientemit_hide_image', image_to_delete.image_id);
+      socket.emit('c-e:  hide_image', imageToDelete.image_id);
     };
   });
 
@@ -1225,7 +1219,7 @@ socket.on('insta_download_ready', function (new_file) {
   $('#reject_delete_button').on('click', function () {
     state_change_after_reject_delete();
     // send socket to show on other clients
-    socket.emit('clientemit_show_image', image_to_delete.image_id);
+    socket.emit('c-e:  show_image', imageToDelete.image_id);
   });
 
   // confirm delete
@@ -1233,14 +1227,14 @@ socket.on('insta_download_ready', function (new_file) {
     var socketdata = {};
 
     // remove image
-    document.getElementById(image_to_delete.image_id).remove();
+    document.getElementById(imageToDelete.image_id).remove();
     // change navigation container
     state_change_after_delete();
     // prepare data to send
-    socketdata.filename_to_delete = image_to_delete.image_filename;
-    socketdata.id_to_delete = image_to_delete.image_id;
+    socketdata.filenameToDelete = imageToDelete.imageFilename;
+    socketdata.id_to_delete = imageToDelete.image_id;
     // send data to server
-    socket.emit('clientemit_delete_image', socketdata);
+    socket.emit('c-e:  delete_image', socketdata);
     clear_selected_file();
   });
 
@@ -1253,7 +1247,7 @@ socket.on('insta_download_ready', function (new_file) {
 
     // insta_step 24: If the client has an access token, open Instagram divs and skip to insta_step 7.
 
-    // insta_access_ready is assigned during the initial socket 'connect_set_client_vars'
+    // insta_access_ready is assigned during the initial socket 'connect_set_clientVars'
     if (insta_access_ready === true) {
 
       socket.emit('get_instagram_data');
@@ -1270,12 +1264,12 @@ socket.on('insta_download_ready', function (new_file) {
     } else {
 
       // insta_step 1: Redirect to Instagram API to prompt user to authenticate
-      // insta_app_id, provided to Instagram developers, is stored on the server
+      // instaAppID, provided to Instagram developers, is stored on the server
       // and fetched with the initial socket connection
       // Successful authentication will send the browser back to the server's
       // app.get('/') with 'myclient_id' and 'code' query parameter to be parsed by the server
 
-      window.location = 'https://api.instagram.com/oauth/authorize/?client_id=' + insta_app_id + '&redirect_uri=' + redirect_url + '&response_type=code';
+      window.location = 'https://api.instagram.com/oauth/authorize/?client_id=' + instaAppID + '&redirect_uri=' + redirect_url + '&response_type=code';
     };
 
   });
@@ -1340,15 +1334,15 @@ socket.on('insta_download_ready', function (new_file) {
 
 /*
       // gather data
-      image_to_delete.image_id = selected_file.image_id;
-      image_to_delete.image_filename = delete_element.getAttribute('title');
-      image_to_delete.src = delete_element.src;
-      image_to_delete.width = delete_element.style.width;
-      image_to_delete.height = delete_element.style.height;
-      image_to_delete.zindex = delete_element.style.zIndex;
+      imageToDelete.image_id = selected_file.image_id;
+      imageToDelete.imageFilename = delete_element.getAttribute('title');
+      imageToDelete.src = delete_element.src;
+      imageToDelete.width = delete_element.style.width;
+      imageToDelete.height = delete_element.style.height;
+      imageToDelete.zindex = delete_element.style.zIndex;
 
       // hide original image
-      document.getElementById(image_to_delete.image_id).style.display = 'none';
+      document.getElementById(imageToDelete.image_id).style.display = 'none';
 
       // hide draggers
       hide_draggers();
@@ -1357,7 +1351,7 @@ socket.on('insta_download_ready', function (new_file) {
       state_change_to_delete();
 
       // send socket to hide on other clients
-      socket.emit('clientemit_hide_image', image_to_delete.image_id);
+      socket.emit('c-e:  hide_image', imageToDelete.image_id);
 */
 
 
@@ -1429,10 +1423,10 @@ socket.on('insta_download_ready', function (new_file) {
           this.style.webkitFilter = '';
 
           // send emit to remove filter from other clients
-          socket.emit('clientemit_remove_filter', this.image_id);
+          socket.emit('c-e:  remove_filter', this.image_id);
 
-          // pass id to clientemit_freeze
-          socket.emit('clientemit_freeze', this.image_id);
+          // pass id to c-e:  freeze
+          socket.emit('c-e:  freeze', this.image_id);
 
           // begin to prepare socketdata
           this.socketdata = {};
@@ -1450,11 +1444,11 @@ socket.on('insta_download_ready', function (new_file) {
           debug_report([[4, 'Current: Left: ' + this.socketdata.image_left + ' Top: ' + this.socketdata.image_top]]);
 
           // pass socket data to server
-          socket.emit('clientemit_moving', this.socketdata);
+          socket.emit('c-e:  moving', this.socketdata);
         },
         stop: function () {
           // prepare data to send to ajax post, get all drawing elements
-          var drag_post_data = {},
+          var dropPost = {},
             i = 0,
             drawing_elements = document.body.getElementsByClassName('drawing');
 
@@ -1466,33 +1460,33 @@ socket.on('insta_download_ready', function (new_file) {
           this.removeAttribute('data-filter');
 
           // send emit to restore filter to other clients
-          socket.emit('clientemit_restore_filter', this.image_id);
+          socket.emit('c-e:  restore_filter', this.image_id);
 
           debug_report([[5, 'Stop: Left: ' + this.style.left + ' Top: ' + this.style.top]]);
 
           // send emit to unfreeze in other clients
-          socket.emit('clientemit_unfreeze', this.image_id);
+          socket.emit('c-e:  unfreeze', this.image_id);
 
           // prepare data to send to server
-          drag_post_data.dom_ids = [];
-          drag_post_data.filenames = [];
-          drag_post_data.z_indexes = [];
-          drag_post_data.moved_file = this.getAttribute('title');
-          drag_post_data.moved_posleft = this.style.left;
-          drag_post_data.moved_postop = this.style.top;
+          dropPost.dom_ids = [];
+          dropPost.filenames = [];
+          dropPost.z_indexes = [];
+          dropPost.moved_file = this.getAttribute('title');
+          dropPost.moved_posleft = this.style.left;
+          dropPost.moved_postop = this.style.top;
 
-          // populate drag_post_data
+          // populate dropPost
           for (i = 0; i < drawing_elements.length; i++) {
-            drag_post_data.dom_ids[i] = drawing_elements[i].getAttribute('id');
-            drag_post_data.filenames[i] = drawing_elements[i].getAttribute('title');
-            drag_post_data.z_indexes[i] = drawing_elements[i].style.zIndex;
+            dropPost.dom_ids[i] = drawing_elements[i].getAttribute('id');
+            dropPost.filenames[i] = drawing_elements[i].getAttribute('title');
+            dropPost.z_indexes[i] = drawing_elements[i].style.zIndex;
           };
 
           // ajax post from jquery.  FUTURE WORK: replace with a socket
           $.ajax({
             method: 'POST',
             url: '/dragstop',
-            data: JSON.stringify( { drag_post_data: drag_post_data} ),
+            data: JSON.stringify( { dropPost: dropPost} ),
             contentType: 'application/json'
           }).done(function () {
           });
@@ -1620,13 +1614,13 @@ socket.on('insta_download_ready', function (new_file) {
       this.angle = parseFloat(this.image_element.getAttribute('data-angle'));
       this.scale = parseFloat(this.image_element.getAttribute('data-scale'));
 
-      // pass id to clientemit_freeze
-      socket.emit('clientemit_freeze', this.image_id);
+      // pass id to c-e:  freeze
+      socket.emit('c-e:  freeze', this.image_id);
 
       // prepare socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
-      this.socketdata.image_filename = this.image_element.getAttribute('title');
+      this.socketdata.imageFilename = this.image_element.getAttribute('title');
     },
     onmove: function (event) {
       // retrieve scale and angle from event object
@@ -1640,7 +1634,7 @@ socket.on('insta_download_ready', function (new_file) {
 
       // send socketdata
       this.socketdata.image_transform = this.image_element.style.transform;
-      socket.emit('clientemit_transforming', this.socketdata);
+      socket.emit('c-e:  transforming', this.socketdata);
     },
     onend: function (event) {
       // if angle is < 0 or > 360, revise the angle to 0-360 range
@@ -1660,12 +1654,12 @@ socket.on('insta_download_ready', function (new_file) {
       this.socketdata.rotateY = this.image_element.getAttribute('data-rotateY');
       this.socketdata.rotateZ = this.image_element.getAttribute('data-rotateZ');
 
-      socket.emit('clientemit_store_data_attributes', this.socketdata);
+      socket.emit('c-e:  store_data_attributes', this.socketdata);
       this.socketdata.image_transform = this.image_element.style.transform;
-      socket.emit('clientemit_store_transformed', this.socketdata);
+      socket.emit('c-e:  store_transformed', this.socketdata);
 
-      // pass id to clientemit_unfreeze
-      socket.emit('clientemit_unfreeze', this.image_id);
+      // pass id to c-e:  unfreeze
+      socket.emit('c-e:  unfreeze', this.image_id);
 
       // put new scale and angle into data-scale and data-angle
       event.target.setAttribute('data-scale', this.scale.toFixed(2));
@@ -1699,15 +1693,15 @@ socket.on('insta_download_ready', function (new_file) {
 //       console.log('Draggable drawing dropped on exit door.');
 
       // gather data
-      image_to_delete.image_id = ui.draggable.attr('id');
-      image_to_delete.image_filename = ui.draggable.attr('title');
-      image_to_delete.src = ui.draggable.attr('src');
-      image_to_delete.width = ui.draggable.css('width');
-      image_to_delete.height = ui.draggable.css('height');
-      image_to_delete.zindex = ui.draggable.css('z-index');
+      imageToDelete.image_id = ui.draggable.attr('id');
+      imageToDelete.imageFilename = ui.draggable.attr('title');
+      imageToDelete.src = ui.draggable.attr('src');
+      imageToDelete.width = ui.draggable.css('width');
+      imageToDelete.height = ui.draggable.css('height');
+      imageToDelete.zindex = ui.draggable.css('z-index');
 
       // hide original image
-      document.getElementById(image_to_delete.image_id).style.display = 'none';
+      document.getElementById(imageToDelete.image_id).style.display = 'none';
 
       // hide draggers
       hide_draggers();
@@ -1716,7 +1710,7 @@ socket.on('insta_download_ready', function (new_file) {
       state_change_to_delete();
 
       // send socket to hide on other clients
-      socket.emit('clientemit_hide_image', image_to_delete.image_id);
+      socket.emit('c-e:  hide_image', imageToDelete.image_id);
     }
   });
 
@@ -1873,7 +1867,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.setAttribute('data-filter', this.image_element.style.WebkitFilter);
       this.image_element.style.WebkitFilter = '';
       // socket to other clients
-      socket.emit('clientemit_remove_filter', this.image_id);
+      socket.emit('c-e:  remove_filter', this.image_id);
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
@@ -1897,7 +1891,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.socketdata.image_height    = this.image_element.style.height;
       this.socketdata.image_left      = this.image_element.style.left;
       this.socketdata.image_top       = this.image_element.style.top;
-      socket.emit('clientemit_resizing', this.socketdata);
+      socket.emit('c-e:  resizing', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -1910,11 +1904,11 @@ socket.on('insta_download_ready', function (new_file) {
       // show draggers
       set_dragger_locations(this.image_id);
       // socket to other clients
-      socket.emit('clientemit_restore_filter', this.image_id);
+      socket.emit('c-e:  restore_filter', this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
       // socket to other clients
-      socket.emit('clientemit_store_resized', this.socketdata);
+      socket.emit('c-e:  store_resized', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1949,7 +1943,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.opacity = this.percentage_wide;
       // socket to other clients
       this.socketdata.current_opacity = this.percentage_wide;
-      socket.emit('clientemit_opacity_changing', this.socketdata);
+      socket.emit('c-e:  opacity_changing', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -1959,8 +1953,8 @@ socket.on('insta_download_ready', function (new_file) {
       // show draggers
       set_dragger_locations(this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
-      socket.emit('clientemit_store_opacity', this.socketdata);
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
+      socket.emit('c-e:  store_opacity', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1988,7 +1982,7 @@ socket.on('insta_download_ready', function (new_file) {
       // this.image_element.setAttribute('data-filter', this.image_element.style.WebkitFilter);
       // this.image_element.style.WebkitFilter = '';
       // socket to other clients
-      // socket.emit('clientemit_remove_filter', this.image_id);
+      // socket.emit('c-e:  remove_filter', this.image_id);
     },
     drag: function (event, ui) {
       // calculate changes: define the selected_image's new rotation in relation to the percentage of inner window size
@@ -2003,7 +1997,7 @@ socket.on('insta_download_ready', function (new_file) {
 
       // socket to other clients
       this.socketdata.image_transform = this.image_element.style.transform;
-      socket.emit('clientemit_transforming', this.socketdata);
+      socket.emit('c-e:  transforming', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -2013,11 +2007,11 @@ socket.on('insta_download_ready', function (new_file) {
       // restore filter
       // this.image_element.style.WebkitFilter = this.image_element.getAttribute('data-filter');
       // this.image_element.removeAttribute('data-filter');
-      // socket.emit('clientemit_restore_filter', this.image_id);
+      // socket.emit('c-e:  restore_filter', this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
       // this.socketdata.image_transform = this.image_element.style.transform;
-      socket.emit('clientemit_store_transformed', this.socketdata);
+      socket.emit('c-e:  store_transformed', this.socketdata);
       // store angle in data-angle
       this.image_element.setAttribute('data-angle', this.new_rotation.toFixed(2));
       this.image_element.setAttribute('data-rotateZ', this.new_rotateZ.toFixed(2));
@@ -2029,7 +2023,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.socketdata.rotateX = this.image_element.getAttribute('data-rotateX');
       this.socketdata.rotateY = this.image_element.getAttribute('data-rotateY');
       this.socketdata.rotateZ = this.image_element.getAttribute('data-rotateZ');
-      socket.emit('clientemit_store_data_attributes', this.socketdata);
+      socket.emit('c-e:  store_data_attributes', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -2066,7 +2060,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/grayscale\(.*?\)/, 'grayscale(' + this.percentage_high + ')');
       // socket to other clients
       this.socketdata.current_filter = this.image_element.style.WebkitFilter;
-      socket.emit('clientemit_filter_changing', this.socketdata);
+      socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -2076,8 +2070,8 @@ socket.on('insta_download_ready', function (new_file) {
       // show draggers
       set_dragger_locations(this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
-      socket.emit('clientemit_store_filter', this.socketdata);
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
+      socket.emit('c-e:  store_filter', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -2114,7 +2108,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.percentage_wide * brightness_level) + ')');
       // socket to other clients
       this.socketdata.current_filter = this.image_element.style.WebkitFilter;
-      socket.emit('clientemit_filter_changing', this.socketdata);
+      socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -2124,8 +2118,8 @@ socket.on('insta_download_ready', function (new_file) {
       // show draggers
       set_dragger_locations(this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
-      socket.emit('clientemit_store_filter', this.socketdata);
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
+      socket.emit('c-e:  store_filter', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -2162,7 +2156,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.percentage_wide * saturate_level) + ')');
       // socket to other clients
       this.socketdata.current_filter = this.image_element.style.WebkitFilter;
-      socket.emit('clientemit_filter_changing', this.socketdata);
+      socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -2172,8 +2166,8 @@ socket.on('insta_download_ready', function (new_file) {
       // show draggers
       set_dragger_locations(this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
-      socket.emit('clientemit_store_filter', this.socketdata);
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
+      socket.emit('c-e:  store_filter', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -2212,8 +2206,8 @@ socket.on('insta_download_ready', function (new_file) {
       // socket to other clients
       this.socketdata.current_opacity = this.percentage_wide;
       this.socketdata.current_filter = this.image_element.style.WebkitFilter;
-      socket.emit('clientemit_opacity_changing', this.socketdata);
-      socket.emit('clientemit_filter_changing', this.socketdata);
+      socket.emit('c-e:  opacity_changing', this.socketdata);
+      socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -2223,10 +2217,10 @@ socket.on('insta_download_ready', function (new_file) {
       // show draggers
       set_dragger_locations(this.image_id);
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
       this.socketdata.image_id = this.image_id;
-      socket.emit('clientemit_store_opacity', this.socketdata);
-      socket.emit('clientemit_store_filter', this.socketdata);
+      socket.emit('c-e:  store_opacity', this.socketdata);
+      socket.emit('c-e:  store_filter', this.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -2267,7 +2261,7 @@ socket.on('insta_download_ready', function (new_file) {
 
       // socket to other clients
       this.socketdata.image_transform = this.image_element.style.transform;
-      socket.emit('clientemit_transforming', this.socketdata);
+      socket.emit('c-e:  transforming', this.socketdata);
     },
     stop: function () {
       // remove grid and dragger_info box
@@ -2275,9 +2269,9 @@ socket.on('insta_download_ready', function (new_file) {
       // allow transitions
       this.classList.add('dragger_transitions');
       // save to database
-      this.socketdata.image_filename  = this.image_element.getAttribute('title');
+      this.socketdata.imageFilename  = this.image_element.getAttribute('title');
       this.socketdata.image_id = this.image_id;
-      socket.emit('clientemit_store_transformed', this.socketdata);
+      socket.emit('c-e:  store_transformed', this.socketdata);
       // store rotate in data-rotateX,Y
       this.image_element.setAttribute('data-rotateX', this.new_rotate_x.toFixed(2));
       this.image_element.setAttribute('data-rotateY', this.new_rotate_y.toFixed(2));
@@ -2290,7 +2284,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.socketdata.rotateX = this.image_element.getAttribute('data-rotateX');
       this.socketdata.rotateY = this.image_element.getAttribute('data-rotateY');
       this.socketdata.rotateZ = this.image_element.getAttribute('data-rotateZ');
-      socket.emit('clientemit_store_data_attributes', this.socketdata);
+      socket.emit('c-e:  store_data_attributes', this.socketdata);
       // reset click count
       click_count = 0;
     }

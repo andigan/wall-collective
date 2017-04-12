@@ -52,8 +52,8 @@ Uses:
   ```
   config.port = '80';
   config.database_name = 'mydatabase';
-  config.use_cdn = true;
-  config.image_dir = '/images/';
+  config.useCDN = true;
+  config.imageDir = '/images/';
   ```
 
 4. Run the app:

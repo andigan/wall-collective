@@ -1,3 +1,6 @@
+var fs = require('fs'),
+    request = require('request');
+
 // download helper function
 module.exports = function (uri, filename, callback) {
 
