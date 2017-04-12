@@ -64,4 +64,6 @@ Uses:
 
 ## Notes
 
-The app is currently in beta mode.  Instagram integration is currently in sandbox mode due to API restrictions.  Contact me for a working Instagram demo account!
+The app is currently in beta mode.
+- Instagram integration is currently in sandbox mode due to API restrictions.  Contact me for a working Instagram demo account!
+- Currently only works consistently with Chrome and Safari.
