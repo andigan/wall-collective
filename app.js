@@ -87,7 +87,6 @@ dbInit();
 ImageDocuments = mongoose.model('images');
 UserDocuments = mongoose.model('users');
 
-
 // routing
 app.get('/', function (req, res) {
 

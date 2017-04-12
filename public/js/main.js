@@ -355,13 +355,11 @@ $(document).ready( function () {
     document.getElementById('line_three').style.top = '60%';
 
     // remove
-    if (document.getElementById('insta_div').style.display === 'block') {
-      history.replaceState({}, 'wall-collective', '/');
-      document.getElementById('insta_header').style.display = 'none';
-      document.getElementById('insta_div').style.display = 'none';
-    };
-
-
+    // if (document.getElementById('insta_div').style.display === 'block') {
+    //   history.replaceState({}, 'wall-collective', '/');
+    //   document.getElementById('insta_header').style.display = 'none';
+    //   document.getElementById('insta_div').style.display = 'none';
+    // };
   }
 
   function state_change_to_tools_menu() {
