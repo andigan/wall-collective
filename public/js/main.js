@@ -59,7 +59,7 @@ $(document).ready( function () {
     imageToDelete = {},
 
     // assigned by initial socket; used by upload counter
-    client_id = String,
+    sessionID = String,
 
     // assigned by initial socket; used by instagram link
     instaAppID = String,
@@ -78,7 +78,7 @@ $(document).ready( function () {
     insta_download_ready_filename = {},
 
     // used when an access token is available for the client after a user authenticates with Instagram
-    insta_access_ready = false;
+    instaAccessReady = false;
 
   // set wrapper size; (css vh and vw were not working with mobile safari)
   document.getElementById('wrapper').style.width = window.innerWidth + 'px';
@@ -130,7 +130,7 @@ $(document).ready( function () {
 
   // insta_step 6: Open the instagram_div and fetch instagram data
   if (open_instagram_div === true) {
-    socket.emit('get_instagram_data');
+    socket.emit('ce: get_instagram_data');
 
     document.getElementById('insta_header').style.display = 'flex';
     document.getElementById('insta_div').style.display = 'block';
@@ -309,7 +309,7 @@ $(document).ready( function () {
   function getCookie(cookie_name) {
     var i = 0,
       cookie_element = '',
-      // create an array of key=value pairs e.g. ['name=Shannon', 'client_id=Vy94J6V1W']
+      // create an array of key=value pairs e.g. ['name=Shannon', 'sessionID=Vy94J6V1W']
       cookie_array = document.cookie.split(';');
 
     for ( i = 0; i < cookie_array.length; i++) {
@@ -511,12 +511,12 @@ $(document).ready( function () {
 //     });
 
 
-  // on initial connect, retrieve client_id cookie and send results to server
+  // on initial connect, retrieve sessionID cookie and send results to server
   socket.on('connect', function () {
     var clientVars = {};
 
-    clientVars.client_id = getCookie('client_id');
-    socket.emit ('c-e:  client_id_check', clientVars);
+    clientVars.sessionID = getCookie('sessionID');
+    socket.emit ('c-e:  sessionID_check', clientVars);
 
   });
 
@@ -527,8 +527,8 @@ $(document).ready( function () {
   });
 
 
-  socket.on('insta_access_ready', function () {
-    insta_access_ready = true;
+  socket.on('ce: insta_access_ready', function () {
+    instaAccessReady = true;
   });
 
   // initial set up for all visits.
@@ -536,20 +536,20 @@ $(document).ready( function () {
     var i = 0,
       switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
 
-    // assign client_id.  used by upload_counter and user_count
+    // assign sessionID.  used by upload_counter and user_count
     // the server sends a unique id or the previous id from the cookie
-    client_id = clientVars.client_id;
+    sessionID = clientVars.sessionID;
 
     instaAppID = clientVars.instaAppID;
 
-//    insta_access_ready = clientVars.clients_insta_access_ready;
+//    instaAccessReady = clientVars.clients_instaAccessReady;
 
-    // set or reset client_id cookie
-    setCookie('client_id', client_id, 7);
+    // set or reset sessionID cookie
+    setCookie('sessionID', sessionID, 7);
 
-    // hack: Problem:  busboy stream received the file stream before the client_id, which was passed as a data value in the ajax submit
-    //       Solution: change the HTML 'name' attribute of the form's input to the client_id, which always arrives concurrently
-    document.getElementById('fileselect').setAttribute('name', client_id);
+    // hack: Problem:  busboy stream received the file stream before the sessionID, which was passed as a data value in the ajax submit
+    //       Solution: change the HTML 'name' attribute of the form's input to the sessionID, which always arrives concurrently
+    document.getElementById('fileselect').setAttribute('name', sessionID);
 
     // switches_status cookie stores which draggers are activated when the page loads; capital letters denote an activated dragger
     if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgtp', 7);
@@ -571,39 +571,39 @@ $(document).ready( function () {
     // for each connected_client, add an icon to connect_info element
     for ( i = 0; i < data.length; i++ ) {
       content = content + "<img src='icons/person_icon.png' class='person_icon' />";
-      // debug: report client_id rather than image. underline connected client_id
-      // if (data[i] === client_id) content = content + '<u>'; content = content + '  ' + data[i]; if (data[i] === client_id) content = content + '</u>';
+      // debug: report sessionID rather than image. underline connected sessionID
+      // if (data[i] === sessionID) content = content + '<u>'; content = content + '  ' + data[i]; if (data[i] === sessionID) content = content + '</u>';
     };
     connect_info_element.innerHTML = content;
   });
 
   // on another client moving an image, move target
   socket.on('bc: moving', function (data) {
-    document.getElementById(data.image_id).style.top  = data.image_top;
-    document.getElementById(data.image_id).style.left = data.image_left;
+    document.getElementById(data.image_id).style.top  = data.imageTop;
+    document.getElementById(data.image_id).style.left = data.imageLeft;
   });
 
   // on another client resizing an image, resize target
   socket.on('bc: resizing', function (data) {
-    document.getElementById(data.image_id).style.transform = data.image_transform;
-    document.getElementById(data.image_id).style.top       = data.image_top;
-    document.getElementById(data.image_id).style.left      = data.image_left;
-    document.getElementById(data.image_id).style.width     = data.image_width;
-    document.getElementById(data.image_id).style.height    = data.image_height;
+    document.getElementById(data.image_id).style.transform = data.imageTransform;
+    document.getElementById(data.image_id).style.top       = data.imageTop;
+    document.getElementById(data.image_id).style.left      = data.imageLeft;
+    document.getElementById(data.image_id).style.width     = data.imageWidth;
+    document.getElementById(data.image_id).style.height    = data.imageHeight;
   });
 
   // on resize stop, resize target with new parameters
   socket.on('bc: resized', function (data) {
-    document.getElementById(data.image_id).style.transform = data.image_transform;
-    document.getElementById(data.image_id).style.top       = data.image_top;
-    document.getElementById(data.image_id).style.left      = data.image_left;
-    document.getElementById(data.image_id).style.width     = data.image_width;
-    document.getElementById(data.image_id).style.height    = data.image_height;
+    document.getElementById(data.image_id).style.transform = data.imageTransform;
+    document.getElementById(data.image_id).style.top       = data.imageTop;
+    document.getElementById(data.image_id).style.left      = data.imageLeft;
+    document.getElementById(data.image_id).style.width     = data.imageWidth;
+    document.getElementById(data.image_id).style.height    = data.imageHeight;
   });
 
   // on transforming, transform target
   socket.on('bc: transforming', function (data) {
-    document.getElementById(data.image_id).style.transform = data.image_transform;
+    document.getElementById(data.image_id).style.transform = data.imageTransform;
   });
 
   // on transform changes, modify data attributes used by set_dragger_locations
@@ -617,12 +617,12 @@ $(document).ready( function () {
 
   // on opacity changing, adjust target
   socket.on('bc: opacity_changing', function (data) {
-    document.getElementById(data.image_id).style.opacity = data.current_opacity;
+    document.getElementById(data.image_id).style.opacity = data.imageOpacity;
   });
 
   // on filter changing, adjust target
   socket.on('bc: filter_changing', function (data) {
-    document.getElementById(data.image_id).style.WebkitFilter = data.current_filter;
+    document.getElementById(data.image_id).style.WebkitFilter = data.imageFilter;
   });
 
   // reset page across all clients
@@ -698,7 +698,7 @@ $(document).ready( function () {
 
   // if this client is the uploader, show upload statistics from busboy
   socket.on('bc: chunk_sent', function (uploaddata) {
-    if (uploaddata.client_id === client_id) {
+    if (uploaddata.sessionID === sessionID) {
       uploadtotal += uploaddata.chunkSize;
       document.getElementById('confirm_or_reject_container_info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
       debug_report([[10, 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.']]);
@@ -708,7 +708,7 @@ $(document).ready( function () {
   });
 
   // insta_step 10: Add content to insta_div
-  socket.on('add_content_to_insta_div', function (insta_fetch_data) {
+  socket.on('se: add_content_to_insta_div', function (insta_fetch_data) {
     var i = 0,
       insta_image_container = document.getElementById('insta_image_container');
 
@@ -763,7 +763,7 @@ $(document).ready( function () {
             // insta_step 12: When dragging starts, save dragged image to server storage, using id as an index
             console.log(this);
 
-            socket.emit('client_emit_save_insta_image', { src: this.getAttribute('src'), id: parseInt(this.getAttribute('id').replace('insta', '')) });
+            socket.emit('ce: save_insta_image', { src: this.getAttribute('src'), id: parseInt(this.getAttribute('id').replace('insta', '')) });
 
             // assign temporary z-index
             this.style.zIndex = 60000;
@@ -772,16 +772,16 @@ $(document).ready( function () {
           }
         });
     };
-  }); // end of socket add_content_to_insta_div
+  }); // end of socket se: add_content_to_insta_div
 
 
 // insta_step 15: Receive new filename from server
-socket.on('insta_download_ready', function (new_file) {
+socket.on('ce: insta_download_ready', function (newFileData) {
 
   //  store new filename in an object with the id as the key
-  insta_download_ready_filename['insta' + new_file.image_index] = new_file.newfilename;
+  insta_download_ready_filename['insta' + newFileData.iIndex] = newFileData.newFilename;
 
-  console.log(new_file.newfilename + ' downloaded.');
+  console.log(newFileData.newFilename + ' downloaded.');
 });
 
 
@@ -793,7 +793,7 @@ socket.on('insta_download_ready', function (new_file) {
     accept: '.insta_image',
     drop: function (event, ui) {
       var clone = {},
-        insta_drop_data = {},
+        instaDropData = {},
         timeout_counter = 0;
 
         // clone is a jQuery method.  false specifies that event handlers should not be copied.
@@ -827,16 +827,16 @@ socket.on('insta_download_ready', function (new_file) {
 
         // once the filename is received...
 
-        // insta_step 17: Send insta_drop_data to server
-        insta_drop_data.insta_id = ui.draggable[0].getAttribute('id');
-        insta_drop_data.insta_filename = insta_download_ready_filename[ui.draggable[0].getAttribute('id')];
-        insta_drop_data.posleft = ui.offset.left;
-        insta_drop_data.postop = ui.offset.top;
-        insta_drop_data.insta_width = window.getComputedStyle(ui.draggable[0]).width;
-        insta_drop_data.insta_height = window.getComputedStyle(ui.draggable[0]).height;
-        insta_drop_data.insta_link = ui.draggable[0].getAttribute('data-link');
+        // insta_step 17: Send instaDropData to server
+        instaDropData.iID = ui.draggable[0].getAttribute('id');
+        instaDropData.iFilename =  insta_download_ready_filename[ui.draggable[0].getAttribute('id')];
+        instaDropData.posleft = ui.offset.left;
+        instaDropData.postop = ui.offset.top;
+        instaDropData.iWidth = window.getComputedStyle(ui.draggable[0]).width;
+        instaDropData.iHeight = window.getComputedStyle(ui.draggable[0]).height;
+        instaDropData.iLink = ui.draggable[0].getAttribute('data-link');
 
-        socket.emit('client_emit_insta_drop', insta_drop_data);
+        socket.emit('ce: insta_drop', instaDropData);
 
         // delete id key from insta_download_ready_filename object
         delete insta_download_ready_filename[ui.draggable[0].getAttribute('id')];
@@ -853,46 +853,46 @@ socket.on('insta_download_ready', function (new_file) {
 
 
   // insta_step 20: Convert dragged image to typical .drawing
-  socket.on('change_clone_to_image', function(insta_database_parameters) {
-    var image_element = document.getElementById(insta_database_parameters.insta_id);
+  socket.on('se: change_clone_to_image', function(instaDBData) {
+    var image_element = document.getElementById(instaDBData.iID);
 
-    image_element.setAttribute('id', insta_database_parameters.dom_id);
-    image_element.src = insta_database_parameters.location + insta_database_parameters.insta_filename;
+    image_element.setAttribute('id', instaDBData.dom_id);
+    image_element.src = instaDBData.location + instaDBData.iFilename;
     image_element.classList.add('drawing');
-    image_element.style.width = insta_database_parameters.width;
-    image_element.style.height = insta_database_parameters.height;
+    image_element.style.width = instaDBData.width;
+    image_element.style.height = instaDBData.height;
     image_element.classList.remove('insta_image');
-    image_element.setAttribute('title', insta_database_parameters.insta_filename);
-    image_element.setAttribute('data-link', insta_database_parameters.insta_link);
+    image_element.setAttribute('title', instaDBData.iFilename);
+    image_element.setAttribute('data-link', instaDBData.insta_link);
     image_element.setAttribute('data-scale', '1');
     image_element.setAttribute('data-angle', '0');
     image_element.setAttribute('data-rotateX', '0');
     image_element.setAttribute('data-rotateY', '0');
     image_element.setAttribute('data-rotateZ', '0');
-    image_element.style.zIndex = insta_database_parameters.z_index;
+    image_element.style.zIndex = instaDBData.z_index;
     image_element.style.opacity = 1;
     image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
     image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
 
     // assign drag to added element
-    assigndrag(insta_database_parameters.dom_id);
+    assigndrag(instaDBData.dom_id);
   });
 
   // insta_step 22: Add image to other clients
-  socket.on('add_insta_image_to_other_clients', function (insta_database_parameters) {
+  socket.on('be: add_insta_image_to_other_clients', function (instaDBData) {
     var images_element = document.getElementById('images'),
       image_element = document.createElement('img');
 
-    image_element.setAttribute('id', insta_database_parameters.dom_id);
-    image_element.setAttribute('title', insta_database_parameters.insta_filename);
-    image_element.src = insta_database_parameters.location + insta_database_parameters.insta_filename;
+    image_element.setAttribute('id', instaDBData.dom_id);
+    image_element.setAttribute('title', instaDBData.iFilename);
+    image_element.src = instaDBData.location + instaDBData.iFilename;
     image_element.classList.add('drawing');
-    image_element.style.width = insta_database_parameters.width;
-    image_element.style.height = insta_database_parameters.height;
-    image_element.style.top = insta_database_parameters.postop;
-    image_element.style.left = insta_database_parameters.posleft;
-    image_element.style.zIndex = insta_database_parameters.z_index;
-    image_element.setAttribute('data-link', insta_database_parameters.insta_link);
+    image_element.style.width = instaDBData.width;
+    image_element.style.height = instaDBData.height;
+    image_element.style.top = instaDBData.postop;
+    image_element.style.left = instaDBData.posleft;
+    image_element.style.zIndex = instaDBData.z_index;
+    image_element.setAttribute('data-link', instaDBData.insta_link);
 
 
     image_element.setAttribute('data-scale', '1');
@@ -907,7 +907,7 @@ socket.on('insta_download_ready', function (new_file) {
     images_element.appendChild(image_element);
 
     // assign drag to added element
-    assigndrag(insta_database_parameters.dom_id);
+    assigndrag(instaDBData.dom_id);
   });
 
 
@@ -1243,14 +1243,14 @@ socket.on('insta_download_ready', function (new_file) {
     var redirect_url = [location.protocol, '//', location.host, location.pathname].join('');
 
     // redirect_url: http://www.example.com?myclient_id=johndoe
-    redirect_url = redirect_url + '?myclient_id=' + client_id;
+    redirect_url = redirect_url + '?myclient_id=' + sessionID;
 
     // insta_step 24: If the client has an access token, open Instagram divs and skip to insta_step 7.
 
-    // insta_access_ready is assigned during the initial socket 'connect_set_clientVars'
-    if (insta_access_ready === true) {
+    // instaAccessReady is assigned during the initial socket 'connect_set_clientVars'
+    if (instaAccessReady === true) {
 
-      socket.emit('get_instagram_data');
+      socket.emit('ce: get_instagram_data');
 
       document.getElementById('insta_header').style.display = 'flex';
       document.getElementById('insta_div').style.display = 'block';
@@ -1292,9 +1292,9 @@ socket.on('insta_download_ready', function (new_file) {
     alert('logged out');
 
     // insta_step 26: Remove client's access token from server
-    socket.emit('client_emit_remove_client_from_clients_access', client_id);
+    socket.emit('ce: remove_client_from_clients_access', sessionID);
 
-    insta_access_ready = false;
+    instaAccessReady = false;
   });
 
 
@@ -1438,10 +1438,10 @@ socket.on('insta_download_ready', function (new_file) {
           ui.position.top += this.recoupTop;
 
           // prepare socketdata to pass
-          this.socketdata.image_top = this.style.top;
-          this.socketdata.image_left = this.style.left;
+          this.socketdata.imageTop = this.style.top;
+          this.socketdata.imageLeft = this.style.left;
 
-          debug_report([[4, 'Current: Left: ' + this.socketdata.image_left + ' Top: ' + this.socketdata.image_top]]);
+          debug_report([[4, 'Current: Left: ' + this.socketdata.imageLeft + ' Top: ' + this.socketdata.imageTop]]);
 
           // pass socket data to server
           socket.emit('c-e:  moving', this.socketdata);
@@ -1468,18 +1468,18 @@ socket.on('insta_download_ready', function (new_file) {
           socket.emit('c-e:  unfreeze', this.image_id);
 
           // prepare data to send to server
-          dropPost.dom_ids = [];
+          dropPost.domIDs = [];
           dropPost.filenames = [];
-          dropPost.z_indexes = [];
-          dropPost.moved_file = this.getAttribute('title');
-          dropPost.moved_posleft = this.style.left;
-          dropPost.moved_postop = this.style.top;
+          dropPost.zIndexes = [];
+          dropPost.dFilename = this.getAttribute('title');
+          dropPost.dLeft = this.style.left;
+          dropPost.dTop = this.style.top;
 
           // populate dropPost
           for (i = 0; i < drawing_elements.length; i++) {
-            dropPost.dom_ids[i] = drawing_elements[i].getAttribute('id');
+            dropPost.domIDs[i] = drawing_elements[i].getAttribute('id');
             dropPost.filenames[i] = drawing_elements[i].getAttribute('title');
-            dropPost.z_indexes[i] = drawing_elements[i].style.zIndex;
+            dropPost.zIndexes[i] = drawing_elements[i].style.zIndex;
           };
 
           // ajax post from jquery.  FUTURE WORK: replace with a socket
@@ -1633,7 +1633,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.transform = this.image_element.style.transform.replace(/scale\(.*?\)/ , 'scale(' + this.scale + ')');
 
       // send socketdata
-      this.socketdata.image_transform = this.image_element.style.transform;
+      this.socketdata.imageTransform = this.image_element.style.transform;
       socket.emit('c-e:  transforming', this.socketdata);
     },
     onend: function (event) {
@@ -1655,7 +1655,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.socketdata.rotateZ = this.image_element.getAttribute('data-rotateZ');
 
       socket.emit('c-e:  store_data_attributes', this.socketdata);
-      this.socketdata.image_transform = this.image_element.style.transform;
+      this.socketdata.imageTransform = this.image_element.style.transform;
       socket.emit('c-e:  store_transformed', this.socketdata);
 
       // pass id to c-e:  unfreeze
@@ -1886,11 +1886,11 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.left = this.new_left + 'px';
       this.image_element.style.top = this.new_top + 'px';
       // emit to other clients
-      this.socketdata.image_transform = this.image_element.style.transform;
-      this.socketdata.image_width     = this.image_element.style.width;
-      this.socketdata.image_height    = this.image_element.style.height;
-      this.socketdata.image_left      = this.image_element.style.left;
-      this.socketdata.image_top       = this.image_element.style.top;
+      this.socketdata.imageTransform = this.image_element.style.transform;
+      this.socketdata.imageWidth     = this.image_element.style.width;
+      this.socketdata.imageHeight    = this.image_element.style.height;
+      this.socketdata.imageLeft      = this.image_element.style.left;
+      this.socketdata.imageTop       = this.image_element.style.top;
       socket.emit('c-e:  resizing', this.socketdata);
     },
     stop: function () {
@@ -1942,7 +1942,7 @@ socket.on('insta_download_ready', function (new_file) {
       // make the calculated changes
       this.image_element.style.opacity = this.percentage_wide;
       // socket to other clients
-      this.socketdata.current_opacity = this.percentage_wide;
+      this.socketdata.imageOpacity = this.percentage_wide;
       socket.emit('c-e:  opacity_changing', this.socketdata);
     },
     stop: function () {
@@ -1996,7 +1996,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.transform = this.image_element.style.transform.replace(/rotateZ\(.*?\)/      , 'rotateZ(' + this.new_rotateZ + 'deg)');
 
       // socket to other clients
-      this.socketdata.image_transform = this.image_element.style.transform;
+      this.socketdata.imageTransform = this.image_element.style.transform;
       socket.emit('c-e:  transforming', this.socketdata);
     },
     stop: function () {
@@ -2010,7 +2010,7 @@ socket.on('insta_download_ready', function (new_file) {
       // socket.emit('c-e:  restore_filter', this.image_id);
       // save to database
       this.socketdata.imageFilename  = this.image_element.getAttribute('title');
-      // this.socketdata.image_transform = this.image_element.style.transform;
+      // this.socketdata.imageTransform = this.image_element.style.transform;
       socket.emit('c-e:  store_transformed', this.socketdata);
       // store angle in data-angle
       this.image_element.setAttribute('data-angle', this.new_rotation.toFixed(2));
@@ -2059,7 +2059,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/invert\(.*?\)/   , 'invert('    + this.percentage_wide + ')');
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/grayscale\(.*?\)/, 'grayscale(' + this.percentage_high + ')');
       // socket to other clients
-      this.socketdata.current_filter = this.image_element.style.WebkitFilter;
+      this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
       socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
@@ -2107,7 +2107,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/blur\(.*?\)/      , 'blur(' + ((1 - this.percentage_high) * blur_level) + 'px)');
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.percentage_wide * brightness_level) + ')');
       // socket to other clients
-      this.socketdata.current_filter = this.image_element.style.WebkitFilter;
+      this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
       socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
@@ -2155,7 +2155,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/contrast\(.*?\)/      , 'contrast(' + ((1 - this.percentage_high) * contrast_level) + ')');
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.percentage_wide * saturate_level) + ')');
       // socket to other clients
-      this.socketdata.current_filter = this.image_element.style.WebkitFilter;
+      this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
       socket.emit('c-e:  filter_changing', this.socketdata);
     },
     stop: function () {
@@ -2204,8 +2204,8 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.opacity = this.new_opacity;
       this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/hue-rotate\(.*?\)/      , 'hue-rotate(' + this.new_hue_rotate + 'deg)');
       // socket to other clients
-      this.socketdata.current_opacity = this.percentage_wide;
-      this.socketdata.current_filter = this.image_element.style.WebkitFilter;
+      this.socketdata.imageOpacity = this.percentage_wide;
+      this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
       socket.emit('c-e:  opacity_changing', this.socketdata);
       socket.emit('c-e:  filter_changing', this.socketdata);
     },
@@ -2260,7 +2260,7 @@ socket.on('insta_download_ready', function (new_file) {
       this.image_element.style.transform = this.image_element.style.transform.replace(/rotateY\(.*?\)/      , 'rotateY(' + this.new_rotate_y + 'deg)');
 
       // socket to other clients
-      this.socketdata.image_transform = this.image_element.style.transform;
+      this.socketdata.imageTransform = this.image_element.style.transform;
       socket.emit('c-e:  transforming', this.socketdata);
     },
     stop: function () {
@@ -2326,13 +2326,13 @@ socket.on('insta_download_ready', function (new_file) {
     var dragger_element = document.getElementById('stretch_dragger'),
       image_element     = document.getElementById(id),
       // get the width and height
-      selected_image_width  = parseInt(image_element.style.width),
-      selected_image_height = parseInt(image_element.style.height),
+      selected_imageWidth  = parseInt(image_element.style.width),
+      selected_imageHeight = parseInt(image_element.style.height),
       // calculate the dragger location
-      selected_image_width_percentage  = selected_image_width / mainwide,
-      selected_image_height_percentage = selected_image_height / mainhigh,
-      dragger_location_left            = selected_image_width_percentage * inner_width,
-      dragger_location_top             = (1 - selected_image_height_percentage) * inner_height;
+      selected_imageWidth_percentage  = selected_imageWidth / mainwide,
+      selected_imageHeight_percentage = selected_imageHeight / mainhigh,
+      dragger_location_left            = selected_imageWidth_percentage * inner_width,
+      dragger_location_top             = (1 - selected_imageHeight_percentage) * inner_height;
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';

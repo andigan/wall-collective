@@ -16,7 +16,7 @@
 var config = require('./config/config'),
     port = process.env.PORT || config.port,
 
-    // express framework; create the server using express
+    // create the server using express framework
     express = require('express'),
     app = express(),
 
@@ -46,11 +46,11 @@ var config = require('./config/config'),
     fs = require('fs'),
     path = require('path'),
     helpers = require('./helpers'),
-    shortid = require('shortid'),
+    shortID = require('shortid'),
     bodyParser = require('body-parser'), // parse response into objects (req.body.filename)
     Busboy = require('busboy'), // streaming parser for HTML multipart/form data
 
-    // an array of current client_ids that are connected
+    // an array of current sessionIDs that are connected
     connectedClients = [],
     server = {},
     io = {};
@@ -126,20 +126,19 @@ app.post('/dragstop', bodyParser.json(), function (req, res) {
   // close ajax connection
   res.end();
 
-  // report connection
   console.log('\n---- dropPost data received to update database ----\n');
-  console.log('dom_ids       : ' + dropPost.dom_ids);
-  console.log('filenames     : ' + dropPost.filenames);
-  console.log('z_indexes     : ' + dropPost.z_indexes);
-  console.log('moved_file    : ' + dropPost.moved_file);
-  console.log('moved_posleft : ' + dropPost.moved_posleft);
-  console.log('moved_postop  : ' + dropPost.moved_postop + '\n');
+  console.log('dom_ids   : ' + dropPost.domIDs);
+  console.log('filenames : ' + dropPost.filenames);
+  console.log('z_indexes : ' + dropPost.zIndexes);
+  console.log('dFilename : ' + dropPost.dFilename);
+  console.log('dLeft     : ' + dropPost.dLeft);
+  console.log('dTop      : ' + dropPost.dTop + '\n');
 
   // update left/top positions for moved_file's filename
   ImageDocuments.update(
-    { filename : dropPost.moved_file },
-    { $set: {   posleft  : dropPost.moved_posleft,
-                postop   : dropPost.moved_postop } },
+    { filename : dropPost.dFilename },
+    { $set: {   posleft  : dropPost.dLeft,
+                postop   : dropPost.dTop } },
     { upsert: true },
     function (err) { if (err) return console.error(err); } );
 
@@ -148,8 +147,8 @@ app.post('/dragstop', bodyParser.json(), function (req, res) {
 
     ImageDocuments.update(
       { filename : dropPost.filenames[i] },
-      { $set: { dom_id : dropPost.dom_ids[i],
-                zindex   : dropPost.z_indexes[i]} },
+      { $set: { dom_id : dropPost.domIDs[i],
+                zindex   : dropPost.zIndexes[i]} },
       { upsert: true },
       function (err) { if (err) return console.error(err); } );
   };
@@ -253,7 +252,7 @@ app.post('/addfile', function (req, res) {
 
   // busboy receives request and emits a 'file' event
   busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
-    console.log('client_id: ' + fieldname + ': filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
+    console.log('sessionID: ' + fieldname + ': filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
 
     // validate file mimetype
     if ( (mimetype != 'image/png') && (mimetype != 'image/jpeg') ) {
@@ -271,7 +270,7 @@ app.post('/addfile', function (req, res) {
       file.on('data', function (data) {
         var uploaddata = {};
 
-        uploaddata.client_id = fieldname;
+        uploaddata.sessionID = fieldname;
         uploaddata.chunkSize = data.length;
 
         console.log('File [' + filename + '] got ' + data.length + ' bytes');
@@ -281,17 +280,17 @@ app.post('/addfile', function (req, res) {
       file.on('end', function () {
         // get extension from filename using node method
         var extension = path.extname(filename),
-          // create unique filename using shortid dependency
-          newfilename = shortid.generate() + extension.toLowerCase();
+            // create unique filename using shortid dependency
+            newFilename = shortID.generate() + extension.toLowerCase();
 
         console.log('File [' + filename + '] Finished');
 
         // rename file
         console.log('About to fs.rename...');
         fs.rename(path.join(__dirname, config.staticImageDir, filename),
-                  path.join(__dirname, config.staticImageDir, newfilename),
+                  path.join(__dirname, config.staticImageDir, newFilename),
                   function () {
-                    console.log('file ' + filename + ' renamed: ' + newfilename);
+                    console.log('file ' + filename + ' renamed: ' + newFilename);
 
                     // find the highest z-index
                     ImageDocuments.findOne().sort('-zindex').exec(function (err, highZItem) {
@@ -304,7 +303,7 @@ app.post('/addfile', function (req, res) {
                         if (err) return console.error(err);
 
                         // prepare uploadResponse for client
-                        uploadResponse.imageFilename = newfilename;
+                        uploadResponse.imageFilename = newFilename;
                         uploadResponse.location = config.imageDir;
 
                         // if there are z-index results, add 1
@@ -318,7 +317,7 @@ app.post('/addfile', function (req, res) {
                         };
 
                         ImageDocuments.update(
-                          {           sort_id   : fs.statSync(config.staticImageDir + '/' + newfilename).mtime.toISOString().concat( newfilename ) },
+                          {           sort_id   : fs.statSync(config.staticImageDir + '/' + newFilename).mtime.toISOString().concat( newFilename ) },
                           { $set: {   dom_id    : uploadResponse.dom_id,
                                       filename  : uploadResponse.imageFilename,
                                       location  : config.imageDir,
@@ -363,31 +362,31 @@ io = require('socket.io').listen(server);
 
 // an instance of this function and its variables are created for each client connected
 io.on('connection', function (socket) {
-  var client_id = '';
+  var sessionID = '';
 
   // check to see if the client is new or revisiting with a cookie
-  socket.on('c-e:  client_id_check', function (clientVars) {
-    client_id = clientVars.client_id;
+  socket.on('c-e:  sessionID_check', function (clientVars) {
+    sessionID = clientVars.sessionID;
 
     // add the instagram_app_id
     clientVars.instaAppID = secrets.instaAppID;
 
 
-    // if the client is revisiting, send original client_id to client
-    if (client_id !== '' && client_id !== 'null' && client_id !== '[object Object]') {
-      console.log(client_id + ' reconnected.');
+    // if the client is revisiting, send original sessionID to client
+    if (sessionID !== '' && sessionID !== 'null' && sessionID !== '[object Object]') {
+      console.log(sessionID + ' reconnected.');
       socket.emit('connect_set_clientVars', clientVars);
 
-    // else when client is new, generate a new client_id
+    // else when client is new, generate a new sessionID
     } else {
-      client_id = shortid.generate();
-      console.log(client_id + ' connected for first time.');
-      clientVars.client_id = client_id;
+      sessionID = shortID.generate();
+      console.log(sessionID + ' connected for first time.');
+      clientVars.sessionID = sessionID;
       socket.emit('connect_set_clientVars', clientVars);
     };
 
-    // add client_id to connectedClients array
-    connectedClients.push(client_id);
+    // add sessionID to connectedClients array
+    connectedClients.push(sessionID);
 
     // change user count on all clients
     io.sockets.emit('bc: change_user_count', connectedClients);
@@ -396,7 +395,7 @@ io.on('connection', function (socket) {
     if (config.useIGram) {
       var insta_sockets = require('./i-gram/sockets.js');
 
-      insta_sockets(socket, client_id, download, instaAdapter);
+      insta_sockets(socket, sessionID, download, instaAdapter);
     };
 
 
@@ -404,9 +403,9 @@ io.on('connection', function (socket) {
 
   // on disconnect
   socket.on('disconnect', function () {
-    console.log(client_id + ' disconnected...');
-    // remove client_id from connectedClients array
-    connectedClients.splice(connectedClients.indexOf(client_id), 1);
+    console.log(sessionID + ' disconnected...');
+    // remove sessionID from connectedClients array
+    connectedClients.splice(connectedClients.indexOf(sessionID), 1);
     // change user count on remaining clients
     socket.broadcast.emit('bc: change_user_count', connectedClients);
   });
@@ -430,11 +429,11 @@ io.on('connection', function (socket) {
       // filter
       { filename : data.imageFilename },
       // set
-      { $set: { transform : data.image_transform,
-                posleft   : data.image_left,
-                postop    : data.image_top,
-                width     : data.image_width,
-                height    : data.image_height } },
+      { $set: { transform : data.imageTransform,
+                posleft   : data.imageLeft,
+                postop    : data.imageTop,
+                width     : data.imageWidth,
+                height    : data.imageHeight } },
       // options
       { upsert: true }, // if query isn't met, creates new document
       // callback
@@ -464,7 +463,7 @@ io.on('connection', function (socket) {
   socket.on('c-e:  store_transformed', function (data) {
     ImageDocuments.update(
       { filename : data.imageFilename },
-      { $set: { transform : data.image_transform } },
+      { $set: { transform : data.imageTransform } },
       { upsert: true },
       function (err) { if (err) return console.error(err); } );
   });
@@ -476,7 +475,7 @@ io.on('connection', function (socket) {
   socket.on('c-e:  store_opacity', function (data) {
     ImageDocuments.update(
       { filename : data.imageFilename },
-      { $set: { opacity : data.current_opacity } },
+      { $set: { opacity : data.imageOpacity } },
       { upsert: true },
       function (err) { if (err) return console.error(err); } );
   });
@@ -488,7 +487,7 @@ io.on('connection', function (socket) {
   socket.on('c-e:  store_filter', function (data) {
     ImageDocuments.update(
       { filename : data.imageFilename },
-      { $set: { filter : data.current_filter } },
+      { $set: { filter : data.imageFilter } },
       { upsert: true },
       function (err) { if (err) return console.error(err); } );
   });
