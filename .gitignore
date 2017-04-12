@@ -1,8 +1,6 @@
-/logs
-/public/images/*.*
-/public/art/*.*
-/node_modules
-/public/js/cdn_locals
-/routes
 /_notes
 /i-gram/config/secrets.js
+/node_modules
+/logs
+/public/images
+/public/js/cdn_locals
