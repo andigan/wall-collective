@@ -207,6 +207,22 @@ fullscreenmaskclass: 90000;
   top:50%;
 }
 
+#login_container {
+  background-color:transparent;
+  bottom:0;
+  display:flex;
+  height:15vh;
+  justify-content:space-around;
+  position:fixed;
+  transform:scaleY(0);
+  -webkit-transform:scaleY(0);
+
+  transition:transform 150ms ease-in-out;
+  width:100%;
+  z-index:50000;
+}
+
+
 #navigation_container {
   background-color:transparent;
   bottom:0;
@@ -374,6 +390,21 @@ fullscreenmaskclass: 90000;
 
 #threeD_dragger_switch.switchon {
   background-color: lightpink !important;
+}
+
+#upload_container {
+  background-color:transparent;
+  bottom:0;
+  display:flex;
+  height:15vh;
+  justify-content:space-around;
+  position:fixed;
+  transform:scaleY(0);
+  -webkit-transform:scaleY(0);
+
+  transition:transform 150ms ease-in-out;
+  width:100%;
+  z-index:50000;
 }
 
 #update_message {
@@ -597,6 +628,11 @@ fullscreenmaskclass: 90000;
   font-size:1.75vh;
 }
 
+.login_container_is_open {
+  transform:scaleY(1)!important;
+  -webkit-transform:scaleY(1)!important;
+}
+
 .navigation_button {
   background: #6db3f2; /* Old browsers */
   background: -moz-linear-gradient(top, #6db3f2 0%, #54a3ee 21%, #54a3ee 21%, #3690f0 75%, #1e69de 100%); /* FF3.6-15 */
@@ -615,10 +651,10 @@ fullscreenmaskclass: 90000;
 }
 
 .tools_button {
-  background: #feccb1; /* Old browsers */
-  background: -moz-linear-gradient(top,  #feccb1 0%, #f17432 0%, #fb955e 99%); /* FF3.6-15 */
-  background: -webkit-linear-gradient(top,  #feccb1 0%,#f17432 0%,#fb955e 99%); /* Chrome10-25,Safari5.1-6 */
-  background: linear-gradient(to bottom,  #feccb1 0%,#f17432 0%,#fb955e 99%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
+  background: rgb(180,221,180); /* Old browsers */
+  background: -moz-linear-gradient(top, rgba(180,221,180,1) 0%, rgba(82,177,82,1) 33%, rgba(0,138,0,1) 67%, rgba(0,87,0,1) 100%, rgba(0,36,0,1) 100%); /* FF3.6-15 */
+  background: -webkit-linear-gradient(top, rgba(180,221,180,1) 0%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 100%,rgba(0,36,0,1) 100%); /* Chrome10-25,Safari5.1-6 */
+  background: linear-gradient(to bottom, rgba(180,221,180,1) 0%,rgba(82,177,82,1) 33%,rgba(0,138,0,1) 67%,rgba(0,87,0,1) 100%,rgba(0,36,0,1) 100%); /* W3C, IE10+, FF16+, Chrome26+, Opera12+, Safari7+ */
 }
 
 .tools_container_is_open {
@@ -637,6 +673,11 @@ fullscreenmaskclass: 90000;
 
 .tool_hover_class {
   background-color:grey!important;
+}
+
+.upload_container_is_open {
+  transform:scaleY(1)!important;
+  -webkit-transform:scaleY(1)!important;
 }
 
 .upload_preview_container_is_open {
@@ -669,13 +710,250 @@ body {
 }
 
 @-webkit-keyframes blink {
-  0%   { outline: 1px solid white; }
-  33%  { outline: 1px solid white; }
-  100% { outline: 1px solid transparent; }
+  0%   { outline: 1px solid white;
+         z-index: 90000;  }
+  33%  { outline: 1px solid white;
+    z-index: 90000;  }
+  100% { outline: 1px solid transparent;
+    z-index: 90000;  }
 }
 
 .selected_file_animation {
   outline: 1px solid transparent;
   -webkit-animation: blink 2s ease-out 0s 1;
   animation: blink 2s ease-out 0s 1;
+}
+
+@-webkit-keyframes temp_fade {
+  0%   { opacity: .50; }
+  33%  { opacity: .50; }
+  100% { opacity: .50; }
+}
+
+.temp_fade {
+  -webkit-animation: temp_fade 2s ease-out 0s 1;
+  animation: temp_fade 2s ease-out 0s 1;
+}
+
+#explore_container {
+  background-color: gray;
+  display: none;
+  left: 5vw;
+  overflow-y: scroll; /* has to be scroll, not auto */
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 5vh;
+  width: 90vw;
+  z-index: 90000;
+}
+
+#close_explore_container {
+  display: none;
+  position: fixed;
+  right: 5vw;
+  z-index: 90001;
+}
+
+
+#explore_image_container {
+  width: 80%;
+  height: 60%;
+  margin: auto;
+}
+
+#explore_image {
+  max-height:100%;
+  max-width:100%;
+  display:block;
+  margin:2vh auto auto;
+
+
+}
+
+
+#explore_left_button {
+  left: 0;
+  width: 5vw;
+  top: 50%;
+  position: absolute;
+
+}
+
+
+#explore_right_button {
+  width: 5vw;
+  right: 0;
+    top: 50%;
+    position: absolute;
+}
+
+#insta_link {
+left: 45%;
+top: 80%;
+position: absolute;
+  }
+
+
+
+
+
+#app_info {
+  background-color: white;
+  display: none;
+  left: 5vw;
+  overflow-y: scroll; /* has to be scroll, not auto */
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 5vh;
+  width: 90vw;
+  z-index: 90000;
+}
+
+.info_title {
+  font-size: 5vh;
+  font-family:‘Arial Narrow’, sans-serif;
+  font-family:"Open Sans", sans-serif;
+  font-family:Courier New, Courier, monospace;
+  font-weight: 700;
+  text-align: center;
+}
+
+.info_subheading {
+  display: block;
+  font-family:‘Arial Narrow’, sans-serif;
+  font-size: 2vh;
+  left: 5vw;
+  text-align: left;
+}
+
+.info_paragraph {
+  display: block;
+  text-align: justify;
+  postion: static;
+}
+
+.info_line_center {
+  background-color: black;
+  height: 2px;
+  left: 25%;
+  position: absolute;
+  width: 50%;
+}
+
+#close_info_container {
+  display: none;
+  position: fixed;
+  right: 5vw;
+  z-index: 90001;
+}
+
+.x_icon {
+  height: 100%;
+  width: 100%;
+}
+
+#inner_info {
+  height: 100%;
+  left:15%;
+  position: absolute;
+  width: 70%;
+}
+
+.inline_icon {
+  height: 2vh;
+}
+
+#info li {
+margin-left: 5%;
+}
+
+
+#insta_div {
+  display: none;
+  right: 0;
+  position: absolute;
+  top: 0;
+  width: 20vw;
+  z-index: 50000;
+}
+
+#insta_image_container {
+  align-items: center;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  right: 0;
+  overflow: hidden;
+  overflow-y: scroll; /* has to be scroll, not auto */
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  width: 20vw;
+  z-index: 50000;
+}
+
+.insta_image_div {
+  margin: auto;
+  padding-top: 4vh;
+  padding-bottom: 4vh;
+}
+
+.insta_image {
+  height: 10vh;
+  width: 10vh;
+}
+
+#background_opacity_trick {
+position: absolute;
+  left: 0;
+  width: 100%;
+  background: gray;
+  opacity: 0.3;
+  z-index: 1;
+}
+
+.spacer_top_bottom {
+    background-color: gray;
+    height: 1px;
+    margin: auto;
+    width: 15vw;
+  }
+
+.spacer_middle {
+  background-color: gray;
+  height: 1px;
+  margin: auto;
+  width: 10vw;
+  margin-top: 1vh;
+  margin-bottom: 1vh;
+}
+
+#insta_header {
+  align-items: center;
+  border-bottom: 1px solid gray;
+  display: none;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: space-around;
+  position: absolute;
+  right: 4vw;
+  top: 0;
+
+}
+
+#insta_username {
+  color: white;
+  text-decoration: underline;
+}
+
+#insta_profile_pic_container {
+  margin: auto;
+  padding-left: 1vw;
+  width: 5vh;
+  height: 5vh;
+}
+
+#insta_profile_pic {
+width: 5vh;
+height: 5vh;
 }

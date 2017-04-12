@@ -1,6 +1,6 @@
 // wall-collective
 //
-// Version: 0.6.0
+// Version: 0.7.0
 // Requires: jQuery v1.7+
 //           jquery-ui
 //           jquery.form
@@ -9,22 +9,23 @@
 //           socket.io v1.3.7+
 //           interact.js
 //
-// Copyright (c) 2016 Andrew Nease (andrew.nease.code@gmail.com)
+// Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
 
 $(document).ready( function () {
 
 // --Development helpers
 
   // setTimeout(function () { $( '#debug_button' ).trigger( 'click' ); }, 0);
-  // setTimeout(function () { $( '#navigation_toggle_button' ).trigger( 'click' ); }, 0);
+  // setTimeout(function () { $( '#explore_button' ).trigger( 'click' ); }, 0);
+  // setTimeout(function () { $( '#upload_container_button').trigger( 'click' ); }, 1000);
+
   // setTimeout(function () { $( '#dragger_switches_button' ).trigger( 'click' ); }, 0);
   // setTimeout(function() { $('#wrapper').css('background-color', 'yellow'); },1500);
-
 
 // --Setup and configure variables
 
   // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
-  var socket = io.connect(window.location.href),
+  var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
 
     // set debug box on or off
     debug_on = true,
@@ -63,6 +64,9 @@ $(document).ready( function () {
     // assigned by initial socket; used by upload counter
     client_id = String,
 
+    // assigned by initial socket; used by instagram link
+    insta_app_id = String,
+
     // used with a cookie to store which draggers are active for individual persistence
     switches_status = String,
 
@@ -71,11 +75,45 @@ $(document).ready( function () {
 
     // used when an image is clicked more than once
     click_count = 0,
-    previous_clicked_ids = '';
+    previous_clicked_ids = '',
+
+    // used when an image is dragged from the instagram div; assigned by socket when download is complete
+    insta_download_ready_filename = {},
+
+    // used when an access token is available for the client after a user authenticates with Instagram
+    insta_access_ready = false;
 
   // set wrapper size; (css vh and vw were not working with mobile safari)
   document.getElementById('wrapper').style.width = window.innerWidth + 'px';
   document.getElementById('wrapper').style.height = window.innerHeight + 'px';
+
+  // set app_info height
+  document.getElementById('app_info').style.height = (window.innerHeight * 0.9) + 'px';
+
+  // set explore_container height
+  document.getElementById('explore_container').style.height = (window.innerHeight * 0.9) + 'px';
+
+
+  // set insta_divs height
+  document.getElementById('insta_div').style.height = (window.innerHeight) + 'px';
+  document.getElementById('insta_image_container').style.height = (window.innerHeight * 0.8) + 'px';
+  document.getElementById('insta_image_container').style.top = (window.innerHeight * 0.1) + 'px';
+  document.getElementById('insta_header').style.height = (window.innerHeight * 0.07) + 'px';
+  document.getElementById('background_opacity_trick').style.height = (window.innerHeight * 0.8) + 'px';
+  document.getElementById('background_opacity_trick').style.top = (window.innerHeight * 0.1) + 'px';
+
+
+
+  // set position and size of the close_info container divs
+  document.getElementById('close_info_container').style.width = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
+  document.getElementById('close_info_container').style.height = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
+  document.getElementById('close_info_container').style.top = (mainhigh * .05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_info_container').style.height)) + 'px';
+
+  // set position and size of the x_icon container divs
+  document.getElementById('close_explore_container').style.width = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
+  document.getElementById('close_explore_container').style.height = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
+  document.getElementById('close_explore_container').style.top = (mainhigh * .05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_explore_container').style.height)) + 'px';
+
 
   // add perspective to 3d transforms
   document.getElementById('images').style.width = window.innerWidth + 'px';
@@ -85,10 +123,27 @@ $(document).ready( function () {
   document.getElementById('images').style.webkitPerspectiveOriginY = '50%';
 
   // position the navigation_toggle_button_container on the bottom on startup.
-  document.getElementById('navigation_toggle_button_container').style.top = (mainhigh - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).height) + 'px');
+//  document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
+  document.getElementById('navigation_toggle_button_container').style.left = (mainwide - $('#navigation_toggle_button_container').width()) + 'px';
+
 
   // assign draggable to all .drawing elements
   assigndrag();
+
+
+  // insta_step 6: Open the instagram_div and fetch instagram data
+  if (open_instagram_div === true) {
+    socket.emit('get_instagram_data');
+
+    document.getElementById('insta_header').style.display = 'flex';
+    document.getElementById('insta_div').style.display = 'block';
+    document.body.classList.add('button_container_is_open');
+
+    // animate open hamburgers
+    document.getElementById('line_one').style.top = '35%';
+    document.getElementById('line_three').style.top = '65%';
+  };
+
 
 // --Debug functions
 
@@ -166,18 +221,20 @@ $(document).ready( function () {
 
   // prevent default behavior to prevent iphone dragging and bouncing
   // http://www.quirksmode.org/mobile/default.html
-  document.ontouchmove = function (event) {
-    event.preventDefault();
-  };
+//  document.ontouchmove = function (event) {
+//    event.preventDefault();
+//  };
 
   // process any click on the wrapper
   $('#wrapper').on('click touchstart', function (event) {
     var dragger_elements = {};
 
-    // DEBUG: this line will log whichever element is clicked on
+    // DEBUG:
+    // uncomment to log whichever element is clicked on
     // console.log(event.target.getAttribute('id'));
+    // uncomment to log all the elements below the click
     // console.log(document.querySelectorAll( ":hover" ));
-    // DEBUG: this line will log whichever elements are clicked on. ONLY WORKS WITH CHROME
+    // uncomment to log whichever elements are clicked on. ONLY WORKS WITH CHROME
     // console.log(document.elementsFromPoint(event.pageX, event.pageY));
 
     // if the images div alone is clicked...
@@ -199,8 +256,10 @@ $(document).ready( function () {
     // set wrapper size
     document.getElementById('wrapper').style.width = window.innerWidth + 'px',
     document.getElementById('wrapper').style.height = window.innerHeight + 'px',
-    // position the navigation_toggle_button_container on the bottom on startup.
+    // position the navigation_toggle_button_container on the bottom right on startup.
     document.getElementById('navigation_toggle_button_container').style.top = (mainhigh - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).height) + 'px');
+    document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
+
     clear_debug_box();
     debug_report([[1, 'resize: new width : ' + window.innerWidth + 'px'],
                   [2, 'resize: new height : ' + window.innerHeight + 'px']]);
@@ -281,18 +340,50 @@ $(document).ready( function () {
     document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
     document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
     document.getElementById('tools_container').classList.remove('tools_container_is_open');
+    document.getElementById('login_container').classList.remove('login_container_is_open');
+    document.getElementById('upload_container').classList.remove('upload_container_is_open');
     document.getElementById('connect_info').classList.remove('connect_info_is_open');
+    document.getElementById('explore_container').style.display = 'none';
+
     // replace image_upload_preview image and delete_preview image
     document.getElementById('image_upload_preview').src = '/icons/1x1.png';
     document.getElementById('delete_preview').src = '/icons/1x1.png';
+    // close navigation button
+    document.body.classList.remove('button_container_is_open');
+    // animate close hamburgers
+    document.getElementById('line_one').style.top = '40%';
+    document.getElementById('line_three').style.top = '60%';
+
+    // remove
+    if (document.getElementById('insta_div').style.display === 'block') {
+      history.replaceState({}, 'wall-collective', '/');
+      document.getElementById('insta_header').style.display = 'none';
+      document.getElementById('insta_div').style.display = 'none';
+    };
+
+
   }
 
-  function state_change_to_tools() {
+  function state_change_to_tools_menu() {
     // show element
     document.getElementById('tools_container').classList.add('tools_container_is_open');
     // hide elements
     document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
     document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+  }
+
+  function state_change_to_account_menu() {
+    // show element
+    document.getElementById('login_container').classList.add('login_container_is_open');
+    // hide elements
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  }
+
+  function state_change_to_upload_menu() {
+    // show element
+    document.getElementById('upload_container').classList.add('upload_container_is_open');
+    // hide elements
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
   }
 
   function state_change_to_upload() {
@@ -304,6 +395,7 @@ $(document).ready( function () {
     // show element
     document.getElementById('navigation_container').classList.add('navigation_container_is_open');
     // hide elements
+    document.getElementById('upload_container').classList.remove('upload_container_is_open');
     document.getElementById('upload_preview_container').style.display = 'none';
     document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
     document.getElementById('confirm_or_reject_container_info').textContent = '';
@@ -358,6 +450,7 @@ $(document).ready( function () {
     data.image_id = image_to_delete.image_id;
     socket.emit('clientemit_show_image', data);
   }
+
 
 // --Create grid line divs
 //    use left/top parameter with unit
@@ -429,6 +522,18 @@ $(document).ready( function () {
 
     client_vars.client_id = getCookie('client_id');
     socket.emit ('clientemit_client_id_check', client_vars);
+
+  });
+
+
+  // used to see instagram results
+  socket.on('check_out', function (data) {
+    console.log(data);
+  });
+
+
+  socket.on('insta_access_ready', function () {
+    insta_access_ready = true;
   });
 
   // initial set up for all visits.
@@ -442,6 +547,10 @@ $(document).ready( function () {
     // assign client_id.  used by upload_counter and user_count
     // the server sends a unique id or the previous id from the cookie
     client_id = client_vars.client_id;
+
+    insta_app_id = client_vars.insta_app_id;
+
+//    insta_access_ready = client_vars.clients_insta_access_ready;
 
     // set or reset client_id cookie
     setCookie('client_id', client_id, 7);
@@ -547,7 +656,7 @@ $(document).ready( function () {
     image_element.style.zIndex = data.z_index;
     image_element.style.top = upload_top;
     image_element.style.left = upload_left;
-    images_element.style.opacity = 1;
+    image_element.style.opacity = 1;
     image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
     image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
 
@@ -606,6 +715,213 @@ $(document).ready( function () {
     };
   });
 
+  // insta_step 10: Add content to insta_div
+  socket.on('add_content_to_insta_div', function (insta_fetch_data) {
+    var i = 0,
+      insta_image_container = document.getElementById('insta_image_container');
+
+    // set content in insta_header
+    document.getElementById('insta_username').textContent = insta_fetch_data.username;
+    document.getElementById('insta_profile_pic').src = insta_fetch_data.profile_picture;
+    document.getElementById('insta_profile_link').setAttribute('href', 'https://www.instagram.com/' + insta_fetch_data.username + '/?hl=en');
+
+    // destroy current images in insta_image_container
+    insta_image_container.innerHTML = '';
+
+    // use insta_images_src to display fetched Instagram images
+    for (i = 0; i < insta_fetch_data.insta_images_src.length; i++ ) {
+
+      var temp_img = document.createElement('img'),
+        temp_div = document.createElement('div'),
+        spacer_top = document.createElement('div'),
+        spacer_middle = document.createElement('div'),
+        spacer_bottom = document.createElement('div');
+
+      temp_div.classList.add('insta_image_div');
+
+      temp_img.setAttribute('id', 'insta' + i);
+      temp_img.classList.add('insta_image');
+      temp_img.src = insta_fetch_data.insta_images_src[i];
+      temp_img.setAttribute('data-link', insta_fetch_data.insta_images_link[i]);
+
+      spacer_top.classList.add('spacer_top_bottom');
+      spacer_middle.classList.add('spacer_middle');
+      spacer_bottom.classList.add('spacer_top_bottom');
+
+      temp_div.appendChild(temp_img);
+      insta_image_container.appendChild(temp_div);
+
+      // add spacers for scrolling
+      if (i < insta_fetch_data.insta_images_src.length - 1) {
+        insta_image_container.appendChild(spacer_top);
+        insta_image_container.appendChild(spacer_middle);
+        insta_image_container.appendChild(spacer_bottom);
+      };
+
+      // insta_step 11: Make the imported Instagram images draggable
+
+      // use a clone so that the images can escape the scrollable div
+      $('#insta' + i).draggable(
+        {
+          helper: 'clone',
+          appendTo: 'body',
+          scroll: true,
+          start:  function () {
+
+            // insta_step 12: When dragging starts, save dragged image to server storage, using id as an index
+            console.log(this);
+
+            socket.emit('client_emit_save_insta_image', { src: this.getAttribute('src'), id: parseInt(this.getAttribute('id').replace('insta', '')) });
+
+            // assign temporary z-index
+            this.style.zIndex = 60000;
+
+            hide_draggers();
+          }
+        });
+    };
+  }); // end of socket add_content_to_insta_div
+
+
+// insta_step 15: Receive new filename from server
+socket.on('insta_download_ready', function (new_file) {
+
+  //  store new filename in an object with the id as the key
+  insta_download_ready_filename['insta' + new_file.image_index] = new_file.newfilename;
+
+  console.log(new_file.newfilename + ' downloaded.');
+});
+
+
+// insta_step 16: Make dragged insta_image droppable in images_div
+
+// http://stackoverflow.com/questions/36181050/jquery-ui-draggable-and-droppable-duplicate-issue
+// This allows the image to be draggable outside of the scrollable div
+  $('#images').droppable({
+    accept: '.insta_image',
+    drop: function (event, ui) {
+      var clone = {},
+        insta_drop_data = {},
+        timeout_counter = 0;
+
+        // clone is a jQuery method.  false specifies that event handlers should not be copied.
+        // create a clone of the ui.draggable within the images div
+      clone = ui.draggable.clone(false);
+      clone.css('left', ui.offset.left)
+           .css('top', ui.offset.top)
+           .css('position', 'absolute')
+           // consider changing id so that id is not duplicated in dom
+           // .attr('id', 'i' + clone.attr('id')),
+           .removeClass('ui-draggable ui-draggable-dragging resize-drag');
+      $('#images').append(clone);
+
+      // wait for the filename to be received from the server
+      function wait_for_download() {
+
+        if (insta_download_ready_filename[ui.draggable[0].getAttribute('id')] === undefined) {
+
+          // if timeout_counter has lasted too long, cancel operation
+          timeout_counter = timeout_counter + 50;
+          console.log('Waiting for download: ' + (timeout_counter / 1000) + 's');
+          if (timeout_counter > 10000) {
+            alert('Download error.  Refreshing page.');
+            window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
+          } else {
+            // wait 50 milliseconds then recheck
+            setTimeout(wait_for_download, 50);
+            return;
+          };
+        };
+
+        // once the filename is received...
+
+        // insta_step 17: Send insta_drop_data to server
+        insta_drop_data.insta_id = ui.draggable[0].getAttribute('id');
+        insta_drop_data.insta_filename = insta_download_ready_filename[ui.draggable[0].getAttribute('id')];
+        insta_drop_data.posleft = ui.offset.left;
+        insta_drop_data.postop = ui.offset.top;
+        insta_drop_data.insta_width = window.getComputedStyle(ui.draggable[0]).width;
+        insta_drop_data.insta_height = window.getComputedStyle(ui.draggable[0]).height;
+        insta_drop_data.insta_link = ui.draggable[0].getAttribute('data-link');
+
+        socket.emit('client_emit_insta_drop', insta_drop_data);
+
+        // delete id key from insta_download_ready_filename object
+        delete insta_download_ready_filename[ui.draggable[0].getAttribute('id')];
+      }
+
+      wait_for_download();
+
+      // It would be much less complex to initiate the download here,
+      // however, this strategy (of starting the download when the drag starts)
+      // provides a quicker user experience.
+    }
+  });
+
+
+
+  // insta_step 20: Convert dragged image to typical .drawing
+  socket.on('change_clone_to_image', function(insta_database_parameters) {
+    var image_element = document.getElementById(insta_database_parameters.insta_id);
+
+    image_element.setAttribute('id', insta_database_parameters.dom_id);
+    image_element.src = image_dir + insta_database_parameters.insta_filename;
+    image_element.classList.add('drawing');
+    image_element.style.width = insta_database_parameters.width;
+    image_element.style.height = insta_database_parameters.height;
+    image_element.classList.remove('insta_image');
+    image_element.setAttribute('title', insta_database_parameters.insta_filename);
+    image_element.setAttribute('data-link', insta_database_parameters.insta_link);
+    image_element.setAttribute('data-scale', '1');
+    image_element.setAttribute('data-angle', '0');
+    image_element.setAttribute('data-rotateX', '0');
+    image_element.setAttribute('data-rotateY', '0');
+    image_element.setAttribute('data-rotateZ', '0');
+    image_element.style.zIndex = insta_database_parameters.z_index;
+    image_element.style.opacity = 1;
+    image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
+    image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
+
+    // assign drag to added element
+    assigndrag(insta_database_parameters.dom_id);
+  });
+
+  // insta_step 22: Add image to other clients
+  socket.on('add_insta_image_to_other_clients', function (insta_database_parameters) {
+    var images_element = document.getElementById('images'),
+      image_element = document.createElement('img');
+
+    image_element.setAttribute('id', insta_database_parameters.dom_id);
+    image_element.setAttribute('title', insta_database_parameters.insta_filename);
+    image_element.src = image_dir + insta_database_parameters.insta_filename;
+    image_element.classList.add('drawing');
+    image_element.style.width = insta_database_parameters.width;
+    image_element.style.height = insta_database_parameters.height;
+    image_element.style.top = insta_database_parameters.postop;
+    image_element.style.left = insta_database_parameters.posleft;
+    image_element.style.zIndex = insta_database_parameters.z_index;
+    image_element.setAttribute('data-link', insta_database_parameters.insta_link);
+
+
+    image_element.setAttribute('data-scale', '1');
+    image_element.setAttribute('data-angle', '0');
+    image_element.setAttribute('data-rotateX', '0');
+    image_element.setAttribute('data-rotateY', '0');
+    image_element.setAttribute('data-rotateZ', '0');
+    image_element.style.opacity = 1;
+    image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
+    image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
+
+    images_element.appendChild(image_element);
+
+    // assign drag to added element
+    assigndrag(insta_database_parameters.dom_id);
+  });
+
+
+
+
+
 // --Buttons
 //     IMPORTANT: Delegated vs. Direct binding
 //     Example:  $('#id').on('click', function() { console.log('hi')};
@@ -627,10 +943,6 @@ $(document).ready( function () {
       if ( document.body.classList.contains('button_container_is_open') ) {
         // close all containers
         state_change_to_close_all();
-        document.body.classList.remove('button_container_is_open');
-        // animate close hamburgers
-        document.getElementById('line_one').style.top = '40%';
-        document.getElementById('line_three').style.top = '60%';
         // show selected_file in case it was removed by being dragged onto the exit door
         // except when no file is selected: selected_file.image_id is undefined or ''
         if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
@@ -659,19 +971,29 @@ $(document).ready( function () {
       debug_on = false;
       document.body.classList.remove('debug_on');
       document.getElementById('debug_box').style.display = 'none';
-      document.getElementById('debug_button').textContent = 'info is off';
+      document.getElementById('debug_button').innerHTML = "report is off <img class='icon_image' src='/icons/debug_icon.png'>";
     // else when debug_box is closed, show it
     } else {
       debug_on = true;
       document.body.classList.add('debug_on');
       document.getElementById('debug_box').style.display = 'block';
-      document.getElementById('debug_button').textContent = 'info is on';
+      document.getElementById('debug_button').innerHTML = "report is on <img class='icon_image' src='/icons/debug_icon.png'>";
     };
   });
 
   // tools button
   $('#tools_container_button').on('click', function () {
-    state_change_to_tools();
+    state_change_to_tools_menu();
+  });
+
+  // login button
+  $('#login_container_button').on('click', function () {
+    state_change_to_account_menu();
+  });
+
+  // upload button
+  $('#upload_container_button').on('click', function () {
+    state_change_to_upload_menu();
   });
 
   // dragger_all_switch; used to toggle all dragger switches
@@ -771,9 +1093,22 @@ $(document).ready( function () {
     $.get('/resetpage', function () {
       socket.emit('clientemit_resetpage');
       // reload the page
-      window.location.reload(true);
+      window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
     });
   });
+
+  $('#info_button').on('click', function () {
+    document.getElementById('app_info').style.display = 'block';
+    document.getElementById('close_info_container').style.display = 'block';
+  });
+
+  $('#close_info_container').on('click', function () {
+    document.getElementById('app_info').style.display = 'none';
+    document.getElementById('close_info_container').style.display = 'none';
+  });
+
+
+
 
   // on file_select element change, load up the image preview
   $('#fileselect').on('change', function () {
@@ -859,12 +1194,40 @@ $(document).ready( function () {
     state_change_after_upload();
   });
 
+
+  $('#exit_door').on('click', function () {
+    var delete_element = {};
+
+    if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
+      delete_element = document.getElementById(selected_file.image_id);
+
+      // gather data
+      image_to_delete.image_id = selected_file.image_id;
+      image_to_delete.image_filename = delete_element.getAttribute('title');
+      image_to_delete.src = delete_element.src;
+      image_to_delete.width = delete_element.style.width;
+      image_to_delete.height = delete_element.style.height;
+      image_to_delete.zindex = delete_element.style.zIndex;
+
+      // hide original image
+      document.getElementById(image_to_delete.image_id).style.display = 'none';
+
+      // hide draggers
+      hide_draggers();
+
+      // show delete_preview_container
+      state_change_to_delete();
+
+      // send socket to hide on other clients
+      socket.emit('clientemit_hide_image', image_to_delete.image_id);
+    };
+  });
+
   // reject delete
   $('#reject_delete_button').on('click', function () {
     state_change_after_reject_delete();
     // send socket to show on other clients
     socket.emit('clientemit_show_image', image_to_delete.image_id);
-
   });
 
   // confirm delete
@@ -885,13 +1248,129 @@ $(document).ready( function () {
 
 
   $('#instagram_login').on('click', function () {
+    var redirect_url = [location.protocol, '//', location.host, location.pathname].join('');
+
+    // redirect_url: http://www.example.com?myclient_id=johndoe
+    redirect_url = redirect_url + '?myclient_id=' + client_id;
+
+    // insta_step 24: If the client has an access token, open Instagram divs and skip to insta_step 7.
+
+    // insta_access_ready is assigned during the initial socket 'connect_set_client_vars'
+    if (insta_access_ready === true) {
+
+      socket.emit('get_instagram_data');
+
+      document.getElementById('insta_header').style.display = 'flex';
+      document.getElementById('insta_div').style.display = 'block';
+      document.getElementById('upload_container').classList.remove('upload_container_is_open');
+      document.body.classList.add('button_container_is_open');
+
+      // animate open hamburgers
+      document.getElementById('line_one').style.top = '35%';
+      document.getElementById('line_three').style.top = '65%';
+
+    } else {
+
+      // insta_step 1: Redirect to Instagram API to prompt user to authenticate
+      // insta_app_id, provided to Instagram developers, is stored on the server
+      // and fetched with the initial socket connection
+      // Successful authentication will send the browser back to the server's
+      // app.get('/') with 'myclient_id' and 'code' query parameter to be parsed by the server
+
+      window.location = 'https://api.instagram.com/oauth/authorize/?client_id=' + insta_app_id + '&redirect_uri=' + redirect_url + '&response_type=code';
+    };
+
+  });
+
+  // insta_step 25: Use the instagram logout link in an image tag to log out.
+  // http://stackoverflow.com/questions/10991753/instagram-api-user-logout
+  $('#instagram_logout_button').on('click', function () {
+    var logout_image_element = document.createElement('img');
+
+    logout_image_element.src = 'http://instagram.com/accounts/logout/';
+    logout_image_element.setAttribute('id', 'temp_instagram_logout');
+    logout_image_element.style.display = 'none';
+    logout_image_element.style.height = '0';
+    logout_image_element.style.width = '0';
+
+    // create the logout 'image' briefly in the dom.
+    document.getElementById('wrapper').appendChild(logout_image_element);
+    document.getElementById('temp_instagram_logout').remove();
+
+    alert('logged out');
+
+    // insta_step 26: Remove client's access token from server
+    socket.emit('client_emit_remove_client_from_clients_access', client_id);
+
+    insta_access_ready = false;
   });
 
 
-  $('#instagram_logout').on('click', function () {
 
 
-});
+
+  $('#explore_button').on('click', function () {
+
+
+    document.getElementById('explore_container').style.display = 'block';
+    document.getElementById('close_explore_container').style.display = 'block';
+
+
+    document.getElementById('explore_image').src = document.getElementById(selected_file.image_id).src;
+
+
+    if (document.getElementById(selected_file.image_id).getAttribute('data-link').length > 1) {
+
+      document.getElementById('insta_link').setAttribute('href', document.getElementById(selected_file.image_id).getAttribute('data-link'));
+    };
+
+
+    if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
+
+      // if selected file is empty, fill it.
+
+
+
+
+    } else {
+
+
+
+
+
+    };
+
+/*
+      // gather data
+      image_to_delete.image_id = selected_file.image_id;
+      image_to_delete.image_filename = delete_element.getAttribute('title');
+      image_to_delete.src = delete_element.src;
+      image_to_delete.width = delete_element.style.width;
+      image_to_delete.height = delete_element.style.height;
+      image_to_delete.zindex = delete_element.style.zIndex;
+
+      // hide original image
+      document.getElementById(image_to_delete.image_id).style.display = 'none';
+
+      // hide draggers
+      hide_draggers();
+
+      // show delete_preview_container
+      state_change_to_delete();
+
+      // send socket to hide on other clients
+      socket.emit('clientemit_hide_image', image_to_delete.image_id);
+*/
+
+
+  });
+
+  $('#close_explore_container').on('click', function () {
+    document.getElementById('explore_container').style.display = 'none';
+    document.getElementById('close_explore_container').style.display = 'none';
+  });
+
+
 
 
 
@@ -1079,22 +1558,39 @@ $(document).ready( function () {
 
           // reset the click count
           click_count = 0;
+           console.log('click count: ' + click_count);
 
         // else when more than one image is clicked...
         } else {
           // create a string of clicked ids
           for (i = 0; i < clicked_ids_zindexes.length; i++) {
-            clicked_ids = clicked_ids + clicked_ids_zindexes[i][0];
+            clicked_ids = clicked_ids + '.' + clicked_ids_zindexes[i][0];
+            // remove temp_fade from all clicked images
+            document.getElementById(clicked_ids_zindexes[i][0]).classList.remove('temp_fade');
+            document.getElementById(clicked_ids_zindexes[i][0]).offsetWidth;
+
           };
           // if the clicked_ids have changed, reset the click_count to 0
           if ((clicked_ids !== previous_clicked_ids) || (previous_clicked_ids === '')) click_count = 0;
 
           // add a click
           click_count++;
+          // console.log('click_count: ' + click_count);
+          // console.log((click_count - 1) % clicked_ids_zindexes.length);
 
           // set the selected image to an id in the clicked array using the remainder of the click_count divided by the number of clicked images
           selected_file.image_id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
-          setTimeout(function () { document.getElementById(selected_file.image_id).classList.add('selected_file_animation'); },0);
+          document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+
+          // add temp_fade class to all clicked images other than the one selected
+          for (i = 0; i < clicked_ids_zindexes.length; i++) {
+
+            // don't add temp_fade class to selected_file, or to an image already faded, or if the selected_file is already on top
+            if ((clicked_ids_zindexes[i][0] !== selected_file.image_id) && (document.getElementById(clicked_ids_zindexes[i][0]).style.opacity > 0.50)
+               && ( (click_count % clicked_ids_zindexes.length) !== 1 )) {
+              document.getElementById(clicked_ids_zindexes[i][0]).classList.add('temp_fade');
+            };
+          };
 
           // store clicked ids in a global string.  Note: Can't use an array as global variable.  Primitives are passed by value.  Objects are passed by 'copy of a reference'.
           previous_clicked_ids = clicked_ids;

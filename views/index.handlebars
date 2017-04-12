@@ -1,0 +1,236 @@
+<head>
+  <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+
+  {{! variables from app.js res.render
+      title           = String
+      use_cdn         = Boolean
+      image_dir       = String
+      database_result = Object }}
+
+  <title>{{ title }}</title>
+
+  {{! bookmark icon link }}
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+
+  {{! css }}
+  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+
+  {{! jquery scripts }}
+  {{#if use_cdn }}
+    <script src="//code.jquery.com/jquery-1.12.0.min.js"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery.form/3.51/jquery.form.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+  {{else}}
+    <script src="js/cdn_locals/jquery.js"></script>
+    <script src="js/cdn_locals/jquery.form.min.js"></script>
+    <script src="js/cdn_locals/jquery-ui.min.js"></script>
+  {{/if}}
+
+  {{! touch supports (must follow jquery) }}
+  {{#if use_cdn }}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/jqueryui-touch-punch/0.2.3/jquery.ui.touch-punch.min.js"></script>
+  {{else}}
+  <script src="js/cdn_locals/jquery.ui.touch-punch.js"></script>
+  {{/if}}
+
+  {{! https://github.com/benmajor/jQuery-Touch-Events }}
+  <script type="text/javascript" src="js/jquery.mobile-events.min.js"></script>
+
+  {{! resize and rotate }}
+  {{#if use_cdn }}
+  <script src="//cdnjs.cloudflare.com/ajax/libs/interact.js/1.2.8/interact.min.js"></script>
+
+  {{else}}
+  <script src="js/cdn_locals/interact.min.js"></script>
+  {{/if}}
+
+  {{! socket io }}
+  {{#if use_cdn }}
+  <script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
+  {{else}}
+  <script src="js/cdn_locals/socket.io-1.3.7.js"></script>
+  {{/if}}
+
+
+</head>
+
+<body>
+  <div id='wrapper'>
+    <div id='update_message'>
+      Please update your browser or phone to continue!
+    </div>
+
+    <div id="images">
+      {{#each database_result }}
+        <img  title={{filename}}
+              src='{{../image_dir}}{{filename}}'
+              id={{dom_id}}
+              class='drawing'
+              style='z-index: {{zindex}};
+                         top: {{postop}};
+                        left: {{posleft}};
+                       width: {{width}};
+                      height: {{height}};
+                   transform: {{transform}};
+                     opacity: {{opacity}};
+              -webkit-filter: {{filter}};'
+              data-scale='{{scale}}'
+              data-angle='{{angle}}'
+              data-rotateX='{{rotateX}}'
+              data-rotateY='{{rotateY}}'
+              data-rotateZ='{{rotateZ}}'
+              data-link='{{insta_link}}'>
+      {{/each}}
+
+    </div>
+
+    {{! main button }}
+    <div id='navigation_toggle_button_container'>
+      <button id='navigation_toggle_button'>
+        <div id='line_one'>
+        </div>
+        <div id='line_two'>
+        </div>
+        <div id='line_three'>
+        </div>
+      </button>
+    </div>
+
+    {{! containers }}
+    <div id='navigation_container'>
+      <div id='login_container_button' class='button navigation_button'> account
+        <img class='icon_image' src='/icons/person_circle_icon.png'>
+      </div>
+
+      <div id='tools_container_button' class='button navigation_button'> tools
+        <img class='icon_image' src='/icons/tools_icon.png'>
+      </div>
+
+      <div id='upload_container_button' class='button navigation_button'> upload
+        <img class='icon_image' src='/icons/upload_icon.png'>
+      </div>
+
+      <div id='exit_door' class='button navigation_button'> remove
+        <img class='icon_image' src='/icons/door_icon.png'>
+      </div>
+      <div id='rightbutton' class='button_no_show'></div>
+    </div>
+
+    <div id='connect_info' class='connect_info'></div>
+
+    <div id='login_container'>
+      <div id='info_button' class='button tools_button'> info
+        <img class='icon_image' src='/icons/info_icon.png'>
+      </div>
+        <div id='instagram_logout_button' class='button tools_button'> instagram logout
+          <img class='icon_image' src='/icons/debug_icon.png'>
+        </div>
+        <div class='button_no_show'></div>
+        <div class='button_no_show'></div>
+        <div class='button_no_show'></div>
+
+    </div>
+
+
+    <div id='upload_container'>
+
+      <div class='button_no_show'></div>
+      <form id='upload_image_button' name='title' method='post'
+            enctype='multipart/form-data'
+            action='addfile/' runat='server'>
+        <div class='btn-file button tools_button'> device
+          <img class='icon_image' src='/icons/upload_icon.png'>
+          <input id='fileselect' type='file' name='client_id_goes_here'>
+        </div>
+      </form>
+      <div id='instagram_login' class='button tools_button'> Instagram
+        <img class='icon_image' src='/icons/glyph-logo_May2016.png'>
+      </div>
+      <div class='button_no_show'></div>
+      <div class='button_no_show'></div>
+    </div>
+
+    <div id='tools_container'>
+      <div id='dragger_switches_button' class='button tools_button'> draggers
+        <img class='icon_image' src='/icons/draggers_icon.png'>
+      </div>
+      <div id='reset_page_button' class='button tools_button'> reset page
+        <img class='icon_image' src='/icons/reset_icon.png'>
+      </div>
+      <div id='debug_button' class='button tools_button'> report is off
+        <img class='icon_image' src='/icons/debug_icon.png'>
+      </div>
+      <div id='explore_button' class='button tools_button'> explore
+        <img class='icon_image' src='/icons/magnifying_glass_icon.png'>
+      </div>
+      <div class='button_no_show'></div>
+    </div>
+
+    <div id='upload_preview_container' class='rainbow_border'>
+      <img id='image_upload_preview' src='/icons/1x1.png'/>
+      <div id='confirm_or_reject_container'>
+        <div id='confirm_upload_button' class='confirm_button confirm_yes'> Confirm Upload </div>
+        <div id='reject_upload_button' class='confirm_button confirm_no'> Cancel </div>
+      </div>
+      <div id='confirm_or_reject_container_info'> </div>
+    </div>
+
+    <div id='delete_preview_container' class='rainbow_border'>
+      <img id='delete_preview' src='/icons/1x1.png'/>
+      <div id='delete_confirm_or_reject_container'>
+        <div id='confirm_delete_button' class='confirm_button confirm_yes'> Confirm Delete </div>
+        <div id='reject_delete_button' class='confirm_button confirm_no'> Cancel </div>
+      </div>
+      <div id='delete_confirm_or_reject_container_info'></div>
+    </div>
+
+    <a id='insta_profile_link'>
+    <div id='insta_header'>
+      <div id='insta_username'></div>
+      <div id='insta_profile_pic_container'>
+        <img id='insta_profile_pic' src='/icons/1x1.png'/>
+      </div>
+    </div>
+  </a>
+    <div id='insta_div'>
+      <div id='insta_image_container'></div>
+      <div id='background_opacity_trick'></div>
+    </div>
+
+    <div id='explore_container'>
+
+      <div id='explore_image_container'>
+        <img id='explore_image' src='/icons/1x1.png'/>
+      </div>
+      <div id='explore_left_button' class='explore_nav'>
+        <img class='x_icon icon_image' src='/icons/x_icon.png'>
+      </div>
+      <div id='explore_right_button' class='explore_nav'>
+        <img class='x_icon icon_image' src='/icons/x_icon.png'>
+      </div>
+      <div id='explore_info_container'>
+        <a id='insta_link'> <div id='insta_link_text'> instagram link </div>
+        </a>
+
+      </div>
+
+    </div>
+    <div id='close_explore_container'>
+      <img class='x_icon icon_image' src='/icons/x_icon.png'>
+    </div>
+
+    {{>draggers_switch_panel}}
+
+    {{>draggers}}
+
+
+  </div>
+
+  {{>info_and_privacy}}
+
+  {{! main script }}
+  <script> var open_instagram_div = {{open_instagram_div}}; </script>
+  <script src="js/main.js"></script>
+
+</body>
