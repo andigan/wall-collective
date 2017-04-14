@@ -11,8 +11,6 @@
 //
 // Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
 
-$(document).ready( function () {
-
 // --Development helpers
 
   // setTimeout(function () { $( '#debug_button' ).trigger( 'click' ); }, 0);
@@ -24,8 +22,13 @@ $(document).ready( function () {
 
 // --Setup and configure variables
 
-  // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
-  var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
+import test from './test';
+
+test();
+
+
+// set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
+var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
 
     // set debug box on or off
     debug_on = true,
@@ -104,12 +107,12 @@ $(document).ready( function () {
   // set position and size of the close_info container divs
   document.getElementById('close_info_container').style.width = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
   document.getElementById('close_info_container').style.height = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
-  document.getElementById('close_info_container').style.top = (mainhigh * .05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_info_container').style.height)) + 'px';
+  document.getElementById('close_info_container').style.top = (mainhigh * 0.05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_info_container').style.height)) + 'px';
 
   // set position and size of the x_icon container divs
   document.getElementById('close_explore_container').style.width = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
   document.getElementById('close_explore_container').style.height = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
-  document.getElementById('close_explore_container').style.top = (mainhigh * .05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_explore_container').style.height)) + 'px';
+  document.getElementById('close_explore_container').style.top = (mainhigh * 0.05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_explore_container').style.height)) + 'px';
 
 
   // add perspective to 3d transforms
@@ -152,9 +155,9 @@ $(document).ready( function () {
     //   <div id='info1'> </div> ... <div id='info10'> </div>
     // </div>
     var i = 0,
-      info_element = {},
-      wrapper_element = document.getElementById('wrapper'),
-      debug_box_element = document.createElement('div');
+        info_element = {},
+        wrapper_element = document.getElementById('wrapper'),
+        debug_box_element = document.createElement('div');
 
     debug_box_element.setAttribute('id', 'debug_box');
     debug_box_element.style.display = 'none';
@@ -180,7 +183,7 @@ $(document).ready( function () {
       },
       drag: function () {
         var debug_box_element = document.getElementById ('debug_box'),
-          debug_box_coords = debug_box_element.getBoundingClientRect();
+            debug_box_coords = debug_box_element.getBoundingClientRect();
 
         debug_report([[6, ' '],
                       [7, $(this).css('left') + ' <css> ' + $(this).css('right')],
@@ -203,7 +206,7 @@ $(document).ready( function () {
 
   function clear_debug_box() {
     var i = 0,
-      info_elements = {};
+        info_elements = {};
 
     if (debug_on) {
       info_elements = document.getElementsByClassName('info');
@@ -265,7 +268,7 @@ $(document).ready( function () {
   // hide all draggers
   function hide_draggers() {
     var dragger_elements = document.getElementsByClassName('dragger'),
-      i = 0;
+        i;
 
     for (i = 0; i < dragger_elements.length; i++) {
       dragger_elements[i].style.display = 'none';
@@ -275,7 +278,7 @@ $(document).ready( function () {
   // hide all draggers except the one being dragged
   function hide_other_draggers(id) {
     var dragger_elements = document.getElementsByClassName('dragger'),
-      i = 0;
+        i;
 
     for (i = 0; i < dragger_elements.length; i++) {
       if (dragger_elements[i].getAttribute('id') !== id) {
@@ -298,7 +301,7 @@ $(document).ready( function () {
   // cookie setter
   function setCookie(cookie_name, cookie_value, days_til_expire) {
     var expires_string = '',
-      d = new Date();
+        d = new Date();
 
     d.setTime(d.getTime() + (days_til_expire * 24 * 60 * 60 * 1000));
     expires_string = 'expires=' + d.toUTCString();
@@ -775,8 +778,8 @@ $(document).ready( function () {
   }); // end of socket se: add_content_to_insta_div
 
 
-// insta_step 15: Receive new filename from server
-socket.on('ce: insta_download_ready', function (newFileData) {
+  // insta_step 15: Receive new filename from server
+  socket.on('ce: insta_download_ready', function (newFileData) {
 
   //  store new filename in an object with the id as the key
   insta_download_ready_filename['insta' + newFileData.iIndex] = newFileData.newFilename;
@@ -1550,7 +1553,7 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
           // reset the click count
           click_count = 0;
-           console.log('click count: ' + click_count);
+          console.log('click count: ' + click_count);
 
         // else when more than one image is clicked...
         } else {
@@ -2324,15 +2327,15 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
   function set_stretch_dragger_to(id) {
     var dragger_element = document.getElementById('stretch_dragger'),
-      image_element     = document.getElementById(id),
-      // get the width and height
-      selected_imageWidth  = parseInt(image_element.style.width),
-      selected_imageHeight = parseInt(image_element.style.height),
-      // calculate the dragger location
-      selected_imageWidth_percentage  = selected_imageWidth / mainwide,
-      selected_imageHeight_percentage = selected_imageHeight / mainhigh,
-      dragger_location_left            = selected_imageWidth_percentage * inner_width,
-      dragger_location_top             = (1 - selected_imageHeight_percentage) * inner_height;
+        image_element     = document.getElementById(id),
+        // get the width and height
+        selected_imageWidth  = parseInt(image_element.style.width),
+        selected_imageHeight = parseInt(image_element.style.height),
+        // calculate the dragger location
+        selected_imageWidth_percentage  = selected_imageWidth / mainwide,
+        selected_imageHeight_percentage = selected_imageHeight / mainhigh,
+        dragger_location_left            = selected_imageWidth_percentage * inner_width,
+        dragger_location_top             = (1 - selected_imageHeight_percentage) * inner_height;
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2347,11 +2350,11 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
   function set_opacity_dragger_to(id) {
     var dragger_element = document.getElementById('opacity_dragger'),
-      image_element = document.getElementById(id),
-      // get the opacity percentage: 0-1
-      selected_image_opacity = parseInt( image_element.style.opacity * 100) / 100,
-      // calculate the dragger location
-      dragger_location_left = (selected_image_opacity * inner_width);
+        image_element = document.getElementById(id),
+        // get the opacity percentage: 0-1
+        selected_image_opacity = parseInt( image_element.style.opacity * 100) / 100,
+        // calculate the dragger location
+        dragger_location_left = (selected_image_opacity * inner_width);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2382,17 +2385,17 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
   function set_grayscale_invert_dragger_to(id) {
     var dragger_element = document.getElementById('grayscale_invert_dragger'),
-      image_element = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      selected_image_filter = image_element.style.WebkitFilter,
-      // get the numbers within the grayscale and invert parentheses
-      grayscale_Exp = /grayscale\(([^)]+)\)/,
-      invert_Exp = /invert\(([^)]+)\)/,
-      grayscale_matches = grayscale_Exp.exec(selected_image_filter),
-      invert_matches    = invert_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      dragger_location_top = ((1 - parseFloat(grayscale_matches[1])) * inner_height),
-      dragger_location_left = (parseFloat(invert_matches[1]) * inner_width);
+        image_element = document.getElementById(id),
+        // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
+        selected_image_filter = image_element.style.WebkitFilter,
+        // get the numbers within the grayscale and invert parentheses
+        grayscale_Exp = /grayscale\(([^)]+)\)/,
+        invert_Exp = /invert\(([^)]+)\)/,
+        grayscale_matches = grayscale_Exp.exec(selected_image_filter),
+        invert_matches    = invert_Exp.exec(selected_image_filter),
+        // calculate the dragger location
+        dragger_location_top = ((1 - parseFloat(grayscale_matches[1])) * inner_height),
+        dragger_location_left = (parseFloat(invert_matches[1]) * inner_width);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2406,17 +2409,17 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
   function set_blur_brightness_dragger_to(id) {
     var dragger_element = document.getElementById('blur_brightness_dragger'),
-      image_element = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      selected_image_filter = image_element.style.WebkitFilter,
-      // get the numbers within the blur and brightness parentheses
-      blur_Exp = /blur\(([^)]+)\)/,
-      brightness_Exp = /brightness\(([^)]+)\)/,
-      blur_matches = blur_Exp.exec(selected_image_filter),
-      brightness_matches    = brightness_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      dragger_location_top = (parseFloat(blur_matches[1]) * inner_height / blur_level),
-      dragger_location_left = (parseFloat(brightness_matches[1]) * inner_width / brightness_level);
+        image_element = document.getElementById(id),
+        // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
+        selected_image_filter = image_element.style.WebkitFilter,
+        // get the numbers within the blur and brightness parentheses
+        blur_Exp = /blur\(([^)]+)\)/,
+        brightness_Exp = /brightness\(([^)]+)\)/,
+        blur_matches = blur_Exp.exec(selected_image_filter),
+        brightness_matches    = brightness_Exp.exec(selected_image_filter),
+        // calculate the dragger location
+        dragger_location_top = (parseFloat(blur_matches[1]) * inner_height / blur_level),
+        dragger_location_left = (parseFloat(brightness_matches[1]) * inner_width / brightness_level);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2430,17 +2433,17 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
   function set_contrast_saturate_dragger_to(id) {
     var dragger_element = document.getElementById('contrast_saturate_dragger'),
-      image_element = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      selected_image_filter = image_element.style.WebkitFilter,
-      // get the numbers within the contrast and saturate parentheses
-      contrast_Exp = /contrast\(([^)]+)\)/,
-      saturate_Exp = /saturate\(([^)]+)\)/,
-      contrast_matches = contrast_Exp.exec(selected_image_filter),
-      saturate_matches = saturate_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      dragger_location_top = (parseFloat(contrast_matches[1]) * inner_height / contrast_level),
-      dragger_location_left = (parseFloat(saturate_matches[1]) * inner_width / saturate_level);
+        image_element = document.getElementById(id),
+        // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
+        selected_image_filter = image_element.style.WebkitFilter,
+        // get the numbers within the contrast and saturate parentheses
+        contrast_Exp = /contrast\(([^)]+)\)/,
+        saturate_Exp = /saturate\(([^)]+)\)/,
+        contrast_matches = contrast_Exp.exec(selected_image_filter),
+        saturate_matches = saturate_Exp.exec(selected_image_filter),
+        // calculate the dragger location
+        dragger_location_top = (parseFloat(contrast_matches[1]) * inner_height / contrast_level),
+        dragger_location_left = (parseFloat(saturate_matches[1]) * inner_width / saturate_level);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2454,17 +2457,17 @@ socket.on('ce: insta_download_ready', function (newFileData) {
 
   function set_party_dragger_to(id) {
     var dragger_element = document.getElementById('party_dragger'),
-      image_element = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      // and opacity percentage: (0-1)
-      selected_image_filter = image_element.style.WebkitFilter,
-      selected_image_opacity = parseInt( image_element.style.opacity * 100) / 100,
-      // get the number within the hue-rotation parentheses
-      hue_rotate_Exp = /hue-rotate\(([^)]+)\)/,
-      hue_rotate_matches = hue_rotate_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      dragger_location_left = (selected_image_opacity * inner_width),
-      dragger_location_top = (inner_height - (parseFloat(hue_rotate_matches[1]) / 360 * inner_height));
+        image_element = document.getElementById(id),
+        // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
+        // and opacity percentage: (0-1)
+        selected_image_filter = image_element.style.WebkitFilter,
+        selected_image_opacity = parseInt( image_element.style.opacity * 100) / 100,
+        // get the number within the hue-rotation parentheses
+        hue_rotate_Exp = /hue-rotate\(([^)]+)\)/,
+        hue_rotate_matches = hue_rotate_Exp.exec(selected_image_filter),
+        // calculate the dragger location
+        dragger_location_left = (selected_image_opacity * inner_width),
+        dragger_location_top = (inner_height - (parseFloat(hue_rotate_matches[1]) / 360 * inner_height));
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2492,5 +2495,3 @@ socket.on('ce: insta_download_ready', function (newFileData) {
       dragger_element.classList.add('dragger_transitions');
     }, 0);
   };
-
-}); // end of document.ready

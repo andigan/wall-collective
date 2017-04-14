@@ -18,7 +18,7 @@ var config = require('./config/config'),
     express = require('express'),
     app = express(),
 
-    // MongoDB; function to connect to database, create models, declare models
+    // MongoDB; function to connect to database, create models
     dbInit = require('./db/db-init'),
 
     // instagram authorization middleware
@@ -70,7 +70,7 @@ server = app.listen(port, function () {
 io = require('socket.io').listen(server);
 require('./socketio/connection')(io);
 
-// append socket connection to response
+// attach socket connection to response
 app.use(function (req, res, next) {
   res.io = io;
   next();
