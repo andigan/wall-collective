@@ -22,28 +22,10 @@
 
 // --Setup and configure variables
 
-import test from './test';
-
-test();
-
+import config from './config';
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
-
-    // set debug box on or off
-    debug_on = true,
-
-    // set upload placement
-    upload_top = '0px',
-    upload_left = '0px',
-    upload_width = '75px',
-    upload_height = '100px',
-
-    // set maximum limit for draggers
-    blur_level = 7,
-    brightness_level = 8,
-    contrast_level = 10,
-    saturate_level = 10,
 
     // retrieve dragger size
     dragger_width = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width),
@@ -132,7 +114,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
 
   // insta_step 6: Open the instagram_div and fetch instagram data
-  if (open_instagram_div === true) {
+  if (openInstagramDiv === true) {
     socket.emit('ce: get_instagram_data');
 
     document.getElementById('insta_header').style.display = 'flex';
@@ -148,7 +130,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 // --Debug functions
 
   // create debug box, make it draggable
-  if (debug_on) create_debug_box();
+  if (config.debugOn) create_debug_box();
 
   function create_debug_box() {
     // <div id='debug_box' style='display: none;'>
@@ -197,7 +179,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   function debug_report(debug_strings) {
     var i = 0;
 
-    if (debug_on) {
+    if (config.debugOn) {
       for (i = 0; i < debug_strings.length; i++) {
         document.getElementById('info' + debug_strings[i][0]).textContent = debug_strings[i][1];
       };
@@ -208,7 +190,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     var i = 0,
         info_elements = {};
 
-    if (debug_on) {
+    if (config.debugOn) {
       info_elements = document.getElementsByClassName('info');
       for (i = 0; i < info_elements.length; i++) {
         info_elements[i].textContent = '';
@@ -344,6 +326,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     document.getElementById('upload_container').classList.remove('upload_container_is_open');
     document.getElementById('connect_info').classList.remove('connect_info_is_open');
     document.getElementById('explore_container').style.display = 'none';
+    document.getElementById('insta_header').style.display = 'none';
+    document.getElementById('insta_div').style.display = 'none';
+
+
 
     // replace image_upload_preview image and delete_preview image
     document.getElementById('image_upload_preview').src = '/icons/1x1.png';
@@ -647,10 +633,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     image_element.setAttribute('data-rotateX', '0');
     image_element.setAttribute('data-rotateY', '0');
     image_element.setAttribute('data-rotateZ', '0');
-    image_element.style.width = upload_width;
+    image_element.style.width = config.uploadWidth;
     image_element.style.zIndex = data.z_index;
-    image_element.style.top = upload_top;
-    image_element.style.left = upload_left;
+    image_element.style.top = config.uploadTop;
+    image_element.style.left = config.uploadLeft;
     image_element.style.opacity = 1;
     image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
     image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
@@ -963,13 +949,13 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   $('#debug_button').on('click', function () {
     // if debug_box is open, hide it
     if ( document.body.classList.contains('debug_on') ) {
-      debug_on = false;
+      config.debugOn = false;
       document.body.classList.remove('debug_on');
       document.getElementById('debug_box').style.display = 'none';
       document.getElementById('debug_button').innerHTML = "report is off <img class='icon_image' src='/icons/debug_icon.png'>";
     // else when debug_box is closed, show it
     } else {
-      debug_on = true;
+      config.debugOn = true;
       document.body.classList.add('debug_on');
       document.getElementById('debug_box').style.display = 'block';
       document.getElementById('debug_button').innerHTML = "report is on <img class='icon_image' src='/icons/debug_icon.png'>";
@@ -1160,11 +1146,11 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         image_element.setAttribute('data-rotateY', '0');
         image_element.setAttribute('data-rotateZ', '0');
         image_element.setAttribute('data-persective', '0');
-        image_element.style.width = upload_width;
-        image_element.style.height = upload_height;
+        image_element.style.width = config.uploadWidth;
+        image_element.style.height = config.uploadheight;
         image_element.style.zIndex = response.z_index;
-        image_element.style.top = upload_top;
-        image_element.style.left = upload_left;
+        image_element.style.top = config.uploadTop;
+        image_element.style.left = config.uploadLeft;
         image_element.style.opacity = 1;
         image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
         image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
@@ -1835,7 +1821,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       // this causes the class to be removed before the next click event begins
       setTimeout( function () {
         document.getElementById('navigation_toggle_button').classList.remove('dragging_no_click');
-        navigation_toggle_button_is_stationary = true;
+//        navigation_toggle_button_is_stationary = true;
       }, 200);
     }
   });
@@ -2105,10 +2091,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       this.percentage_wide = ui.position.left / inner_width;
       this.percentage_high = (inner_height - ui.position.top) / inner_height;
       // display the percentages in the dragger_info div
-      this.dragger_info.textContent = 'blur:' + ((1 - this.percentage_high) * blur_level).toFixed(2) + 'px brightness: ' + (this.percentage_wide * brightness_level).toFixed(2);
+      this.dragger_info.textContent = 'blur:' + ((1 - this.percentage_high) * config.blurLevel).toFixed(2) + 'px brightness: ' + (this.percentage_wide * config.brightnessLevel).toFixed(2);
       // make the calculated changes
-      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/blur\(.*?\)/      , 'blur(' + ((1 - this.percentage_high) * blur_level) + 'px)');
-      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.percentage_wide * brightness_level) + ')');
+      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/blur\(.*?\)/      , 'blur(' + ((1 - this.percentage_high) * config.blurLevel) + 'px)');
+      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.percentage_wide * config.brightnessLevel) + ')');
       // socket to other clients
       this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
       socket.emit('c-e:  filter_changing', this.socketdata);
@@ -2153,10 +2139,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       this.percentage_wide = ui.position.left / inner_width;
       this.percentage_high = (inner_height - ui.position.top) / inner_height;
       // display the percentages in the dragger_info div
-      this.dragger_info.textContent = 'contrast:' + ((1 - this.percentage_high) * contrast_level).toFixed(2) +  ' saturate: ' + (this.percentage_wide * saturate_level).toFixed(2);
+      this.dragger_info.textContent = 'contrast:' + ((1 - this.percentage_high) * config.contrastLevel).toFixed(2) +  ' saturate: ' + (this.percentage_wide * config.saturateLevel).toFixed(2);
       // make the calculated changes
-      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/contrast\(.*?\)/      , 'contrast(' + ((1 - this.percentage_high) * contrast_level) + ')');
-      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.percentage_wide * saturate_level) + ')');
+      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/contrast\(.*?\)/      , 'contrast(' + ((1 - this.percentage_high) * config.contrastLevel) + ')');
+      this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.percentage_wide * config.saturateLevel) + ')');
       // socket to other clients
       this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
       socket.emit('c-e:  filter_changing', this.socketdata);
@@ -2418,8 +2404,8 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         blur_matches = blur_Exp.exec(selected_image_filter),
         brightness_matches    = brightness_Exp.exec(selected_image_filter),
         // calculate the dragger location
-        dragger_location_top = (parseFloat(blur_matches[1]) * inner_height / blur_level),
-        dragger_location_left = (parseFloat(brightness_matches[1]) * inner_width / brightness_level);
+        dragger_location_top = (parseFloat(blur_matches[1]) * inner_height / config.blurLevel),
+        dragger_location_left = (parseFloat(brightness_matches[1]) * inner_width / config.brightnessLevel);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2442,8 +2428,8 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         contrast_matches = contrast_Exp.exec(selected_image_filter),
         saturate_matches = saturate_Exp.exec(selected_image_filter),
         // calculate the dragger location
-        dragger_location_top = (parseFloat(contrast_matches[1]) * inner_height / contrast_level),
-        dragger_location_left = (parseFloat(saturate_matches[1]) * inner_width / saturate_level);
+        dragger_location_top = (parseFloat(contrast_matches[1]) * inner_height / config.contrastLevel),
+        dragger_location_left = (parseFloat(saturate_matches[1]) * inner_width / config.saturateLevel);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';

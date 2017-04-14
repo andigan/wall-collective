@@ -73,9 +73,21 @@
 "use strict";
 
 
-module.exports = function () {
+module.exports = {
+  debugOn: true, // set debug box on or off
 
-  alert('hi there 2');
+  // set upload placement
+  uploadTop: '0px',
+  uploadLeft: '0px',
+  uploadWidth: '75px',
+  uploadheight: '100px',
+
+  // set maximum limit for draggers
+  blurLevel: 7,
+  brightnessLevel: 8,
+  contrastLevel: 10,
+  saturateLevel: 10
+
 };
 
 /***/ }),
@@ -85,58 +97,14 @@ module.exports = function () {
 "use strict";
 
 
-var _test = __webpack_require__(0);
+var _config = __webpack_require__(0);
 
-var _test2 = _interopRequireDefault(_test);
+var _config2 = _interopRequireDefault(_config);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-(0, _test2.default)();
-
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
-// wall-collective
-//
-// Version: 0.7.0
-// Requires: jQuery v1.7+
-//           jquery-ui
-//           jquery.form
-//           jquery.mobile-events
-//           jquery.ui.touch-punch
-//           socket.io v1.3.7+
-//           interact.js
-//
-// Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
-
-// --Development helpers
-
-// setTimeout(function () { $( '#debug_button' ).trigger( 'click' ); }, 0);
-// setTimeout(function () { $( '#explore_button' ).trigger( 'click' ); }, 0);
-// setTimeout(function () { $( '#upload_container_button').trigger( 'click' ); }, 1000);
-
-// setTimeout(function () { $( '#dragger_switches_button' ).trigger( 'click' ); }, 0);
-// setTimeout(function() { $('#wrapper').css('background-color', 'yellow'); },1500);
-
-// --Setup and configure variables
-
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
-
-
-// set debug box on or off
-debug_on = true,
-
-
-// set upload placement
-upload_top = '0px',
-    upload_left = '0px',
-    upload_width = '75px',
-    upload_height = '100px',
-
-
-// set maximum limit for draggers
-blur_level = 7,
-    brightness_level = 8,
-    contrast_level = 10,
-    saturate_level = 10,
 
 
 // retrieve dragger size
@@ -188,6 +156,30 @@ insta_download_ready_filename = {},
 instaAccessReady = false;
 
 // set wrapper size; (css vh and vw were not working with mobile safari)
+// wall-collective
+//
+// Version: 0.7.0
+// Requires: jQuery v1.7+
+//           jquery-ui
+//           jquery.form
+//           jquery.mobile-events
+//           jquery.ui.touch-punch
+//           socket.io v1.3.7+
+//           interact.js
+//
+// Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
+
+// --Development helpers
+
+// setTimeout(function () { $( '#debug_button' ).trigger( 'click' ); }, 0);
+// setTimeout(function () { $( '#explore_button' ).trigger( 'click' ); }, 0);
+// setTimeout(function () { $( '#upload_container_button').trigger( 'click' ); }, 1000);
+
+// setTimeout(function () { $( '#dragger_switches_button' ).trigger( 'click' ); }, 0);
+// setTimeout(function() { $('#wrapper').css('background-color', 'yellow'); },1500);
+
+// --Setup and configure variables
+
 document.getElementById('wrapper').style.width = window.innerWidth + 'px';
 document.getElementById('wrapper').style.height = window.innerHeight + 'px';
 
@@ -230,7 +222,7 @@ document.getElementById('navigation_toggle_button_container').style.left = mainw
 assigndrag();
 
 // insta_step 6: Open the instagram_div and fetch instagram data
-if (open_instagram_div === true) {
+if (openInstagramDiv === true) {
   socket.emit('ce: get_instagram_data');
 
   document.getElementById('insta_header').style.display = 'flex';
@@ -245,7 +237,7 @@ if (open_instagram_div === true) {
 // --Debug functions
 
 // create debug box, make it draggable
-if (debug_on) create_debug_box();
+if (_config2.default.debugOn) create_debug_box();
 
 function create_debug_box() {
   // <div id='debug_box' style='display: none;'>
@@ -288,7 +280,7 @@ function create_debug_box() {
 function debug_report(debug_strings) {
   var i = 0;
 
-  if (debug_on) {
+  if (_config2.default.debugOn) {
     for (i = 0; i < debug_strings.length; i++) {
       document.getElementById('info' + debug_strings[i][0]).textContent = debug_strings[i][1];
     };
@@ -299,7 +291,7 @@ function clear_debug_box() {
   var i = 0,
       info_elements = {};
 
-  if (debug_on) {
+  if (_config2.default.debugOn) {
     info_elements = document.getElementsByClassName('info');
     for (i = 0; i < info_elements.length; i++) {
       info_elements[i].textContent = '';
@@ -431,6 +423,8 @@ function state_change_to_close_all() {
   document.getElementById('upload_container').classList.remove('upload_container_is_open');
   document.getElementById('connect_info').classList.remove('connect_info_is_open');
   document.getElementById('explore_container').style.display = 'none';
+  document.getElementById('insta_header').style.display = 'none';
+  document.getElementById('insta_div').style.display = 'none';
 
   // replace image_upload_preview image and delete_preview image
   document.getElementById('image_upload_preview').src = '/icons/1x1.png';
@@ -730,10 +724,10 @@ socket.on('bc: add_upload', function (data) {
   image_element.setAttribute('data-rotateX', '0');
   image_element.setAttribute('data-rotateY', '0');
   image_element.setAttribute('data-rotateZ', '0');
-  image_element.style.width = upload_width;
+  image_element.style.width = _config2.default.uploadWidth;
   image_element.style.zIndex = data.z_index;
-  image_element.style.top = upload_top;
-  image_element.style.left = upload_left;
+  image_element.style.top = _config2.default.uploadTop;
+  image_element.style.left = _config2.default.uploadLeft;
   image_element.style.opacity = 1;
   image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
   image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
@@ -1035,13 +1029,13 @@ $('#navigation_toggle_button').on('click', function () {
 $('#debug_button').on('click', function () {
   // if debug_box is open, hide it
   if (document.body.classList.contains('debug_on')) {
-    debug_on = false;
+    _config2.default.debugOn = false;
     document.body.classList.remove('debug_on');
     document.getElementById('debug_box').style.display = 'none';
     document.getElementById('debug_button').innerHTML = "report is off <img class='icon_image' src='/icons/debug_icon.png'>";
     // else when debug_box is closed, show it
   } else {
-    debug_on = true;
+    _config2.default.debugOn = true;
     document.body.classList.add('debug_on');
     document.getElementById('debug_box').style.display = 'block';
     document.getElementById('debug_button').innerHTML = "report is on <img class='icon_image' src='/icons/debug_icon.png'>";
@@ -1230,11 +1224,11 @@ $('#confirm_upload_button').on('click', function () {
       image_element.setAttribute('data-rotateY', '0');
       image_element.setAttribute('data-rotateZ', '0');
       image_element.setAttribute('data-persective', '0');
-      image_element.style.width = upload_width;
-      image_element.style.height = upload_height;
+      image_element.style.width = _config2.default.uploadWidth;
+      image_element.style.height = _config2.default.uploadheight;
       image_element.style.zIndex = response.z_index;
-      image_element.style.top = upload_top;
-      image_element.style.left = upload_left;
+      image_element.style.top = _config2.default.uploadTop;
+      image_element.style.left = _config2.default.uploadLeft;
       image_element.style.opacity = 1;
       image_element.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
       image_element.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
@@ -1857,7 +1851,7 @@ $('#navigation_toggle_button_container').draggable({
     // this causes the class to be removed before the next click event begins
     setTimeout(function () {
       document.getElementById('navigation_toggle_button').classList.remove('dragging_no_click');
-      navigation_toggle_button_is_stationary = true;
+      //        navigation_toggle_button_is_stationary = true;
     }, 200);
   }
 });
@@ -2126,10 +2120,10 @@ $('#blur_brightness_dragger').draggable({
     this.percentage_wide = ui.position.left / inner_width;
     this.percentage_high = (inner_height - ui.position.top) / inner_height;
     // display the percentages in the dragger_info div
-    this.dragger_info.textContent = 'blur:' + ((1 - this.percentage_high) * blur_level).toFixed(2) + 'px brightness: ' + (this.percentage_wide * brightness_level).toFixed(2);
+    this.dragger_info.textContent = 'blur:' + ((1 - this.percentage_high) * _config2.default.blurLevel).toFixed(2) + 'px brightness: ' + (this.percentage_wide * _config2.default.brightnessLevel).toFixed(2);
     // make the calculated changes
-    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/blur\(.*?\)/, 'blur(' + (1 - this.percentage_high) * blur_level + 'px)');
-    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + this.percentage_wide * brightness_level + ')');
+    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/blur\(.*?\)/, 'blur(' + (1 - this.percentage_high) * _config2.default.blurLevel + 'px)');
+    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + this.percentage_wide * _config2.default.brightnessLevel + ')');
     // socket to other clients
     this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
     socket.emit('c-e:  filter_changing', this.socketdata);
@@ -2174,10 +2168,10 @@ $('#contrast_saturate_dragger').draggable({
     this.percentage_wide = ui.position.left / inner_width;
     this.percentage_high = (inner_height - ui.position.top) / inner_height;
     // display the percentages in the dragger_info div
-    this.dragger_info.textContent = 'contrast:' + ((1 - this.percentage_high) * contrast_level).toFixed(2) + ' saturate: ' + (this.percentage_wide * saturate_level).toFixed(2);
+    this.dragger_info.textContent = 'contrast:' + ((1 - this.percentage_high) * _config2.default.contrastLevel).toFixed(2) + ' saturate: ' + (this.percentage_wide * _config2.default.saturateLevel).toFixed(2);
     // make the calculated changes
-    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/contrast\(.*?\)/, 'contrast(' + (1 - this.percentage_high) * contrast_level + ')');
-    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + this.percentage_wide * saturate_level + ')');
+    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/contrast\(.*?\)/, 'contrast(' + (1 - this.percentage_high) * _config2.default.contrastLevel + ')');
+    this.image_element.style.WebkitFilter = this.image_element.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + this.percentage_wide * _config2.default.saturateLevel + ')');
     // socket to other clients
     this.socketdata.imageFilter = this.image_element.style.WebkitFilter;
     socket.emit('c-e:  filter_changing', this.socketdata);
@@ -2450,8 +2444,8 @@ function set_blur_brightness_dragger_to(id) {
       brightness_matches = brightness_Exp.exec(selected_image_filter),
 
   // calculate the dragger location
-  dragger_location_top = parseFloat(blur_matches[1]) * inner_height / blur_level,
-      dragger_location_left = parseFloat(brightness_matches[1]) * inner_width / brightness_level;
+  dragger_location_top = parseFloat(blur_matches[1]) * inner_height / _config2.default.blurLevel,
+      dragger_location_left = parseFloat(brightness_matches[1]) * inner_width / _config2.default.brightnessLevel;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2477,8 +2471,8 @@ function set_contrast_saturate_dragger_to(id) {
       saturate_matches = saturate_Exp.exec(selected_image_filter),
 
   // calculate the dragger location
-  dragger_location_top = parseFloat(contrast_matches[1]) * inner_height / contrast_level,
-      dragger_location_left = parseFloat(saturate_matches[1]) * inner_width / saturate_level;
+  dragger_location_top = parseFloat(contrast_matches[1]) * inner_height / _config2.default.contrastLevel,
+      dragger_location_left = parseFloat(saturate_matches[1]) * inner_width / _config2.default.saturateLevel;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
