@@ -1,5 +1,5 @@
 module.exports = {
-  debugOn: true, // set debug box on or off
+  debugOn: true, // set debug div
 
   // set upload placement
   uploadTop: '0px',
@@ -12,7 +12,5 @@ module.exports = {
   brightnessLevel: 8,
   contrastLevel: 10,
   saturateLevel: 10
-
-
 
 };

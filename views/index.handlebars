@@ -66,7 +66,7 @@
         <img  title={{filename}}
               src='{{location}}{{filename}}'
               id={{dom_id}}
-              class='drawing'
+              class='wallPic'
               style='z-index: {{zindex}};
                          top: {{postop}};
                         left: {{posleft}};
@@ -158,13 +158,12 @@
       <div id='reset_page_button' class='button tools_button'> reset page
         <img class='icon_image' src='/icons/reset_icon.png'>
       </div>
-      <div id='debug_button' class='button tools_button'> report is off
-        <img class='icon_image' src='/icons/debug_icon.png'>
-      </div>
       <div id='explore_button' class='button tools_button'> explore
         <img class='icon_image' src='/icons/magnifying_glass_icon.png'>
       </div>
-      <div class='button_no_show'></div>
+      <div class='button_no_show'>
+      </div>
+      <div id='debug-holder' class='button_no_show'></div>
     </div>
 
     <div id='upload_preview_container' class='rainbow_border'>

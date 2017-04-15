@@ -32,7 +32,7 @@ router.get('/', function (req, res) {
       // insta_step 5: Load the page with the instagram div open.
       // if the request contains the query parameter ?open_instagram_div (from i-gram auth)
       // set the open_instagram_div to true to pass to index.html
-      openInstagramDiv  : (typeof req.query.open_instagram_div !== 'undefined')
+      openInstagramDiv  : ("open_instagram_div" in req.query)
     });
   });
 });

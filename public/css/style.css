@@ -14,7 +14,7 @@ dragger_info: 86000;
 
 
 upload_preview_container: 90000;
-debug_box: 90000;
+debug-container: 90000;
 fullscreenmaskclass: 90000;
 */
 
@@ -82,7 +82,7 @@ fullscreenmaskclass: 90000;
   font-size:150%;
 }
 
-#debug_box {
+#debug-container {
   background-color:transparent;
   border:1px dashed white;
   color:white;

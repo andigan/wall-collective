@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 1);
+/******/ 	return __webpack_require__(__webpack_require__.s = 3);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -74,7 +74,7 @@
 
 
 module.exports = {
-  debugOn: true, // set debug box on or off
+  debugOn: true, // set debug div
 
   // set upload placement
   uploadTop: '0px',
@@ -97,11 +97,173 @@ module.exports = {
 "use strict";
 
 
+// import helpers from '../helpers';
+module.exports = {
+
+  init: function init() {
+    // helpers.clickme('debug-button', 0);
+    // helpers.clickme('dragger_switches_button', 1000);
+    // helpers.clickme('explore_button', 0);
+    // helpers.clickme('upload_container_button', 1000);
+
+    this.createDebugButton();
+    this.createDebugDiv();
+    this.setListeners();
+  },
+
+  createDebugButton: function createDebugButton() {
+    var debugButton = document.getElementById('debug-holder'),
+        debugIcon = document.createElement('img'),
+        debugText = document.createElement('span');
+
+    // create debug button
+    debugButton.setAttribute('id', 'debug-button');
+    debugButton.classList.add('button', 'tools_button');
+    debugButton.classList.remove('button_no_show');
+
+    debugText.textContent = 'report is off';
+    debugText.setAttribute('id', 'debug-text');
+
+    debugIcon.classList.add('icon_image');
+    debugIcon.src = '/icons/debug_icon.png';
+    debugButton.appendChild(debugText);
+    debugButton.appendChild(debugIcon);
+
+    // add button functionality
+    debugButton.addEventListener('click', function () {
+
+      if (this.classList.contains('debug-on')) {
+        this.classList.remove('debug-on');
+        document.getElementById('debug-container').style.display = 'none';
+        document.getElementById('debug-text').innerText = 'report is off';
+      } else {
+        this.classList.add('debug-on');
+        document.getElementById('debug-container').style.display = 'block';
+        document.getElementById('debug-text').innerText = 'report is on';
+      };
+    });
+  },
+
+  createDebugDiv: function createDebugDiv() {
+    var wrapperEl = document.getElementById('wrapper'),
+        debugEl = document.createElement('div'),
+        infoLineEl,
+        i,
+        that = this;
+
+    // create debug div
+    debugEl.setAttribute('id', 'debug-container');
+    debugEl.style.display = 'none';
+    for (i = 1; i <= 10; i++) {
+      infoLineEl = document.createElement('div');
+      infoLineEl.setAttribute('id', 'info' + i);
+      infoLineEl.classList.add('info');
+      debugEl.appendChild(infoLineEl);
+    };
+
+    wrapperEl.appendChild(debugEl);
+
+    // make debug-container draggable
+    $('#debug-container').draggable({
+      containment: 'parent',
+      start: function start() {
+        that.clearDebugInfo();
+        that.addDebugInfo([[1, 'this div width    : ' + $(this).css('width')], [2, 'wrapper width     : ' + document.getElementById('wrapper').style.width], [3, 'screen.width      : ' + screen.width.toString()], [4, 'window.innerWidth : ' + window.innerWidth.toString()], [5, 'screen.availWidth : ' + screen.availWidth.toString()]]);
+      },
+      drag: function drag() {
+        var debugEl = document.getElementById('debug-container'),
+            debugDivInfo = debugEl.getBoundingClientRect();
+
+        that.addDebugInfo([[6, ''], [7, this.style.left + ' <css> ' + $(this).css('right')], [8, debugDivInfo.left.toString() + ' <dom> ' + debugDivInfo.right.toString()]]);
+      }
+    });
+  },
+
+  setListeners: function setListeners() {
+    var that = this;
+
+    // resize window
+    window.addEventListener('resize', function () {
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'resize: new width  : ' + window.innerWidth + 'px'], [2, 'resize: new height : ' + window.innerHeight + 'px']]);
+    });
+
+    // click on image
+    document.getElementById('images').addEventListener('click', function (e) {
+      var clickedEl = e.target;
+
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'Filename: ' + clickedEl.getAttribute('title')], [2, 'Z-index: ' + clickedEl.style.zIndex], [3, 'Start: Left: ' + clickedEl.style.left + ' Top: ' + clickedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
+    });
+
+    // dragged images
+    $(document).on('dragstart', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'Filename: ' + draggedEl.getAttribute('title')], [2, 'Z-index: ' + draggedEl.style.zIndex], [3, 'Start: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
+    });
+
+    $(document).on('drag', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.addDebugInfo([[4, 'Current: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
+    });
+
+    $(document).on('dragstop', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.addDebugInfo([[5, 'Stop: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
+    });
+  },
+
+  // debugInfoText: a multidimensional array: [[1, string], [2, string]]
+  addDebugInfo: function addDebugInfo(debugInfoText) {
+    debugInfoText.forEach(function (item) {
+      document.getElementById('info' + item[0]).textContent = item[1];
+    });
+  },
+
+  clearDebugInfo: function clearDebugInfo() {
+    Array.from(document.getElementsByClassName('info')).forEach(function (element) {
+      element.textContent = '';
+    });
+  }
+};
+
+/***/ }),
+/* 2 */,
+/* 3 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _config = __webpack_require__(0);
 
 var _config2 = _interopRequireDefault(_config);
 
+var _debug = __webpack_require__(1);
+
+var _debug2 = _interopRequireDefault(_debug);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+// debug tools
+// wall-collective
+//
+// Version: 0.7.0
+// Requires: jQuery v1.7+
+//           jquery-ui
+//           jquery.form
+//           jquery.mobile-events
+//           jquery.ui.touch-punch
+//           socket.io v1.3.7+
+//           interact.js
+//
+// Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
+
+if (_config2.default.debugOn) _debug2.default.init();
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
@@ -156,30 +318,6 @@ insta_download_ready_filename = {},
 instaAccessReady = false;
 
 // set wrapper size; (css vh and vw were not working with mobile safari)
-// wall-collective
-//
-// Version: 0.7.0
-// Requires: jQuery v1.7+
-//           jquery-ui
-//           jquery.form
-//           jquery.mobile-events
-//           jquery.ui.touch-punch
-//           socket.io v1.3.7+
-//           interact.js
-//
-// Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
-
-// --Development helpers
-
-// setTimeout(function () { $( '#debug_button' ).trigger( 'click' ); }, 0);
-// setTimeout(function () { $( '#explore_button' ).trigger( 'click' ); }, 0);
-// setTimeout(function () { $( '#upload_container_button').trigger( 'click' ); }, 1000);
-
-// setTimeout(function () { $( '#dragger_switches_button' ).trigger( 'click' ); }, 0);
-// setTimeout(function() { $('#wrapper').css('background-color', 'yellow'); },1500);
-
-// --Setup and configure variables
-
 document.getElementById('wrapper').style.width = window.innerWidth + 'px';
 document.getElementById('wrapper').style.height = window.innerHeight + 'px';
 
@@ -218,7 +356,7 @@ document.getElementById('images').style.webkitPerspectiveOriginY = '50%';
 //  document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
 document.getElementById('navigation_toggle_button_container').style.left = mainwide - $('#navigation_toggle_button_container').width() + 'px';
 
-// assign draggable to all .drawing elements
+// assign draggable to all .wallPic elements
 assigndrag();
 
 // insta_step 6: Open the instagram_div and fetch instagram data
@@ -233,71 +371,6 @@ if (openInstagramDiv === true) {
   document.getElementById('line_one').style.top = '35%';
   document.getElementById('line_three').style.top = '65%';
 };
-
-// --Debug functions
-
-// create debug box, make it draggable
-if (_config2.default.debugOn) create_debug_box();
-
-function create_debug_box() {
-  // <div id='debug_box' style='display: none;'>
-  //   <div id='info1'> </div> ... <div id='info10'> </div>
-  // </div>
-  var i = 0,
-      info_element = {},
-      wrapper_element = document.getElementById('wrapper'),
-      debug_box_element = document.createElement('div');
-
-  debug_box_element.setAttribute('id', 'debug_box');
-  debug_box_element.style.display = 'none';
-  for (i = 1; i <= 10; i++) {
-    info_element = document.createElement('div');
-    info_element.setAttribute('id', 'info' + i);
-    info_element.classList.add('info');
-    debug_box_element.appendChild(info_element);
-  };
-  // add 'debug_box' to 'wrapper'
-  wrapper_element.appendChild(debug_box_element);
-
-  // make debug_box draggable
-  $('#debug_box').draggable({
-    containment: 'parent',
-    start: function start() {
-      clear_debug_box();
-      debug_report([[1, 'this div width: ' + $('#debug_box').css('width')], [2, 'wrapper width     :' + $('#wrapper').css('width')], [3, 'screen.width      :' + screen.width.toString()], [4, 'window.innerWidth :' + window.innerWidth.toString()], [5, 'screen.availWidth :' + screen.availWidth.toString()]]);
-    },
-    drag: function drag() {
-      var debug_box_element = document.getElementById('debug_box'),
-          debug_box_coords = debug_box_element.getBoundingClientRect();
-
-      debug_report([[6, ' '], [7, $(this).css('left') + ' <css> ' + $(this).css('right')], [8, debug_box_coords.left.toString() + ' <dom> ' + debug_box_coords.right.toString()]]);
-    }
-  }); // end of debug_box draggable
-} // end of create_debug_box()
-
-// used to post debug information to the debug box
-// debug_strings is a multidimensional array with number from 1-10 and report strings [[1, string], [2, string]];
-function debug_report(debug_strings) {
-  var i = 0;
-
-  if (_config2.default.debugOn) {
-    for (i = 0; i < debug_strings.length; i++) {
-      document.getElementById('info' + debug_strings[i][0]).textContent = debug_strings[i][1];
-    };
-  };
-}
-
-function clear_debug_box() {
-  var i = 0,
-      info_elements = {};
-
-  if (_config2.default.debugOn) {
-    info_elements = document.getElementsByClassName('info');
-    for (i = 0; i < info_elements.length; i++) {
-      info_elements[i].textContent = '';
-    };
-  };
-}
 
 // --Page helpers
 
@@ -340,10 +413,7 @@ window.addEventListener('resize', function () {
   // position the navigation_toggle_button_container on the bottom right on startup.
   document.getElementById('navigation_toggle_button_container').style.top = mainhigh - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).height) + 'px';
   document.getElementById('navigation_toggle_button_container').style.left = mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px';
-
-  clear_debug_box();
-  debug_report([[1, 'resize: new width : ' + window.innerWidth + 'px'], [2, 'resize: new height : ' + window.innerHeight + 'px']]);
-}, false); // bubbling phase
+}, false);
 
 // hide all draggers
 function hide_draggers() {
@@ -717,7 +787,7 @@ socket.on('bc: add_upload', function (data) {
 
   image_element.setAttribute('id', data.dom_id);
   image_element.src = data.location + data.imageFilename;
-  image_element.classList.add('drawing');
+  image_element.classList.add('wallPic');
   image_element.setAttribute('title', data.imageFilename);
   image_element.setAttribute('data-scale', '1');
   image_element.setAttribute('data-angle', '0');
@@ -781,9 +851,6 @@ socket.on('bc: chunk_sent', function (uploaddata) {
   if (uploaddata.sessionID === sessionID) {
     uploadtotal += uploaddata.chunkSize;
     document.getElementById('confirm_or_reject_container_info').textContent = 'Uploaded ' + uploadtotal + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
-    debug_report([[10, 'Uploaded ' + uploadtotal + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.']]);
-  } else {
-    debug_report([[10, 'Someone is uploading an image.']]);
   };
 });
 
@@ -926,13 +993,13 @@ $('#images').droppable({
   }
 });
 
-// insta_step 20: Convert dragged image to typical .drawing
+// insta_step 20: Convert dragged image to typical .wallPic
 socket.on('se: change_clone_to_image', function (instaDBData) {
   var image_element = document.getElementById(instaDBData.iID);
 
   image_element.setAttribute('id', instaDBData.dom_id);
   image_element.src = instaDBData.location + instaDBData.iFilename;
-  image_element.classList.add('drawing');
+  image_element.classList.add('wallPic');
   image_element.style.width = instaDBData.width;
   image_element.style.height = instaDBData.height;
   image_element.classList.remove('insta_image');
@@ -960,7 +1027,7 @@ socket.on('be: add_insta_image_to_other_clients', function (instaDBData) {
   image_element.setAttribute('id', instaDBData.dom_id);
   image_element.setAttribute('title', instaDBData.iFilename);
   image_element.src = instaDBData.location + instaDBData.iFilename;
-  image_element.classList.add('drawing');
+  image_element.classList.add('wallPic');
   image_element.style.width = instaDBData.width;
   image_element.style.height = instaDBData.height;
   image_element.style.top = instaDBData.postop;
@@ -1022,23 +1089,6 @@ $('#navigation_toggle_button').on('click', function () {
 
       hide_draggers();
     };
-  };
-});
-
-// debug box button
-$('#debug_button').on('click', function () {
-  // if debug_box is open, hide it
-  if (document.body.classList.contains('debug_on')) {
-    _config2.default.debugOn = false;
-    document.body.classList.remove('debug_on');
-    document.getElementById('debug_box').style.display = 'none';
-    document.getElementById('debug_button').innerHTML = "report is off <img class='icon_image' src='/icons/debug_icon.png'>";
-    // else when debug_box is closed, show it
-  } else {
-    _config2.default.debugOn = true;
-    document.body.classList.add('debug_on');
-    document.getElementById('debug_box').style.display = 'block';
-    document.getElementById('debug_button').innerHTML = "report is on <img class='icon_image' src='/icons/debug_icon.png'>";
   };
 });
 
@@ -1202,7 +1252,7 @@ $('#confirm_upload_button').on('click', function () {
   $('#upload_image_button').ajaxSubmit({
     // method from jquery.form
     error: function error(xhr) {
-      debug_report([[1, 'Error:' + xhr.status]]);
+      console.log('Error:' + xhr.status);
       // change navigation_container and remove upload_preview
       state_change_after_upload();
       uploadtotal = 0;
@@ -1216,7 +1266,7 @@ $('#confirm_upload_button').on('click', function () {
       // create new image
       image_element.setAttribute('id', response.dom_id);
       image_element.setAttribute('title', response.imageFilename);
-      image_element.classList.add('drawing');
+      image_element.classList.add('wallPic');
       image_element.src = response.location + response.imageFilename;
       image_element.setAttribute('data-scale', '1');
       image_element.setAttribute('data-angle', '0');
@@ -1409,12 +1459,12 @@ $('#close_explore_container').on('click', function () {
 
 // --Main drag function
 
-// use this function to assign draggable to all '.drawing' elements
+// use this function to assign draggable to all '.wallPic' elements
 // and then specific elements by passing an id
 function assigndrag(id) {
 
   if (typeof id === 'undefined') {
-    id = '.drawing';
+    id = '.wallPic';
   } else {
     id = '#' + id;
   };
@@ -1422,7 +1472,7 @@ function assigndrag(id) {
   // draggable method from jquery.ui
   $(id).draggable({
     // containment: 'window',
-    stack: '.drawing', // the stack option automatically adjusts z-indexes for all .drawing elements
+    stack: '.wallPic', // the stack option automatically adjusts z-indexes for all .wallPic elements
     scroll: true,
     start: function start(event, ui) {
       // recoup for transformed objects, to keep the drag event centered on a transformed object.
@@ -1438,9 +1488,6 @@ function assigndrag(id) {
       top = isNaN(top) ? 0 : top;
       this.recoupLeft = left - ui.position.left;
       this.recoupTop = top - ui.position.top;
-
-      clear_debug_box();
-      debug_report([[1, 'Filename: ' + this.getAttribute('title')], [2, 'Z-index: ' + this.style.zIndex], [3, 'Start: Left: ' + this.style.left + ' Top: ' + this.style.top], [4, 'Current: '], [5, 'Stop: ']]);
 
       // store the original z index
       this.original_zindex = this.style.zIndex;
@@ -1477,16 +1524,14 @@ function assigndrag(id) {
       this.socketdata.imageTop = this.style.top;
       this.socketdata.imageLeft = this.style.left;
 
-      debug_report([[4, 'Current: Left: ' + this.socketdata.imageLeft + ' Top: ' + this.socketdata.imageTop]]);
-
       // pass socket data to server
       socket.emit('c-e:  moving', this.socketdata);
     },
     stop: function stop() {
-      // prepare data to send to ajax post, get all drawing elements
+      // prepare data to send to ajax post, get all wallPic elements
       var dropPost = {},
           i = 0,
-          drawing_elements = document.body.getElementsByClassName('drawing');
+          drawing_elements = document.body.getElementsByClassName('wallPic');
 
       // return to the original z-index
       this.style.zIndex = this.original_zindex;
@@ -1497,8 +1542,6 @@ function assigndrag(id) {
 
       // send emit to restore filter to other clients
       socket.emit('c-e:  restore_filter', this.image_id);
-
-      debug_report([[5, 'Stop: Left: ' + this.style.left + ' Top: ' + this.style.top]]);
 
       // send emit to unfreeze in other clients
       socket.emit('c-e:  unfreeze', this.image_id);
@@ -1536,7 +1579,7 @@ function assigndrag(id) {
     }
   }).click(function () {
     var i = 0,
-        image_objects = document.getElementsByClassName('drawing'),
+        image_objects = document.getElementsByClassName('wallPic'),
         id_and_zindex = [],
         clicked_ids_zindexes = [],
         clickX = event.pageX,
@@ -1546,7 +1589,7 @@ function assigndrag(id) {
         image_px_range = {},
         clicked_ids = '';
 
-    // for each .drawing on the page...
+    // for each .wallPic on the page...
     for (i = 0; i < image_objects.length; i++) {
 
       // calculate the range of pixels it occupies on the page...
@@ -1555,7 +1598,7 @@ function assigndrag(id) {
       image_px_range = { x: [offset_left, offset_left + image_objects[i].offsetWidth],
         y: [offset_top, offset_top + image_objects[i].offsetHeight] };
 
-      // if the click is within the image's range, add the .drawing id and z-index to an array.
+      // if the click is within the image's range, add the .wallPic id and z-index to an array.
       if (clickX >= image_px_range.x[0] && clickX <= image_px_range.x[1] && clickY >= image_px_range.y[0] && clickY <= image_px_range.y[1]) {
         id_and_zindex = [image_objects[i].id, image_objects[i].style.zIndex];
         clicked_ids_zindexes.push(id_and_zindex);
@@ -1622,15 +1665,12 @@ function assigndrag(id) {
     };
 
     set_dragger_locations(selected_file.image_id);
-
-    clear_debug_box();
-    debug_report([[1, 'Filename: ' + this.getAttribute('title')], [2, 'Z-index: ' + this.style.zIndex], [3, 'Start: Left: ' + this.style.left + ' Top: ' + this.style.top], [4, 'Current: '], [5, 'Stop: ']]);
   });
 };
 
-// --Interact('.drawing').gesturable, for touchscreen rotating and scaling
+// --Interact('.wallPic').gesturable, for touchscreen rotating and scaling
 
-interact('.drawing').gesturable({
+interact('.wallPic').gesturable({
   onstart: function onstart(event) {
 
     this.image_id = event.target.getAttribute('id');
@@ -1704,7 +1744,7 @@ interact('.drawing').gesturable({
 // --Exit door.droppable, for preparing a dropped image to delete
 
 $('#exit_door').droppable({
-  accept: '.drawing',
+  accept: '.wallPic',
   // activeClass: 'exit_active_class',
   hoverClass: 'exit_door_hover',
   tolerance: 'pointer',
@@ -1716,7 +1756,7 @@ $('#exit_door').droppable({
     //       console.log('back out over exit door ');
   },
   drop: function drop(event, ui) {
-    //       console.log('Draggable drawing dropped on exit door.');
+    //       console.log('Draggable wallPic dropped on exit door.');
 
     // gather data
     imageToDelete.image_id = ui.draggable.attr('id');
@@ -1751,7 +1791,7 @@ $('#navigation_toggle_button_container').draggable({
     // used to prevent click from registering
     document.getElementById('navigation_toggle_button').classList.add('dragging_no_click');
 
-    clear_debug_box();
+    _debug2.default.clearDebugInfo();
 
     // get the starting size
     this.high = $(this).height();
@@ -1766,37 +1806,36 @@ $('#navigation_toggle_button_container').draggable({
   },
   drag: function drag(event, ui) {
     // ui.position.top is wherever the drag cursor goes
-    debug_report([[1, 'current left       : ' + this.style.left], [2, 'left_when_on_right : ' + this.left_when_on_right_px], [3, 'current top        : ' + this.style.top], [4, 'top_when_on_bottom : ' + this.top_when_on_bottom_px], [8, '. this.left_when_on_right_num - ui.position.left: ' + (this.left_when_on_right_num - ui.position.left)]]);
 
     // take y axis measurements
     if (this.style.top === '0px') {
-      debug_report([[5, 'Top or Bottom: Top']]);
+      // console.log('Top or Bottom: Top');
       this.yplace = 'top';
       this.mostrecentyplace = 'top';
     } else if (this.style.top === this.top_when_on_bottom_px) {
-      debug_report([[5, 'Top or Bottom: Bottom']]);
+      // console.log('Top or Bottom: Bottom');
       this.yplace = 'bottom';
       this.mostrecentyplace = 'bottom';
     } else {
-      debug_report([[5, 'Top or Bottom: Between']]);
+      // console.log('Top or Bottom: Between');
       this.yplace = 'between';
     };
 
     // take x axis measurements
     if (this.style.left === '0px') {
-      debug_report([[6, 'Left or Right: Left']]);
+      // console.log('Left or Right: Left');
       this.xplace = 'left';
       this.mostrecentxplace = 'left';
     } else if (this.style.left === this.left_when_on_right_px) {
-      debug_report([[6, 'Left or Right: Right']]);
+      // console.log('Left or Right: Right');
       this.xplace = 'right';
       this.mostrecentxplace = 'right';
     } else {
-      debug_report([[6, 'Left or Right: Between']]);
+      // console.log('Left or Right: Between');
       this.xplace = 'between';
     };
 
-    debug_report([[7, 'Corner: Not a corner.']]);
+    // console.log('Corner: Not a corner.');
 
     // if the element is on a side already, keep it there
     if (this.yplace === 'top' && this.xplace === 'between') {
@@ -1812,7 +1851,7 @@ $('#navigation_toggle_button_container').draggable({
       // but on the occasion that the ui.position goes uniformly toward the center (e.g. 0,0 to 1,1)
       // select the side based on which directional threshold the ui crosses first
     } else {
-      debug_report([[7, 'Corner: ' + this.mostrecentxplace + ' ' + this.mostrecentyplace]]);
+      // console.log(`Corner: ${this.mostrecentxplace} ${this.mostrecentyplace}`);
       // top left corner: left drag
       if (this.mostrecentxplace === 'left' && this.mostrecentyplace === 'top' && ui.position.left > this.commit_distance) {
         ui.position.top = 0;

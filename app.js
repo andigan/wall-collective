@@ -70,7 +70,7 @@ server = app.listen(port, function () {
 io = require('socket.io').listen(server);
 require('./socketio/connection')(io);
 
-// attach socket connection to response
+// attach socket connection to response object
 app.use(function (req, res, next) {
   res.io = io;
   next();
