@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 3);
+/******/ 	return __webpack_require__(__webpack_require__.s = 0);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,183 +73,43 @@
 "use strict";
 
 
-module.exports = {
-  debugOn: true, // set debug div
-
-  // set upload placement
-  uploadTop: '0px',
-  uploadLeft: '0px',
-  uploadWidth: '75px',
-  uploadheight: '100px',
-
-  // set maximum limit for draggers
-  blurLevel: 7,
-  brightnessLevel: 8,
-  contrastLevel: 10,
-  saturateLevel: 10
-
-};
-
-/***/ }),
-/* 1 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-// import helpers from '../helpers';
-module.exports = {
-
-  init: function init() {
-    // helpers.clickme('debug-button', 0);
-    // helpers.clickme('dragger_switches_button', 1000);
-    // helpers.clickme('explore_button', 0);
-    // helpers.clickme('upload_container_button', 1000);
-
-    this.createDebugButton();
-    this.createDebugDiv();
-    this.setListeners();
-  },
-
-  createDebugButton: function createDebugButton() {
-    var debugButton = document.getElementById('debug-holder'),
-        debugIcon = document.createElement('img'),
-        debugText = document.createElement('span');
-
-    // create debug button
-    debugButton.setAttribute('id', 'debug-button');
-    debugButton.classList.add('button', 'tools_button');
-    debugButton.classList.remove('button_no_show');
-
-    debugText.textContent = 'report is off';
-    debugText.setAttribute('id', 'debug-text');
-
-    debugIcon.classList.add('icon_image');
-    debugIcon.src = '/icons/debug_icon.png';
-    debugButton.appendChild(debugText);
-    debugButton.appendChild(debugIcon);
-
-    // add button functionality
-    debugButton.addEventListener('click', function () {
-
-      if (this.classList.contains('debug-on')) {
-        this.classList.remove('debug-on');
-        document.getElementById('debug-container').style.display = 'none';
-        document.getElementById('debug-text').innerText = 'report is off';
-      } else {
-        this.classList.add('debug-on');
-        document.getElementById('debug-container').style.display = 'block';
-        document.getElementById('debug-text').innerText = 'report is on';
-      };
-    });
-  },
-
-  createDebugDiv: function createDebugDiv() {
-    var wrapperEl = document.getElementById('wrapper'),
-        debugEl = document.createElement('div'),
-        infoLineEl,
-        i,
-        that = this;
-
-    // create debug div
-    debugEl.setAttribute('id', 'debug-container');
-    debugEl.style.display = 'none';
-    for (i = 1; i <= 10; i++) {
-      infoLineEl = document.createElement('div');
-      infoLineEl.setAttribute('id', 'info' + i);
-      infoLineEl.classList.add('info');
-      debugEl.appendChild(infoLineEl);
-    };
-
-    wrapperEl.appendChild(debugEl);
-
-    // make debug-container draggable
-    $('#debug-container').draggable({
-      containment: 'parent',
-      start: function start() {
-        that.clearDebugInfo();
-        that.addDebugInfo([[1, 'this div width    : ' + $(this).css('width')], [2, 'wrapper width     : ' + document.getElementById('wrapper').style.width], [3, 'screen.width      : ' + screen.width.toString()], [4, 'window.innerWidth : ' + window.innerWidth.toString()], [5, 'screen.availWidth : ' + screen.availWidth.toString()]]);
-      },
-      drag: function drag() {
-        var debugEl = document.getElementById('debug-container'),
-            debugDivInfo = debugEl.getBoundingClientRect();
-
-        that.addDebugInfo([[6, ''], [7, this.style.left + ' <css> ' + $(this).css('right')], [8, debugDivInfo.left.toString() + ' <dom> ' + debugDivInfo.right.toString()]]);
-      }
-    });
-  },
-
-  setListeners: function setListeners() {
-    var that = this;
-
-    // resize window
-    window.addEventListener('resize', function () {
-      that.clearDebugInfo();
-      that.addDebugInfo([[1, 'resize: new width  : ' + window.innerWidth + 'px'], [2, 'resize: new height : ' + window.innerHeight + 'px']]);
-    });
-
-    // click on image
-    document.getElementById('images').addEventListener('click', function (e) {
-      var clickedEl = e.target;
-
-      that.clearDebugInfo();
-      that.addDebugInfo([[1, 'Filename: ' + clickedEl.getAttribute('title')], [2, 'Z-index: ' + clickedEl.style.zIndex], [3, 'Start: Left: ' + clickedEl.style.left + ' Top: ' + clickedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
-    });
-
-    // dragged images
-    $(document).on('dragstart', '.wallPic', function (e) {
-      var draggedEl = e.target;
-
-      that.clearDebugInfo();
-      that.addDebugInfo([[1, 'Filename: ' + draggedEl.getAttribute('title')], [2, 'Z-index: ' + draggedEl.style.zIndex], [3, 'Start: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
-    });
-
-    $(document).on('drag', '.wallPic', function (e) {
-      var draggedEl = e.target;
-
-      that.addDebugInfo([[4, 'Current: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
-    });
-
-    $(document).on('dragstop', '.wallPic', function (e) {
-      var draggedEl = e.target;
-
-      that.addDebugInfo([[5, 'Stop: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
-    });
-  },
-
-  // debugInfoText: a multidimensional array: [[1, string], [2, string]]
-  addDebugInfo: function addDebugInfo(debugInfoText) {
-    debugInfoText.forEach(function (item) {
-      document.getElementById('info' + item[0]).textContent = item[1];
-    });
-  },
-
-  clearDebugInfo: function clearDebugInfo() {
-    Array.from(document.getElementsByClassName('info')).forEach(function (element) {
-      element.textContent = '';
-    });
-  }
-};
-
-/***/ }),
-/* 2 */,
-/* 3 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _config = __webpack_require__(0);
+var _config = __webpack_require__(9);
 
 var _config2 = _interopRequireDefault(_config);
 
-var _debug = __webpack_require__(1);
+var _debug = __webpack_require__(10);
 
 var _debug2 = _interopRequireDefault(_debug);
 
+var _configureStore = __webpack_require__(12);
+
+var _configureStore2 = _interopRequireDefault(_configureStore);
+
+var _stateChange = __webpack_require__(37);
+
+var _stateChange2 = _interopRequireDefault(_stateChange);
+
+var _buttons = __webpack_require__(39);
+
+var _buttons2 = _interopRequireDefault(_buttons);
+
+var _actions = __webpack_require__(32);
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
+// dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
+var store = (0, _configureStore2.default)();
+
 // debug tools
+
+
+// dispatched when an image is clicked or dragged
+// keep modularizing
+// state changes
+// buttons
+// fix selected-image id
+
+
 // wall-collective
 //
 // Version: 0.7.0
@@ -263,7 +123,9 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 //
 // Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
 
-if (_config2.default.debugOn) _debug2.default.init();
+if (_config2.default.debugOn) _debug2.default.init(store);
+
+_buttons2.default.init();
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
@@ -283,10 +145,6 @@ mainwide = window.innerWidth,
 
 // assigned when an image is clicked or dragged; used by draggers
 selected_file = {},
-
-
-// assigned when an image is dragged onto the exit_door icon; used by delete_button
-imageToDelete = {},
 
 
 // assigned by initial socket; used by upload counter
@@ -316,6 +174,9 @@ insta_download_ready_filename = {},
 
 // used when an access token is available for the client after a user authenticates with Instagram
 instaAccessReady = false;
+
+window.store = store;
+window.socket = socket;
 
 // set wrapper size; (css vh and vw were not working with mobile safari)
 document.getElementById('wrapper').style.width = window.innerWidth + 'px';
@@ -396,7 +257,7 @@ $('#wrapper').on('click touchstart', function (event) {
   if (event.target.getAttribute('id') === 'images') {
     dragger_elements = document.getElementsByClassName('dragger');
     // remove all draggers
-    hide_draggers();
+    _stateChange2.default.hideDraggers();
     // close button containers and remove dragger_transitions
     document.body.classList.remove('dragger_transitions');
   }; // end of if
@@ -415,37 +276,17 @@ window.addEventListener('resize', function () {
   document.getElementById('navigation_toggle_button_container').style.left = mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px';
 }, false);
 
-// hide all draggers
-function hide_draggers() {
-  var dragger_elements = document.getElementsByClassName('dragger'),
-      i;
-
-  for (i = 0; i < dragger_elements.length; i++) {
-    dragger_elements[i].style.display = 'none';
-  };
-}
-
-// hide all draggers except the one being dragged
-function hide_other_draggers(id) {
-  var dragger_elements = document.getElementsByClassName('dragger'),
-      i;
-
-  for (i = 0; i < dragger_elements.length; i++) {
-    if (dragger_elements[i].getAttribute('id') !== id) {
-      dragger_elements[i].style.display = 'none';
-    };
-  };
-};
-
 // used by delete image button
 function clear_selected_file() {
-  selected_file.image_id = '';
+  console.log('hi');
+  store.getState().selectedImage.id = '';
   selected_file.imageFilename = '';
   selected_file.src = '';
   selected_file.width = '';
   selected_file.height = '';
   selected_file.transform = '';
   selected_file.zindex = '';
+  store.dispatch((0, _actions.setSelectedImage)(''));
 };
 
 // cookie setter
@@ -479,126 +320,13 @@ function getCookie(cookie_name) {
   return '';
 }
 
-// --State Change functions
-//     functions to change the state of the containers and buttons in response to drags, uploads, etc
+// remove
+// if (document.getElementById('insta_div').style.display === 'block') {
+//   history.replaceState({}, 'wall-collective', '/');
+//   document.getElementById('insta_header').style.display = 'none';
+//   document.getElementById('insta_div').style.display = 'none';
+// };
 
-function state_change_to_close_all() {
-  // hide elements
-  document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-  document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-  document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-  document.getElementById('tools_container').classList.remove('tools_container_is_open');
-  document.getElementById('login_container').classList.remove('login_container_is_open');
-  document.getElementById('upload_container').classList.remove('upload_container_is_open');
-  document.getElementById('connect_info').classList.remove('connect_info_is_open');
-  document.getElementById('explore_container').style.display = 'none';
-  document.getElementById('insta_header').style.display = 'none';
-  document.getElementById('insta_div').style.display = 'none';
-
-  // replace image_upload_preview image and delete_preview image
-  document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-  document.getElementById('delete_preview').src = '/icons/1x1.png';
-  // close navigation button
-  document.body.classList.remove('button_container_is_open');
-  // animate close hamburgers
-  document.getElementById('line_one').style.top = '40%';
-  document.getElementById('line_three').style.top = '60%';
-
-  // remove
-  // if (document.getElementById('insta_div').style.display === 'block') {
-  //   history.replaceState({}, 'wall-collective', '/');
-  //   document.getElementById('insta_header').style.display = 'none';
-  //   document.getElementById('insta_div').style.display = 'none';
-  // };
-}
-
-function state_change_to_tools_menu() {
-  // show element
-  document.getElementById('tools_container').classList.add('tools_container_is_open');
-  // hide elements
-  document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-}
-
-function state_change_to_account_menu() {
-  // show element
-  document.getElementById('login_container').classList.add('login_container_is_open');
-  // hide elements
-  document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-}
-
-function state_change_to_upload_menu() {
-  // show element
-  document.getElementById('upload_container').classList.add('upload_container_is_open');
-  // hide elements
-  document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-}
-
-function state_change_to_upload() {
-  // hide element
-  document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-}
-
-function state_change_after_upload() {
-  // show element
-  document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-  // hide elements
-  document.getElementById('upload_container').classList.remove('upload_container_is_open');
-  document.getElementById('upload_preview_container').style.display = 'none';
-  document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-  document.getElementById('confirm_or_reject_container_info').textContent = '';
-  // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
-  // to visible after the transition effect takes place
-  setTimeout(function () {
-    document.getElementById('upload_preview_container').style.display = 'block';
-    document.getElementById('confirm_or_reject_container').style.display = 'flex';
-  }, 500);
-  // replace image_upload_preview image
-  document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-}
-
-function state_change_to_delete() {
-  // show elements
-  document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
-  document.getElementById('delete_preview').src = imageToDelete.src;
-  // hide element
-  document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-}
-
-function state_change_after_delete() {
-  // show element
-  document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-  // hide elements
-  document.getElementById('delete_preview_container').style.display = 'none';
-  document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-  hide_draggers();
-  // This setTimeout is so that the delete_preview_container disappears immediately, and then resets
-  // to visible after the transition effect takes place
-  setTimeout(function () {
-    document.getElementById('delete_preview_container').style.display = 'block';
-  }, 500);
-  // replace delete_preview
-  document.getElementById('delete_preview').src = '/icons/1x1.png';
-}
-
-function state_change_after_reject_delete() {
-  var data = {};
-
-  // show element
-  document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-  // hide elements
-  document.getElementById('delete_preview_container').style.display = 'none';
-  document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-  setTimeout(function () {
-    document.getElementById('delete_preview_container').style.display = 'block';
-  }, 500);
-  // reshow hidden image that wasn't deleted
-  document.getElementById(imageToDelete.image_id).style.display = 'block';
-  // show image on other clients
-  data.image_id = imageToDelete.image_id;
-  socket.emit('c-e:  show_image', data);
-}
 
 // --Create grid line divs
 //    use left/top parameter with unit
@@ -811,9 +539,9 @@ socket.on('bc: add_upload', function (data) {
 // remove deleted image
 socket.on('bc: delete_image', function (data) {
   document.getElementById(data.id_to_delete).remove();
-  if (data.id_to_delete === selected_file.image_id) {
+  if (data.id_to_delete === store.getState().selectedImage.id) {
     clear_selected_file();
-    hide_draggers();
+    _stateChange2.default.hideDraggers();
   };
 });
 
@@ -843,7 +571,8 @@ socket.on('bc: hide_image', function (data) {
 });
 // show element; other client has cancelled deletion
 socket.on('bc: show_image', function (data) {
-  document.getElementById(data.image_id).style.display = 'block';
+  console.log(data);
+  document.getElementById(data).style.display = 'initial';
 });
 
 // if this client is the uploader, show upload statistics from busboy
@@ -914,7 +643,7 @@ socket.on('se: add_content_to_insta_div', function (insta_fetch_data) {
         // assign temporary z-index
         this.style.zIndex = 60000;
 
-        hide_draggers();
+        _stateChange2.default.hideDraggers();
       }
     });
   };
@@ -1070,11 +799,11 @@ $('#navigation_toggle_button').on('click', function () {
     // otherwise, if button containers are open
     if (document.body.classList.contains('button_container_is_open')) {
       // close all containers
-      state_change_to_close_all();
+      _stateChange2.default.closeAll();
       // show selected_file in case it was removed by being dragged onto the exit door
-      // except when no file is selected: selected_file.image_id is undefined or ''
-      if (typeof selected_file.image_id !== 'undefined' && selected_file.image_id.length > 0) {
-        document.getElementById(selected_file.image_id).style.display = 'block';
+      // except when no file is selected: store.getState().selectedImage.id is undefined or ''
+      if (store.getState().selectedImage.id !== '') {
+        document.getElementById(store.getState().selectedImage.id).style.display = 'initial';
       };
       // else when no containers are open
     } else {
@@ -1087,25 +816,18 @@ $('#navigation_toggle_button').on('click', function () {
       document.getElementById('line_one').style.top = '35%';
       document.getElementById('line_three').style.top = '65%';
 
-      hide_draggers();
+      _stateChange2.default.hideDraggers();
     };
   };
 });
 
-// tools button
-$('#tools_container_button').on('click', function () {
-  state_change_to_tools_menu();
-});
+//
+// <div id='exit_door' class='button navigation_button'> remove
+//   <img class='icon_image' src='/icons/door_icon.png'>
+// </div>
 
-// login button
-$('#login_container_button').on('click', function () {
-  state_change_to_account_menu();
-});
 
-// upload button
-$('#upload_container_button').on('click', function () {
-  state_change_to_upload_menu();
-});
+var exitDoor = __webpack_require__(11);
 
 // dragger_all_switch; used to toggle all dragger switches
 $('#dragger_all_switch').click(function () {
@@ -1123,9 +845,9 @@ $('#dragger_all_switch').click(function () {
       switch_elements[i].classList.add('switchon');
     };
     // set dragger element locations
-    set_dragger_locations(selected_file.image_id);
+    set_dragger_locations(store.getState().selectedImage.id);
     // show dragger elements if an image is selected
-    if (selected_file.image_id) {
+    if (store.getState().selectedImage.id) {
       dragger_elements = document.getElementsByClassName('dragger');
       for (i = 0; i < dragger_elements.length; i++) {
         dragger_elements[i].style.display = 'block';
@@ -1168,9 +890,9 @@ $('.dragger_switch').click(function () {
   // if switched on
   if (this.classList.contains('switchon')) {
     // set dragger locations
-    set_dragger_locations(selected_file.image_id);
+    set_dragger_locations(store.getState().selectedImage.id);
     // show dragger if an image is selected
-    if (selected_file.image_id) {
+    if (store.getState().selectedImage.id) {
       document.getElementById(dragger_name).style.display = 'block';
     };
     // use first letter of dragger_name to find corresponding character in array and replace it
@@ -1222,7 +944,7 @@ $('#close_info_container').on('click', function () {
 // on file_select element change, load up the image preview
 $('#fileselect').on('change', function () {
   // open upload_preview_container
-  state_change_to_upload();
+  _stateChange2.default.uploadPreview();
   readURL(this);
 });
 
@@ -1254,7 +976,7 @@ $('#confirm_upload_button').on('click', function () {
     error: function error(xhr) {
       console.log('Error:' + xhr.status);
       // change navigation_container and remove upload_preview
-      state_change_after_upload();
+      _stateChange2.default.afterUpload();
       uploadtotal = 0;
     },
     success: function success(response) {
@@ -1288,7 +1010,7 @@ $('#confirm_upload_button').on('click', function () {
       // assign drag to added element
       assigndrag(response.dom_id);
       // change navigation container and remove upload_preview
-      state_change_after_upload();
+      _stateChange2.default.afterUpload();
       // emit to other clients
       socketdata.uploadedFilename = response.imageFilename;
       socket.emit('c-e:  share_upload', socketdata);
@@ -1300,55 +1022,32 @@ $('#confirm_upload_button').on('click', function () {
 
 // reject upload
 $('#reject_upload_button').on('click', function () {
-  state_change_after_upload();
+  _stateChange2.default.afterUpload();
 });
 
-$('#exit_door').on('click', function () {
-  var delete_element = {};
-
-  if (typeof selected_file.image_id !== 'undefined' && selected_file.image_id.length > 0) {
-    delete_element = document.getElementById(selected_file.image_id);
-
-    // gather data
-    imageToDelete.image_id = selected_file.image_id;
-    imageToDelete.imageFilename = delete_element.getAttribute('title');
-    imageToDelete.src = delete_element.src;
-    imageToDelete.width = delete_element.style.width;
-    imageToDelete.height = delete_element.style.height;
-    imageToDelete.zindex = delete_element.style.zIndex;
-
-    // hide original image
-    document.getElementById(imageToDelete.image_id).style.display = 'none';
-
-    // hide draggers
-    hide_draggers();
-
-    // show delete_preview_container
-    state_change_to_delete();
-
-    // send socket to hide on other clients
-    socket.emit('c-e:  hide_image', imageToDelete.image_id);
-  };
-});
+$('#n4').on('click', function () {});
 
 // reject delete
 $('#reject_delete_button').on('click', function () {
-  state_change_after_reject_delete();
+  var deleteTargetID = store.getState().deleteTarget.id;
+
+  _stateChange2.default.rejectDelete();
   // send socket to show on other clients
-  socket.emit('c-e:  show_image', imageToDelete.image_id);
+  socket.emit('c-e:  show_image', deleteTargetID);
 });
 
 // confirm delete
 $('#confirm_delete_button').on('click', function () {
-  var socketdata = {};
+  var socketdata = {},
+      deleteTarget = store.getState().deleteTarget;
 
   // remove image
-  document.getElementById(imageToDelete.image_id).remove();
+  deleteTarget.element.remove();
   // change navigation container
-  state_change_after_delete();
+  _stateChange2.default.afterDelete();
   // prepare data to send
-  socketdata.filenameToDelete = imageToDelete.imageFilename;
-  socketdata.id_to_delete = imageToDelete.image_id;
+  socketdata.filenameToDelete = deleteTarget.element.getAttribute('title');
+  socketdata.id_to_delete = deleteTarget.id;
   // send data to server
   socket.emit('c-e:  delete_image', socketdata);
   clear_selected_file();
@@ -1415,41 +1114,19 @@ $('#explore_button').on('click', function () {
   document.getElementById('explore_container').style.display = 'block';
   document.getElementById('close_explore_container').style.display = 'block';
 
-  document.getElementById('explore_image').src = document.getElementById(selected_file.image_id).src;
+  document.getElementById('explore_image').src = document.getElementById(store.getState().selectedImage.id).src;
 
-  if (document.getElementById(selected_file.image_id).getAttribute('data-link').length > 1) {
+  if (document.getElementById(store.getState().selectedImage.id).getAttribute('data-link').length > 1) {
 
-    document.getElementById('insta_link').setAttribute('href', document.getElementById(selected_file.image_id).getAttribute('data-link'));
+    document.getElementById('insta_link').setAttribute('href', document.getElementById(store.getState().selectedImage.id).getAttribute('data-link'));
   };
 
-  if (typeof selected_file.image_id !== 'undefined' && selected_file.image_id.length > 0) {
+  if (typeof store.getState().selectedImage.id !== 'undefined' && store.getState().selectedImage.id.length > 0) {
 
     // if selected file is empty, fill it.
 
 
   } else {};
-
-  /*
-        // gather data
-        imageToDelete.image_id = selected_file.image_id;
-        imageToDelete.imageFilename = delete_element.getAttribute('title');
-        imageToDelete.src = delete_element.src;
-        imageToDelete.width = delete_element.style.width;
-        imageToDelete.height = delete_element.style.height;
-        imageToDelete.zindex = delete_element.style.zIndex;
-  
-        // hide original image
-        document.getElementById(imageToDelete.image_id).style.display = 'none';
-  
-        // hide draggers
-        hide_draggers();
-  
-        // show delete_preview_container
-        state_change_to_delete();
-  
-        // send socket to hide on other clients
-        socket.emit('c-e:  hide_image', imageToDelete.image_id);
-  */
 });
 
 $('#close_explore_container').on('click', function () {
@@ -1498,7 +1175,7 @@ function assigndrag(id) {
       // assign temporary z-index
       this.style.zIndex = 60000;
 
-      hide_draggers();
+      _stateChange2.default.hideDraggers();
 
       // remove filter
       // --this is necessary because dragging images with filter causes too much rendering lag
@@ -1570,12 +1247,13 @@ function assigndrag(id) {
       }).done(function () {});
 
       // for set dragger locations
-      selected_file.image_id = this.getAttribute('id');
+      store.getState().selectedImage.id = this.getAttribute('id');
+      store.dispatch((0, _actions.setSelectedImage)(this.getAttribute('id')));
 
       // reset click count
       click_count = 0;
 
-      //          set_dragger_locations(selected_file.image_id);
+      //          set_dragger_locations(store.getState().selectedImage.id);
     }
   }).click(function () {
     var i = 0,
@@ -1611,20 +1289,21 @@ function assigndrag(id) {
     });
 
     // if selected_file is not empty, remove selected_file_animation class
-    if (typeof selected_file.image_id !== 'undefined' && selected_file.image_id.length > 0) {
-      document.getElementById(selected_file.image_id).classList.remove('selected_file_animation');
+    if (typeof store.getState().selectedImage.id !== 'undefined' && store.getState().selectedImage.id.length > 0) {
+      document.getElementById(store.getState().selectedImage.id).classList.remove('selected_file_animation');
       // css-trick: this will 'trigger a reflow' which will allow the class to be added again before the animation ends.
-      document.getElementById(selected_file.image_id).offsetWidth;
+      document.getElementById(store.getState().selectedImage.id).offsetWidth;
     };
 
     // if one image is clicked...
     if (clicked_ids_zindexes.length === 1) {
 
       // set the selected_file
-      selected_file.image_id = this.getAttribute('id');
+      store.getState().selectedImage.id = this.getAttribute('id');
+      store.dispatch((0, _actions.setSelectedImage)(this.getAttribute('id')));
 
       // add the selected_file_animation class
-      document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+      document.getElementById(store.getState().selectedImage.id).classList.add('selected_file_animation');
 
       // reset the click count
       click_count = 0;
@@ -1648,14 +1327,14 @@ function assigndrag(id) {
       // console.log((click_count - 1) % clicked_ids_zindexes.length);
 
       // set the selected image to an id in the clicked array using the remainder of the click_count divided by the number of clicked images
-      selected_file.image_id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
-      document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+      store.getState().selectedImage.id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
+      document.getElementById(store.getState().selectedImage.id).classList.add('selected_file_animation');
 
       // add temp_fade class to all clicked images other than the one selected
       for (i = 0; i < clicked_ids_zindexes.length; i++) {
 
         // don't add temp_fade class to selected_file, or to an image already faded, or if the selected_file is already on top
-        if (clicked_ids_zindexes[i][0] !== selected_file.image_id && document.getElementById(clicked_ids_zindexes[i][0]).style.opacity > 0.50 && click_count % clicked_ids_zindexes.length !== 1) {
+        if (clicked_ids_zindexes[i][0] !== store.getState().selectedImage.id && document.getElementById(clicked_ids_zindexes[i][0]).style.opacity > 0.50 && click_count % clicked_ids_zindexes.length !== 1) {
           document.getElementById(clicked_ids_zindexes[i][0]).classList.add('temp_fade');
         };
       };
@@ -1664,7 +1343,7 @@ function assigndrag(id) {
       previous_clicked_ids = clicked_ids;
     };
 
-    set_dragger_locations(selected_file.image_id);
+    set_dragger_locations(store.getState().selectedImage.id);
   });
 };
 
@@ -1676,7 +1355,7 @@ interact('.wallPic').gesturable({
     this.image_id = event.target.getAttribute('id');
     this.image_element = event.target;
 
-    hide_draggers();
+    _stateChange2.default.hideDraggers();
 
     // retrieve original angle and scale
     this.angle = parseFloat(this.image_element.getAttribute('data-angle'));
@@ -1743,7 +1422,7 @@ interact('.wallPic').gesturable({
 
 // --Exit door.droppable, for preparing a dropped image to delete
 
-$('#exit_door').droppable({
+$('#n4').droppable({
   accept: '.wallPic',
   // activeClass: 'exit_active_class',
   hoverClass: 'exit_door_hover',
@@ -1757,26 +1436,21 @@ $('#exit_door').droppable({
   },
   drop: function drop(event, ui) {
     //       console.log('Draggable wallPic dropped on exit door.');
+    var deleteTarget = ui.draggable[0];
 
-    // gather data
-    imageToDelete.image_id = ui.draggable.attr('id');
-    imageToDelete.imageFilename = ui.draggable.attr('title');
-    imageToDelete.src = ui.draggable.attr('src');
-    imageToDelete.width = ui.draggable.css('width');
-    imageToDelete.height = ui.draggable.css('height');
-    imageToDelete.zindex = ui.draggable.css('z-index');
+    store.dispatch((0, _actions.setDeleteTarget)(deleteTarget));
 
     // hide original image
-    document.getElementById(imageToDelete.image_id).style.display = 'none';
+    deleteTarget.style.display = 'none';
 
     // hide draggers
-    hide_draggers();
+    _stateChange2.default.hideDraggers();
 
     // show delete_preview_container
-    state_change_to_delete();
+    _stateChange2.default.deletePreview();
 
     // send socket to hide on other clients
-    socket.emit('c-e:  hide_image', imageToDelete.image_id);
+    socket.emit('c-e:  hide_image', deleteTarget.id);
   }
 });
 
@@ -1902,10 +1576,10 @@ $('#stretch_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -1976,10 +1650,10 @@ $('#opacity_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -2022,10 +1696,10 @@ $('#rotation_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -2091,10 +1765,10 @@ $('#grayscale_invert_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -2139,10 +1813,10 @@ $('#blur_brightness_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -2187,10 +1861,10 @@ $('#contrast_saturate_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -2235,10 +1909,10 @@ $('#party_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
     // prepare the socketdata
     this.socketdata = {};
     this.socketdata.image_id = this.image_id;
@@ -2288,10 +1962,10 @@ $('#threeD_dragger').draggable({
   scroll: false,
   start: function start() {
     // hide other draggers
-    hide_other_draggers(this.getAttribute('id'));
+    _stateChange2.default.hideOtherDraggers(this.getAttribute('id'));
     // prepare dom elements for manipulation
-    this.image_id = selected_file.image_id;
-    this.image_element = document.getElementById(selected_file.image_id);
+    this.image_id = store.getState().selectedImage.id;
+    this.image_element = document.getElementById(store.getState().selectedImage.id);
 
     // prepare the socketdata
     this.socketdata = {};
@@ -2398,7 +2072,7 @@ function set_stretch_dragger_to(id) {
   dragger_element.style.top = dragger_location_top + 'px';
   dragger_element.style.display = 'block';
   // allow transitions
-  // setTimeout is needed because the dragger will otherwise transitioning from no selection to selection
+  // setTimeout is needed because the dragger will otherwise transition from no selection to selection
   setTimeout(function () {
     dragger_element.classList.add('dragger_transitions');
   }, 0);
@@ -2567,6 +2241,1815 @@ function set_threeD_dragger_to(id) {
     dragger_element.classList.add('dragger_transitions');
   }, 0);
 };
+
+/***/ }),
+/* 1 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__root_js__ = __webpack_require__(22);
+
+
+/** Built-in value references. */
+var Symbol = __WEBPACK_IMPORTED_MODULE_0__root_js__["a" /* default */].Symbol;
+
+/* harmony default export */ __webpack_exports__["a"] = (Symbol);
+
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__baseGetTag_js__ = __webpack_require__(16);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getPrototype_js__ = __webpack_require__(18);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__isObjectLike_js__ = __webpack_require__(23);
+
+
+
+
+/** `Object#toString` result references. */
+var objectTag = '[object Object]';
+
+/** Used for built-in method references. */
+var funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__isObjectLike_js__["a" /* default */])(value) || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__baseGetTag_js__["a" /* default */])(value) != objectTag) {
+    return false;
+  }
+  var proto = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__getPrototype_js__["a" /* default */])(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+    funcToString.call(Ctor) == objectCtorString;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (isPlainObject);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = compose;
+/**
+ * Composes single-argument functions from right to left. The rightmost
+ * function can take multiple arguments as it provides the signature for
+ * the resulting composite function.
+ *
+ * @param {...Function} funcs The functions to compose.
+ * @returns {Function} A function obtained by composing the argument functions
+ * from right to left. For example, compose(f, g, h) is identical to doing
+ * (...args) => f(g(h(...args))).
+ */
+
+function compose() {
+  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
+    funcs[_key] = arguments[_key];
+  }
+
+  if (funcs.length === 0) {
+    return function (arg) {
+      return arg;
+    };
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0];
+  }
+
+  var last = funcs[funcs.length - 1];
+  var rest = funcs.slice(0, -1);
+  return function () {
+    return rest.reduceRight(function (composed, f) {
+      return f(composed);
+    }, last.apply(undefined, arguments));
+  };
+}
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable__ = __webpack_require__(27);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_symbol_observable__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ActionTypes; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = createStore;
+
+
+
+/**
+ * These are private action types reserved by Redux.
+ * For any unknown actions, you must return the current state.
+ * If the current state is undefined, you must return the initial state.
+ * Do not reference these action types directly in your code.
+ */
+var ActionTypes = {
+  INIT: '@@redux/INIT'
+};
+
+/**
+ * Creates a Redux store that holds the state tree.
+ * The only way to change the data in the store is to call `dispatch()` on it.
+ *
+ * There should only be a single store in your app. To specify how different
+ * parts of the state tree respond to actions, you may combine several reducers
+ * into a single reducer function by using `combineReducers`.
+ *
+ * @param {Function} reducer A function that returns the next state tree, given
+ * the current state tree and the action to handle.
+ *
+ * @param {any} [preloadedState] The initial state. You may optionally specify it
+ * to hydrate the state from the server in universal apps, or to restore a
+ * previously serialized user session.
+ * If you use `combineReducers` to produce the root reducer function, this must be
+ * an object with the same shape as `combineReducers` keys.
+ *
+ * @param {Function} enhancer The store enhancer. You may optionally specify it
+ * to enhance the store with third-party capabilities such as middleware,
+ * time travel, persistence, etc. The only store enhancer that ships with Redux
+ * is `applyMiddleware()`.
+ *
+ * @returns {Store} A Redux store that lets you read the state, dispatch actions
+ * and subscribe to changes.
+ */
+function createStore(reducer, preloadedState, enhancer) {
+  var _ref2;
+
+  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+    enhancer = preloadedState;
+    preloadedState = undefined;
+  }
+
+  if (typeof enhancer !== 'undefined') {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Expected the enhancer to be a function.');
+    }
+
+    return enhancer(createStore)(reducer, preloadedState);
+  }
+
+  if (typeof reducer !== 'function') {
+    throw new Error('Expected the reducer to be a function.');
+  }
+
+  var currentReducer = reducer;
+  var currentState = preloadedState;
+  var currentListeners = [];
+  var nextListeners = currentListeners;
+  var isDispatching = false;
+
+  function ensureCanMutateNextListeners() {
+    if (nextListeners === currentListeners) {
+      nextListeners = currentListeners.slice();
+    }
+  }
+
+  /**
+   * Reads the state tree managed by the store.
+   *
+   * @returns {any} The current state tree of your application.
+   */
+  function getState() {
+    return currentState;
+  }
+
+  /**
+   * Adds a change listener. It will be called any time an action is dispatched,
+   * and some part of the state tree may potentially have changed. You may then
+   * call `getState()` to read the current state tree inside the callback.
+   *
+   * You may call `dispatch()` from a change listener, with the following
+   * caveats:
+   *
+   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
+   * If you subscribe or unsubscribe while the listeners are being invoked, this
+   * will not have any effect on the `dispatch()` that is currently in progress.
+   * However, the next `dispatch()` call, whether nested or not, will use a more
+   * recent snapshot of the subscription list.
+   *
+   * 2. The listener should not expect to see all state changes, as the state
+   * might have been updated multiple times during a nested `dispatch()` before
+   * the listener is called. It is, however, guaranteed that all subscribers
+   * registered before the `dispatch()` started will be called with the latest
+   * state by the time it exits.
+   *
+   * @param {Function} listener A callback to be invoked on every dispatch.
+   * @returns {Function} A function to remove this change listener.
+   */
+  function subscribe(listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('Expected listener to be a function.');
+    }
+
+    var isSubscribed = true;
+
+    ensureCanMutateNextListeners();
+    nextListeners.push(listener);
+
+    return function unsubscribe() {
+      if (!isSubscribed) {
+        return;
+      }
+
+      isSubscribed = false;
+
+      ensureCanMutateNextListeners();
+      var index = nextListeners.indexOf(listener);
+      nextListeners.splice(index, 1);
+    };
+  }
+
+  /**
+   * Dispatches an action. It is the only way to trigger a state change.
+   *
+   * The `reducer` function, used to create the store, will be called with the
+   * current state tree and the given `action`. Its return value will
+   * be considered the **next** state of the tree, and the change listeners
+   * will be notified.
+   *
+   * The base implementation only supports plain object actions. If you want to
+   * dispatch a Promise, an Observable, a thunk, or something else, you need to
+   * wrap your store creating function into the corresponding middleware. For
+   * example, see the documentation for the `redux-thunk` package. Even the
+   * middleware will eventually dispatch plain object actions using this method.
+   *
+   * @param {Object} action A plain object representing “what changed”. It is
+   * a good idea to keep actions serializable so you can record and replay user
+   * sessions, or use the time travelling `redux-devtools`. An action must have
+   * a `type` property which may not be `undefined`. It is a good idea to use
+   * string constants for action types.
+   *
+   * @returns {Object} For convenience, the same action object you dispatched.
+   *
+   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
+   * return something else (for example, a Promise you can await).
+   */
+  function dispatch(action) {
+    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__["a" /* default */])(action)) {
+      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
+    }
+
+    if (typeof action.type === 'undefined') {
+      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
+    }
+
+    if (isDispatching) {
+      throw new Error('Reducers may not dispatch actions.');
+    }
+
+    try {
+      isDispatching = true;
+      currentState = currentReducer(currentState, action);
+    } finally {
+      isDispatching = false;
+    }
+
+    var listeners = currentListeners = nextListeners;
+    for (var i = 0; i < listeners.length; i++) {
+      listeners[i]();
+    }
+
+    return action;
+  }
+
+  /**
+   * Replaces the reducer currently used by the store to calculate the state.
+   *
+   * You might need this if your app implements code splitting and you want to
+   * load some of the reducers dynamically. You might also need this if you
+   * implement a hot reloading mechanism for Redux.
+   *
+   * @param {Function} nextReducer The reducer for the store to use instead.
+   * @returns {void}
+   */
+  function replaceReducer(nextReducer) {
+    if (typeof nextReducer !== 'function') {
+      throw new Error('Expected the nextReducer to be a function.');
+    }
+
+    currentReducer = nextReducer;
+    dispatch({ type: ActionTypes.INIT });
+  }
+
+  /**
+   * Interoperability point for observable/reactive libraries.
+   * @returns {observable} A minimal observable of state changes.
+   * For more information, see the observable proposal:
+   * https://github.com/zenparsing/es-observable
+   */
+  function observable() {
+    var _ref;
+
+    var outerSubscribe = subscribe;
+    return _ref = {
+      /**
+       * The minimal observable subscription method.
+       * @param {Object} observer Any object that can be used as an observer.
+       * The observer object should have a `next` method.
+       * @returns {subscription} An object with an `unsubscribe` method that can
+       * be used to unsubscribe the observable from the store, and prevent further
+       * emission of values from the observable.
+       */
+      subscribe: function subscribe(observer) {
+        if (typeof observer !== 'object') {
+          throw new TypeError('Expected the observer to be an object.');
+        }
+
+        function observeState() {
+          if (observer.next) {
+            observer.next(getState());
+          }
+        }
+
+        observeState();
+        var unsubscribe = outerSubscribe(observeState);
+        return { unsubscribe: unsubscribe };
+      }
+    }, _ref[__WEBPACK_IMPORTED_MODULE_1_symbol_observable___default.a] = function () {
+      return this;
+    }, _ref;
+  }
+
+  // When a store is created, an "INIT" action is dispatched so that every
+  // reducer returns their initial state. This effectively populates
+  // the initial state tree.
+  dispatch({ type: ActionTypes.INIT });
+
+  return _ref2 = {
+    dispatch: dispatch,
+    subscribe: subscribe,
+    getState: getState,
+    replaceReducer: replaceReducer
+  }, _ref2[__WEBPACK_IMPORTED_MODULE_1_symbol_observable___default.a] = observable, _ref2;
+}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__combineReducers__ = __webpack_require__(26);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__ = __webpack_require__(25);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__ = __webpack_require__(24);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__compose__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_warning__ = __webpack_require__(7);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createStore", function() { return __WEBPACK_IMPORTED_MODULE_0__createStore__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "combineReducers", function() { return __WEBPACK_IMPORTED_MODULE_1__combineReducers__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "bindActionCreators", function() { return __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "applyMiddleware", function() { return __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "compose", function() { return __WEBPACK_IMPORTED_MODULE_4__compose__["a"]; });
+
+
+
+
+
+
+
+/*
+* This is a dummy function to check if the function name has been altered by minification.
+* If the function has been minified and NODE_ENV !== 'production', warn the user.
+*/
+function isCrushed() {}
+
+if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
+  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__utils_warning__["a" /* default */])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
+}
+
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = warning;
+/**
+ * Prints a warning in the console if it exists.
+ *
+ * @param {String} message The warning message.
+ * @returns {void}
+ */
+function warning(message) {
+  /* eslint-disable no-console */
+  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+    console.error(message);
+  }
+  /* eslint-enable no-console */
+  try {
+    // This error was thrown as a convenience so that if you enable
+    // "break on all exceptions" in your console,
+    // it would pause the execution at this line.
+    throw new Error(message);
+    /* eslint-disable no-empty */
+  } catch (e) {}
+  /* eslint-enable no-empty */
+}
+
+/***/ }),
+/* 8 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+  debugOn: true, // set debug div
+
+  // set upload placement
+  uploadTop: '0px',
+  uploadLeft: '0px',
+  uploadWidth: '75px',
+  uploadheight: '100px',
+
+  // set maximum limit for draggers
+  blurLevel: 7,
+  brightnessLevel: 8,
+  contrastLevel: 10,
+  saturateLevel: 10
+
+};
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _helpers = __webpack_require__(13);
+
+var _helpers2 = _interopRequireDefault(_helpers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = {
+
+  init: function init(store) {
+    _helpers2.default.clickme('navigation_toggle_button', 0);
+    // helpers.clickme('debug-button', 0);
+    // helpers.clickme('dragger_switches_button', 1000);
+    // helpers.clickme('explore_button', 0);
+    // helpers.clickme('upload_container_button', 1000);
+
+    this.createDebugButton();
+    this.createDebugDiv();
+    this.setListeners();
+
+    document.addEventListener('click', function () {
+      console.log(store.getState());
+    });
+  },
+
+  createDebugButton: function createDebugButton() {
+    var debugButton = document.getElementById('debug-holder'),
+        debugIcon = document.createElement('img'),
+        debugText = document.createElement('span');
+
+    // create debug button
+    debugButton.setAttribute('id', 'debug-button');
+    debugButton.classList.add('button', 'tools_button');
+    debugButton.classList.remove('button_no_show');
+
+    debugText.textContent = 'report is off';
+    debugText.setAttribute('id', 'debug-text');
+
+    debugIcon.classList.add('icon_image');
+    debugIcon.src = '/icons/debug_icon.png';
+    debugButton.appendChild(debugText);
+    debugButton.appendChild(debugIcon);
+
+    // add button functionality
+    debugButton.addEventListener('click', function () {
+
+      if (this.classList.contains('debug-on')) {
+        this.classList.remove('debug-on');
+        document.getElementById('debug-container').style.display = 'none';
+        document.getElementById('debug-text').innerText = 'report is off';
+      } else {
+        this.classList.add('debug-on');
+        document.getElementById('debug-container').style.display = 'block';
+        document.getElementById('debug-text').innerText = 'report is on';
+      };
+    });
+  },
+
+  createDebugDiv: function createDebugDiv() {
+    var wrapperEl = document.getElementById('wrapper'),
+        debugEl = document.createElement('div'),
+        infoLineEl,
+        i,
+        that = this;
+
+    // create debug div
+    debugEl.setAttribute('id', 'debug-container');
+    debugEl.style.display = 'none';
+    for (i = 1; i <= 10; i++) {
+      infoLineEl = document.createElement('div');
+      infoLineEl.setAttribute('id', 'info' + i);
+      infoLineEl.classList.add('info');
+      debugEl.appendChild(infoLineEl);
+    };
+
+    wrapperEl.appendChild(debugEl);
+
+    // make debug-container draggable
+    $('#debug-container').draggable({
+      containment: 'parent',
+      start: function start() {
+        that.clearDebugInfo();
+        that.addDebugInfo([[1, 'this div width    : ' + $(this).css('width')], [2, 'wrapper width     : ' + document.getElementById('wrapper').style.width], [3, 'screen.width      : ' + screen.width.toString()], [4, 'window.innerWidth : ' + window.innerWidth.toString()], [5, 'screen.availWidth : ' + screen.availWidth.toString()]]);
+      },
+      drag: function drag() {
+        var debugEl = document.getElementById('debug-container'),
+            debugDivInfo = debugEl.getBoundingClientRect();
+
+        that.addDebugInfo([[6, ''], [7, this.style.left + ' <css> ' + $(this).css('right')], [8, debugDivInfo.left.toString() + ' <dom> ' + debugDivInfo.right.toString()]]);
+      }
+    });
+  },
+
+  setListeners: function setListeners() {
+    var that = this;
+
+    // resize window
+    window.addEventListener('resize', function () {
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'resize: new width  : ' + window.innerWidth + 'px'], [2, 'resize: new height : ' + window.innerHeight + 'px']]);
+    });
+
+    // click on image
+    document.getElementById('images').addEventListener('click', function (e) {
+      var clickedEl = e.target;
+
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'Filename: ' + clickedEl.getAttribute('title')], [2, 'Z-index: ' + clickedEl.style.zIndex], [3, 'Start: Left: ' + clickedEl.style.left + ' Top: ' + clickedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
+    });
+
+    // dragged images
+    $(document).on('dragstart', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'Filename: ' + draggedEl.getAttribute('title')], [2, 'Z-index: ' + draggedEl.style.zIndex], [3, 'Start: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
+    });
+
+    $(document).on('drag', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.addDebugInfo([[4, 'Current: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
+    });
+
+    $(document).on('dragstop', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.addDebugInfo([[5, 'Stop: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
+    });
+  },
+
+  // debugInfoText: a multidimensional array: [[1, string], [2, string]]
+  addDebugInfo: function addDebugInfo(debugInfoText) {
+    debugInfoText.forEach(function (item) {
+      document.getElementById('info' + item[0]).textContent = item[1];
+    });
+  },
+
+  clearDebugInfo: function clearDebugInfo() {
+    Array.from(document.getElementsByClassName('info')).forEach(function (element) {
+      element.textContent = '';
+    });
+  }
+};
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+  init: function init() {
+    this.imageToDelete = {};
+
+    console.log('and now?');
+  }
+};
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = configureStore;
+
+var _redux = __webpack_require__(6);
+
+var _reducers = __webpack_require__(14);
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function configureStore() {
+  // return createStore(reducers, {}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  return (0, _redux.createStore)(_reducers2.default, {});
+};
+
+/***/ }),
+/* 13 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+
+  clickme: function clickme(id, time) {
+    setTimeout(function () {
+      document.getElementById(id).dispatchEvent(new Event('click'));
+    }, time);
+  }
+
+};
+
+/***/ }),
+/* 14 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+
+var _redux = __webpack_require__(6);
+
+var _deleteTarget = __webpack_require__(35);
+
+var _deleteTarget2 = _interopRequireDefault(_deleteTarget);
+
+var _selectedImage = __webpack_require__(36);
+
+var _selectedImage2 = _interopRequireDefault(_selectedImage);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+exports.default = (0, _redux.combineReducers)({
+	selectedImage: _selectedImage2.default,
+	deleteTarget: _deleteTarget2.default
+});
+
+/***/ }),
+/* 15 */,
+/* 16 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Symbol_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getRawTag_js__ = __webpack_require__(19);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objectToString_js__ = __webpack_require__(20);
+
+
+
+
+/** `Object#toString` result references. */
+var nullTag = '[object Null]',
+    undefinedTag = '[object Undefined]';
+
+/** Built-in value references. */
+var symToStringTag = __WEBPACK_IMPORTED_MODULE_0__Symbol_js__["a" /* default */] ? __WEBPACK_IMPORTED_MODULE_0__Symbol_js__["a" /* default */].toStringTag : undefined;
+
+/**
+ * The base implementation of `getTag` without fallbacks for buggy environments.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the `toStringTag`.
+ */
+function baseGetTag(value) {
+  if (value == null) {
+    return value === undefined ? undefinedTag : nullTag;
+  }
+  return (symToStringTag && symToStringTag in Object(value))
+    ? __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__getRawTag_js__["a" /* default */])(value)
+    : __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__objectToString_js__["a" /* default */])(value);
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (baseGetTag);
+
+
+/***/ }),
+/* 17 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global) {/** Detect free variable `global` from Node.js. */
+var freeGlobal = typeof global == 'object' && global && global.Object === Object && global;
+
+/* harmony default export */ __webpack_exports__["a"] = (freeGlobal);
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(8)))
+
+/***/ }),
+/* 18 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__overArg_js__ = __webpack_require__(21);
+
+
+/** Built-in value references. */
+var getPrototype = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__overArg_js__["a" /* default */])(Object.getPrototypeOf, Object);
+
+/* harmony default export */ __webpack_exports__["a"] = (getPrototype);
+
+
+/***/ }),
+/* 19 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Symbol_js__ = __webpack_require__(1);
+
+
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var nativeObjectToString = objectProto.toString;
+
+/** Built-in value references. */
+var symToStringTag = __WEBPACK_IMPORTED_MODULE_0__Symbol_js__["a" /* default */] ? __WEBPACK_IMPORTED_MODULE_0__Symbol_js__["a" /* default */].toStringTag : undefined;
+
+/**
+ * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
+ *
+ * @private
+ * @param {*} value The value to query.
+ * @returns {string} Returns the raw `toStringTag`.
+ */
+function getRawTag(value) {
+  var isOwn = hasOwnProperty.call(value, symToStringTag),
+      tag = value[symToStringTag];
+
+  try {
+    value[symToStringTag] = undefined;
+    var unmasked = true;
+  } catch (e) {}
+
+  var result = nativeObjectToString.call(value);
+  if (unmasked) {
+    if (isOwn) {
+      value[symToStringTag] = tag;
+    } else {
+      delete value[symToStringTag];
+    }
+  }
+  return result;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (getRawTag);
+
+
+/***/ }),
+/* 20 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/** Used for built-in method references. */
+var objectProto = Object.prototype;
+
+/**
+ * Used to resolve the
+ * [`toStringTag`](http://ecma-international.org/ecma-262/7.0/#sec-object.prototype.tostring)
+ * of values.
+ */
+var nativeObjectToString = objectProto.toString;
+
+/**
+ * Converts `value` to a string using `Object.prototype.toString`.
+ *
+ * @private
+ * @param {*} value The value to convert.
+ * @returns {string} Returns the converted string.
+ */
+function objectToString(value) {
+  return nativeObjectToString.call(value);
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (objectToString);
+
+
+/***/ }),
+/* 21 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * Creates a unary function that invokes `func` with its argument transformed.
+ *
+ * @private
+ * @param {Function} func The function to wrap.
+ * @param {Function} transform The argument transform.
+ * @returns {Function} Returns the new function.
+ */
+function overArg(func, transform) {
+  return function(arg) {
+    return func(transform(arg));
+  };
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (overArg);
+
+
+/***/ }),
+/* 22 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__freeGlobal_js__ = __webpack_require__(17);
+
+
+/** Detect free variable `self`. */
+var freeSelf = typeof self == 'object' && self && self.Object === Object && self;
+
+/** Used as a reference to the global object. */
+var root = __WEBPACK_IMPORTED_MODULE_0__freeGlobal_js__["a" /* default */] || freeSelf || Function('return this')();
+
+/* harmony default export */ __webpack_exports__["a"] = (root);
+
+
+/***/ }),
+/* 23 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/**
+ * Checks if `value` is object-like. A value is object-like if it's not `null`
+ * and has a `typeof` result of "object".
+ *
+ * @static
+ * @memberOf _
+ * @since 4.0.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is object-like, else `false`.
+ * @example
+ *
+ * _.isObjectLike({});
+ * // => true
+ *
+ * _.isObjectLike([1, 2, 3]);
+ * // => true
+ *
+ * _.isObjectLike(_.noop);
+ * // => false
+ *
+ * _.isObjectLike(null);
+ * // => false
+ */
+function isObjectLike(value) {
+  return value != null && typeof value == 'object';
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (isObjectLike);
+
+
+/***/ }),
+/* 24 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__compose__ = __webpack_require__(4);
+/* harmony export (immutable) */ __webpack_exports__["a"] = applyMiddleware;
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+
+
+/**
+ * Creates a store enhancer that applies middleware to the dispatch method
+ * of the Redux store. This is handy for a variety of tasks, such as expressing
+ * asynchronous actions in a concise manner, or logging every action payload.
+ *
+ * See `redux-thunk` package as an example of the Redux middleware.
+ *
+ * Because middleware is potentially asynchronous, this should be the first
+ * store enhancer in the composition chain.
+ *
+ * Note that each middleware will be given the `dispatch` and `getState` functions
+ * as named arguments.
+ *
+ * @param {...Function} middlewares The middleware chain to be applied.
+ * @returns {Function} A store enhancer applying the middleware.
+ */
+function applyMiddleware() {
+  for (var _len = arguments.length, middlewares = Array(_len), _key = 0; _key < _len; _key++) {
+    middlewares[_key] = arguments[_key];
+  }
+
+  return function (createStore) {
+    return function (reducer, preloadedState, enhancer) {
+      var store = createStore(reducer, preloadedState, enhancer);
+      var _dispatch = store.dispatch;
+      var chain = [];
+
+      var middlewareAPI = {
+        getState: store.getState,
+        dispatch: function dispatch(action) {
+          return _dispatch(action);
+        }
+      };
+      chain = middlewares.map(function (middleware) {
+        return middleware(middlewareAPI);
+      });
+      _dispatch = __WEBPACK_IMPORTED_MODULE_0__compose__["a" /* default */].apply(undefined, chain)(store.dispatch);
+
+      return _extends({}, store, {
+        dispatch: _dispatch
+      });
+    };
+  };
+}
+
+/***/ }),
+/* 25 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = bindActionCreators;
+function bindActionCreator(actionCreator, dispatch) {
+  return function () {
+    return dispatch(actionCreator.apply(undefined, arguments));
+  };
+}
+
+/**
+ * Turns an object whose values are action creators, into an object with the
+ * same keys, but with every function wrapped into a `dispatch` call so they
+ * may be invoked directly. This is just a convenience method, as you can call
+ * `store.dispatch(MyActionCreators.doSomething())` yourself just fine.
+ *
+ * For convenience, you can also pass a single function as the first argument,
+ * and get a function in return.
+ *
+ * @param {Function|Object} actionCreators An object whose values are action
+ * creator functions. One handy way to obtain it is to use ES6 `import * as`
+ * syntax. You may also pass a single function.
+ *
+ * @param {Function} dispatch The `dispatch` function available on your Redux
+ * store.
+ *
+ * @returns {Function|Object} The object mimicking the original object, but with
+ * every action creator wrapped into the `dispatch` call. If you passed a
+ * function as `actionCreators`, the return value will also be a single
+ * function.
+ */
+function bindActionCreators(actionCreators, dispatch) {
+  if (typeof actionCreators === 'function') {
+    return bindActionCreator(actionCreators, dispatch);
+  }
+
+  if (typeof actionCreators !== 'object' || actionCreators === null) {
+    throw new Error('bindActionCreators expected an object or a function, instead received ' + (actionCreators === null ? 'null' : typeof actionCreators) + '. ' + 'Did you write "import ActionCreators from" instead of "import * as ActionCreators from"?');
+  }
+
+  var keys = Object.keys(actionCreators);
+  var boundActionCreators = {};
+  for (var i = 0; i < keys.length; i++) {
+    var key = keys[i];
+    var actionCreator = actionCreators[key];
+    if (typeof actionCreator === 'function') {
+      boundActionCreators[key] = bindActionCreator(actionCreator, dispatch);
+    }
+  }
+  return boundActionCreators;
+}
+
+/***/ }),
+/* 26 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_warning__ = __webpack_require__(7);
+/* harmony export (immutable) */ __webpack_exports__["a"] = combineReducers;
+
+
+
+
+function getUndefinedStateErrorMessage(key, action) {
+  var actionType = action && action.type;
+  var actionName = actionType && '"' + actionType.toString() + '"' || 'an action';
+
+  return 'Given action ' + actionName + ', reducer "' + key + '" returned undefined. ' + 'To ignore an action, you must explicitly return the previous state.';
+}
+
+function getUnexpectedStateShapeWarningMessage(inputState, reducers, action, unexpectedKeyCache) {
+  var reducerKeys = Object.keys(reducers);
+  var argumentName = action && action.type === __WEBPACK_IMPORTED_MODULE_0__createStore__["b" /* ActionTypes */].INIT ? 'preloadedState argument passed to createStore' : 'previous state received by the reducer';
+
+  if (reducerKeys.length === 0) {
+    return 'Store does not have a valid reducer. Make sure the argument passed ' + 'to combineReducers is an object whose values are reducers.';
+  }
+
+  if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__["a" /* default */])(inputState)) {
+    return 'The ' + argumentName + ' has unexpected type of "' + {}.toString.call(inputState).match(/\s([a-z|A-Z]+)/)[1] + '". Expected argument to be an object with the following ' + ('keys: "' + reducerKeys.join('", "') + '"');
+  }
+
+  var unexpectedKeys = Object.keys(inputState).filter(function (key) {
+    return !reducers.hasOwnProperty(key) && !unexpectedKeyCache[key];
+  });
+
+  unexpectedKeys.forEach(function (key) {
+    unexpectedKeyCache[key] = true;
+  });
+
+  if (unexpectedKeys.length > 0) {
+    return 'Unexpected ' + (unexpectedKeys.length > 1 ? 'keys' : 'key') + ' ' + ('"' + unexpectedKeys.join('", "') + '" found in ' + argumentName + '. ') + 'Expected to find one of the known reducer keys instead: ' + ('"' + reducerKeys.join('", "') + '". Unexpected keys will be ignored.');
+  }
+}
+
+function assertReducerSanity(reducers) {
+  Object.keys(reducers).forEach(function (key) {
+    var reducer = reducers[key];
+    var initialState = reducer(undefined, { type: __WEBPACK_IMPORTED_MODULE_0__createStore__["b" /* ActionTypes */].INIT });
+
+    if (typeof initialState === 'undefined') {
+      throw new Error('Reducer "' + key + '" returned undefined during initialization. ' + 'If the state passed to the reducer is undefined, you must ' + 'explicitly return the initial state. The initial state may ' + 'not be undefined.');
+    }
+
+    var type = '@@redux/PROBE_UNKNOWN_ACTION_' + Math.random().toString(36).substring(7).split('').join('.');
+    if (typeof reducer(undefined, { type: type }) === 'undefined') {
+      throw new Error('Reducer "' + key + '" returned undefined when probed with a random type. ' + ('Don\'t try to handle ' + __WEBPACK_IMPORTED_MODULE_0__createStore__["b" /* ActionTypes */].INIT + ' or other actions in "redux/*" ') + 'namespace. They are considered private. Instead, you must return the ' + 'current state for any unknown actions, unless it is undefined, ' + 'in which case you must return the initial state, regardless of the ' + 'action type. The initial state may not be undefined.');
+    }
+  });
+}
+
+/**
+ * Turns an object whose values are different reducer functions, into a single
+ * reducer function. It will call every child reducer, and gather their results
+ * into a single state object, whose keys correspond to the keys of the passed
+ * reducer functions.
+ *
+ * @param {Object} reducers An object whose values correspond to different
+ * reducer functions that need to be combined into one. One handy way to obtain
+ * it is to use ES6 `import * as reducers` syntax. The reducers may never return
+ * undefined for any action. Instead, they should return their initial state
+ * if the state passed to them was undefined, and the current state for any
+ * unrecognized action.
+ *
+ * @returns {Function} A reducer function that invokes every reducer inside the
+ * passed object, and builds a state object with the same shape.
+ */
+function combineReducers(reducers) {
+  var reducerKeys = Object.keys(reducers);
+  var finalReducers = {};
+  for (var i = 0; i < reducerKeys.length; i++) {
+    var key = reducerKeys[i];
+
+    if (process.env.NODE_ENV !== 'production') {
+      if (typeof reducers[key] === 'undefined') {
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__utils_warning__["a" /* default */])('No reducer provided for key "' + key + '"');
+      }
+    }
+
+    if (typeof reducers[key] === 'function') {
+      finalReducers[key] = reducers[key];
+    }
+  }
+  var finalReducerKeys = Object.keys(finalReducers);
+
+  if (process.env.NODE_ENV !== 'production') {
+    var unexpectedKeyCache = {};
+  }
+
+  var sanityError;
+  try {
+    assertReducerSanity(finalReducers);
+  } catch (e) {
+    sanityError = e;
+  }
+
+  return function combination() {
+    var state = arguments.length <= 0 || arguments[0] === undefined ? {} : arguments[0];
+    var action = arguments[1];
+
+    if (sanityError) {
+      throw sanityError;
+    }
+
+    if (process.env.NODE_ENV !== 'production') {
+      var warningMessage = getUnexpectedStateShapeWarningMessage(state, finalReducers, action, unexpectedKeyCache);
+      if (warningMessage) {
+        __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__utils_warning__["a" /* default */])(warningMessage);
+      }
+    }
+
+    var hasChanged = false;
+    var nextState = {};
+    for (var i = 0; i < finalReducerKeys.length; i++) {
+      var key = finalReducerKeys[i];
+      var reducer = finalReducers[key];
+      var previousStateForKey = state[key];
+      var nextStateForKey = reducer(previousStateForKey, action);
+      if (typeof nextStateForKey === 'undefined') {
+        var errorMessage = getUndefinedStateErrorMessage(key, action);
+        throw new Error(errorMessage);
+      }
+      nextState[key] = nextStateForKey;
+      hasChanged = hasChanged || nextStateForKey !== previousStateForKey;
+    }
+    return hasChanged ? nextState : state;
+  };
+}
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
+
+/***/ }),
+/* 27 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(28);
+
+
+/***/ }),
+/* 28 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(global, module) {
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _ponyfill = __webpack_require__(29);
+
+var _ponyfill2 = _interopRequireDefault(_ponyfill);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { 'default': obj }; }
+
+var root; /* global window */
+
+
+if (typeof self !== 'undefined') {
+  root = self;
+} else if (typeof window !== 'undefined') {
+  root = window;
+} else if (typeof global !== 'undefined') {
+  root = global;
+} else if (true) {
+  root = module;
+} else {
+  root = Function('return this')();
+}
+
+var result = (0, _ponyfill2['default'])(root);
+exports['default'] = result;
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(30)(module)))
+
+/***/ }),
+/* 29 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+	value: true
+});
+exports['default'] = symbolObservablePonyfill;
+function symbolObservablePonyfill(root) {
+	var result;
+	var _Symbol = root.Symbol;
+
+	if (typeof _Symbol === 'function') {
+		if (_Symbol.observable) {
+			result = _Symbol.observable;
+		} else {
+			result = _Symbol('observable');
+			_Symbol.observable = result;
+		}
+	} else {
+		result = '@@observable';
+	}
+
+	return result;
+};
+
+/***/ }),
+/* 30 */
+/***/ (function(module, exports) {
+
+module.exports = function(module) {
+	if(!module.webpackPolyfill) {
+		module.deprecate = function() {};
+		module.paths = [];
+		// module.parent = undefined by default
+		if(!module.children) module.children = [];
+		Object.defineProperty(module, "loaded", {
+			enumerable: true,
+			get: function() {
+				return module.l;
+			}
+		});
+		Object.defineProperty(module, "id", {
+			enumerable: true,
+			get: function() {
+				return module.i;
+			}
+		});
+		module.webpackPolyfill = 1;
+	}
+	return module;
+};
+
+
+/***/ }),
+/* 31 */,
+/* 32 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setDeleteTarget = setDeleteTarget;
+exports.setSelectedImage = setSelectedImage;
+function setDeleteTarget(deleteTarget) {
+
+  return {
+    type: 'SET_DELETE_TARGET',
+    payload: deleteTarget
+  };
+}
+
+function setSelectedImage(id) {
+  console.log('fired');
+  console.log(id);
+
+  return {
+    type: "SET_SELECTED_IMAGE",
+    payload: id
+  };
+}
+
+/***/ }),
+/* 33 */,
+/* 34 */,
+/* 35 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.default = function () {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { element: {}, id: '' };
+  var action = arguments[1];
+
+  switch (action.type) {
+    case "SET_DELETE_TARGET":
+      return _extends({}, state, { element: action.payload, id: action.payload.id });
+    default:
+      return state;
+  }
+};
+
+;
+
+/***/ }),
+/* 36 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.default = function () {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { id: '' };
+  var action = arguments[1];
+
+  switch (action.type) {
+    case "SET_SELECTED_IMAGE":
+      return _extends({}, state, { id: action.payload });
+    default:
+      return state;
+  }
+};
+
+;
+
+/***/ }),
+/* 37 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+  hideDraggers: function hideDraggers() {
+    Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
+      this.hideElement(dragger);
+    }.bind(this));
+  },
+  hideOtherDraggers: function hideOtherDraggers(id) {
+    Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
+      if (dragger.id !== id) {
+        this.hideElement(dragger);
+      };
+    }.bind(this));
+  },
+  hideID: function hideID(id) {
+    document.getElementById(id).style.display = 'none';
+  },
+  hideElement: function hideElement(element) {
+    element.style.display = 'none';
+  },
+  showID: function showID(id) {
+    document.getElementById(id).style.display = 'block';
+  },
+  deletePreview: function deletePreview() {
+    var deleteTarget = window.store.getState().deleteTarget;
+
+    // show
+    document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
+    document.getElementById('delete_preview').src = deleteTarget.element.src;
+
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  openTools: function openTools() {
+    // show
+    document.getElementById('tools_container').classList.add('tools_container_is_open');
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+  },
+  openAccount: function openAccount() {
+    // show
+    document.getElementById('login_container').classList.add('login_container_is_open');
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  openUpload: function openUpload() {
+    // show
+    document.getElementById('upload_container').classList.add('upload_container_is_open');
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  uploadPreview: function uploadPreview() {
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  afterUpload: function afterUpload() {
+    // show element
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    // hide elements
+    document.getElementById('upload_container').classList.remove('upload_container_is_open');
+    this.hideID('upload_preview_container');
+    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    document.getElementById('confirm_or_reject_container_info').textContent = '';
+    // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
+    // to visible after the transition effect takes place
+    setTimeout(function () {
+      this.showID('upload_preview_container');
+      document.getElementById('confirm_or_reject_container').style.display = 'flex';
+    }, 500);
+    // replace image_upload_preview image
+    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
+  },
+  afterDelete: function afterDelete() {
+    // show element
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    // hide elements
+    document.getElementById('delete_preview_container').style.display = 'none';
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    this.hideDraggers();
+    // This setTimeout is so that the delete_preview_container disappears immediately, and then resets
+    // to visible after the transition effect takes place
+    setTimeout(function () {
+      document.getElementById('delete_preview_container').style.display = 'block';
+    }, 500);
+    // replace delete_preview
+    document.getElementById('delete_preview').src = '/icons/1x1.png';
+  },
+  rejectDelete: function rejectDelete() {
+    var deleteTarget = window.store.getState().deleteTarget;
+
+    // show element
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    // hide elements
+    document.getElementById('delete_preview_container').style.display = 'none';
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    setTimeout(function () {
+      document.getElementById('delete_preview_container').style.display = 'block';
+    }, 500);
+    // reshow hidden image that wasn't deleted
+    deleteTarget.element.style.display = 'initial';
+
+    // show image on other clients
+    window.socket.emit('c-e:  show_image', deleteTarget.id);
+  },
+  closeAll: function closeAll() {
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+    document.getElementById('tools_container').classList.remove('tools_container_is_open');
+    document.getElementById('login_container').classList.remove('login_container_is_open');
+    document.getElementById('upload_container').classList.remove('upload_container_is_open');
+    document.getElementById('connect_info').classList.remove('connect_info_is_open');
+    document.getElementById('explore_container').style.display = 'none';
+    document.getElementById('insta_header').style.display = 'none';
+    document.getElementById('insta_div').style.display = 'none';
+
+    // replace image_upload_preview image and delete_preview image
+    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
+    document.getElementById('delete_preview').src = '/icons/1x1.png';
+    // close navigation button
+    document.body.classList.remove('button_container_is_open');
+    // animate close hamburgers
+    document.getElementById('line_one').style.top = '40%';
+    document.getElementById('line_three').style.top = '60%';
+  }
+};
+
+/***/ }),
+/* 38 */,
+/* 39 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _stateChange = __webpack_require__(37);
+
+var _stateChange2 = _interopRequireDefault(_stateChange);
+
+var _actions = __webpack_require__(32);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = {
+  init: function init() {
+    this.buttons = [];
+    this.createButton('n1', 'open-account', 'account', '/icons/person_circle_icon.png');
+    this.createButton('n2', 'open-tools', 'tools', '/icons/tools_icon.png');
+    this.createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png');
+    this.createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png');
+
+    this.addEvents();
+  },
+  createButton: function createButton(domLocation, action, text, iconPath) {
+    var targetDiv = document.getElementById(domLocation),
+        iconDiv = document.createElement('img');
+
+    targetDiv.classList.remove('button_no_show');
+    targetDiv.classList.add('button', 'navigation_button');
+    targetDiv.setAttribute('data-action', action);
+    targetDiv.innerText = text;
+    iconDiv.classList.add('icon_image');
+    iconDiv.src = iconPath;
+    targetDiv.appendChild(iconDiv);
+
+    this.buttons.push(targetDiv);
+  },
+  onClick: function onClick(e) {
+    console.log(e.currentTarget);
+    switch (e.currentTarget.getAttribute('data-action')) {
+      case 'open-tools':
+        _stateChange2.default.openTools();
+        // NOTES: this.store.dispatch(open-tools())
+        break;
+
+      case 'open-account':
+        _stateChange2.default.openAccount();
+        break;
+
+      case 'open-upload':
+        _stateChange2.default.openUpload();
+        break;
+      case 'exit-door':
+        // hide original image
+        _stateChange2.default.hideElement(selectedImage);
+        // hide draggers
+        _stateChange2.default.hideDraggers();
+        // show delete_preview_container
+        _stateChange2.default.deletePreview();
+        this.handleDelete();
+        break;
+      default:
+        break;
+    }
+  },
+  handleDelete: function handleDelete() {
+    var selectedImageID = window.store.getState().selectedImage.id,
+        selectedImage = document.getElementById(selectedImageID);
+
+    if (selectedImageID !== '') {
+      window.store.dispatch((0, _actions.setDeleteTarget)(selectedImage));
+
+      // send socket to hide on other clients
+      window.socket.emit('c-e:  hide_image', selectedImageID);
+    };
+  },
+  addEvents: function addEvents() {
+    var _this = this;
+
+    this.buttons.forEach(function (button) {
+      button.addEventListener('click', _this.onClick.bind(_this));
+    });
+  }
+};
+// import socketFile from '../socket-file';
 
 /***/ })
 /******/ ]);

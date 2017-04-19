@@ -1,3 +1,9 @@
+// keep modularizing
+// state changes
+// buttons
+// fix selected-image id
+
+
 // wall-collective
 //
 // Version: 0.7.0
@@ -13,10 +19,21 @@
 
 import config from './config';
 import debug from './debug/debug';
+import configureStore from './store/configureStore';
+import stateChange from './views/state-change';
+import buttons from './components/buttons';
+
+// dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
+import { setDeleteTarget } from './actions';
+
+// dispatched when an image is clicked or dragged
+import { setSelectedImage } from './actions';
+const store = configureStore();
 
 // debug tools
-if (config.debugOn) debug.init();
+if (config.debugOn) debug.init(store);
 
+buttons.init();
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
@@ -33,9 +50,6 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
     // assigned when an image is clicked or dragged; used by draggers
     selected_file = {},
-
-    // assigned when an image is dragged onto the exit_door icon; used by delete_button
-    imageToDelete = {},
 
     // assigned by initial socket; used by upload counter
     sessionID = String,
@@ -58,6 +72,12 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
     // used when an access token is available for the client after a user authenticates with Instagram
     instaAccessReady = false;
+
+
+    window.store = store;
+    window.socket = socket;
+
+
 
   // set wrapper size; (css vh and vw were not working with mobile safari)
   document.getElementById('wrapper').style.width = window.innerWidth + 'px';
@@ -145,7 +165,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     if (event.target.getAttribute('id') === 'images') {
       dragger_elements = document.getElementsByClassName('dragger');
       // remove all draggers
-      hide_draggers();
+      stateChange.hideDraggers();
       // close button containers and remove dragger_transitions
       document.body.classList.remove('dragger_transitions');
     }; // end of if
@@ -165,37 +185,17 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
   }, false);
 
-  // hide all draggers
-  function hide_draggers() {
-    var dragger_elements = document.getElementsByClassName('dragger'),
-        i;
-
-    for (i = 0; i < dragger_elements.length; i++) {
-      dragger_elements[i].style.display = 'none';
-    };
-  }
-
-  // hide all draggers except the one being dragged
-  function hide_other_draggers(id) {
-    var dragger_elements = document.getElementsByClassName('dragger'),
-        i;
-
-    for (i = 0; i < dragger_elements.length; i++) {
-      if (dragger_elements[i].getAttribute('id') !== id) {
-        dragger_elements[i].style.display = 'none';
-      };
-    };
-  };
-
   // used by delete image button
   function clear_selected_file() {
-    selected_file.image_id        = '';
+    console.log('hi');
+    store.getState().selectedImage.id        = '';
     selected_file.imageFilename  = '';
     selected_file.src             = '';
     selected_file.width           = '';
     selected_file.height          = '';
     selected_file.transform       = '';
     selected_file.zindex          = '';
+    store.dispatch(setSelectedImage(''));
   };
 
   // cookie setter
@@ -230,128 +230,12 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   }
 
 
-// --State Change functions
-//     functions to change the state of the containers and buttons in response to drags, uploads, etc
-
-  function state_change_to_close_all() {
-    // hide elements
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-    document.getElementById('tools_container').classList.remove('tools_container_is_open');
-    document.getElementById('login_container').classList.remove('login_container_is_open');
-    document.getElementById('upload_container').classList.remove('upload_container_is_open');
-    document.getElementById('connect_info').classList.remove('connect_info_is_open');
-    document.getElementById('explore_container').style.display = 'none';
-    document.getElementById('insta_header').style.display = 'none';
-    document.getElementById('insta_div').style.display = 'none';
-
-
-
-    // replace image_upload_preview image and delete_preview image
-    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-    document.getElementById('delete_preview').src = '/icons/1x1.png';
-    // close navigation button
-    document.body.classList.remove('button_container_is_open');
-    // animate close hamburgers
-    document.getElementById('line_one').style.top = '40%';
-    document.getElementById('line_three').style.top = '60%';
-
-    // remove
-    // if (document.getElementById('insta_div').style.display === 'block') {
-    //   history.replaceState({}, 'wall-collective', '/');
-    //   document.getElementById('insta_header').style.display = 'none';
-    //   document.getElementById('insta_div').style.display = 'none';
-    // };
-  }
-
-  function state_change_to_tools_menu() {
-    // show element
-    document.getElementById('tools_container').classList.add('tools_container_is_open');
-    // hide elements
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-  }
-
-  function state_change_to_account_menu() {
-    // show element
-    document.getElementById('login_container').classList.add('login_container_is_open');
-    // hide elements
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  }
-
-  function state_change_to_upload_menu() {
-    // show element
-    document.getElementById('upload_container').classList.add('upload_container_is_open');
-    // hide elements
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  }
-
-  function state_change_to_upload() {
-    // hide element
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  }
-
-  function state_change_after_upload() {
-    // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-    // hide elements
-    document.getElementById('upload_container').classList.remove('upload_container_is_open');
-    document.getElementById('upload_preview_container').style.display = 'none';
-    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-    document.getElementById('confirm_or_reject_container_info').textContent = '';
-    // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
-    // to visible after the transition effect takes place
-    setTimeout(function () {
-      document.getElementById('upload_preview_container').style.display = 'block';
-      document.getElementById('confirm_or_reject_container').style.display = 'flex';
-    }, 500);
-    // replace image_upload_preview image
-    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-  }
-
-  function state_change_to_delete() {
-    // show elements
-    document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
-    document.getElementById('delete_preview').src = imageToDelete.src;
-    // hide element
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  }
-
-  function state_change_after_delete() {
-    // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-    // hide elements
-    document.getElementById('delete_preview_container').style.display = 'none';
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    hide_draggers();
-    // This setTimeout is so that the delete_preview_container disappears immediately, and then resets
-    // to visible after the transition effect takes place
-    setTimeout(function () {
-      document.getElementById('delete_preview_container').style.display = 'block';
-    }, 500);
-    // replace delete_preview
-    document.getElementById('delete_preview').src = '/icons/1x1.png';
-  }
-
-  function state_change_after_reject_delete() {
-    var data = {};
-
-    // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-    // hide elements
-    document.getElementById('delete_preview_container').style.display = 'none';
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    setTimeout(function () {
-      document.getElementById('delete_preview_container').style.display = 'block';
-    }, 500);
-    // reshow hidden image that wasn't deleted
-    document.getElementById(imageToDelete.image_id).style.display = 'block';
-    // show image on other clients
-    data.image_id = imageToDelete.image_id;
-    socket.emit('c-e:  show_image', data);
-  }
+  // remove
+  // if (document.getElementById('insta_div').style.display === 'block') {
+  //   history.replaceState({}, 'wall-collective', '/');
+  //   document.getElementById('insta_header').style.display = 'none';
+  //   document.getElementById('insta_div').style.display = 'none';
+  // };
 
 
 // --Create grid line divs
@@ -568,9 +452,9 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   // remove deleted image
   socket.on('bc: delete_image', function (data) {
     document.getElementById(data.id_to_delete).remove();
-    if (data.id_to_delete === selected_file.image_id) {
+    if (data.id_to_delete === store.getState().selectedImage.id) {
       clear_selected_file();
-      hide_draggers();
+      stateChange.hideDraggers();
     };
   });
 
@@ -600,7 +484,9 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   });
   // show element; other client has cancelled deletion
   socket.on('bc: show_image', function (data) {
-    document.getElementById(data.image_id).style.display = 'block';
+    console.log(data);
+    document.getElementById(data).style.display = 'initial';
+
   });
 
   // if this client is the uploader, show upload statistics from busboy
@@ -672,7 +558,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
             // assign temporary z-index
             this.style.zIndex = 60000;
 
-            hide_draggers();
+            stateChange.hideDraggers();
           }
         });
     };
@@ -838,11 +724,11 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       // otherwise, if button containers are open
       if ( document.body.classList.contains('button_container_is_open') ) {
         // close all containers
-        state_change_to_close_all();
+        stateChange.closeAll();
         // show selected_file in case it was removed by being dragged onto the exit door
-        // except when no file is selected: selected_file.image_id is undefined or ''
-        if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
-          document.getElementById(selected_file.image_id).style.display = 'block';
+        // except when no file is selected: store.getState().selectedImage.id is undefined or ''
+        if ( store.getState().selectedImage.id !== '' ) {
+          document.getElementById(store.getState().selectedImage.id).style.display = 'initial';
         };
       // else when no containers are open
       } else {
@@ -855,26 +741,20 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         document.getElementById('line_one').style.top = '35%';
         document.getElementById('line_three').style.top = '65%';
 
-        hide_draggers();
+        stateChange.hideDraggers();
       };
     };
   });
 
 
-  // tools button
-  $('#tools_container_button').on('click', function () {
-    state_change_to_tools_menu();
-  });
+  //
+  // <div id='exit_door' class='button navigation_button'> remove
+  //   <img class='icon_image' src='/icons/door_icon.png'>
+  // </div>
 
-  // login button
-  $('#login_container_button').on('click', function () {
-    state_change_to_account_menu();
-  });
 
-  // upload button
-  $('#upload_container_button').on('click', function () {
-    state_change_to_upload_menu();
-  });
+var exitDoor = require('./exit-door');
+
 
   // dragger_all_switch; used to toggle all dragger switches
   $('#dragger_all_switch').click(function () {
@@ -892,9 +772,9 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         switch_elements[i].classList.add('switchon');
       };
       // set dragger element locations
-      set_dragger_locations(selected_file.image_id);
+      set_dragger_locations(store.getState().selectedImage.id);
       // show dragger elements if an image is selected
-      if (selected_file.image_id) {
+      if (store.getState().selectedImage.id) {
         dragger_elements = document.getElementsByClassName('dragger');
         for (i = 0; i < dragger_elements.length; i++) {
           dragger_elements[i].style.display = 'block';
@@ -936,9 +816,9 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     // if switched on
     if (this.classList.contains('switchon')) {
       // set dragger locations
-      set_dragger_locations(selected_file.image_id);
+      set_dragger_locations(store.getState().selectedImage.id);
       // show dragger if an image is selected
-      if (selected_file.image_id) {
+      if (store.getState().selectedImage.id) {
         document.getElementById(dragger_name).style.display = 'block';
       };
       // use first letter of dragger_name to find corresponding character in array and replace it
@@ -993,7 +873,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   // on file_select element change, load up the image preview
   $('#fileselect').on('change', function () {
     // open upload_preview_container
-    state_change_to_upload();
+    stateChange.uploadPreview();
     readURL(this);
   });
 
@@ -1025,7 +905,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       error: function (xhr) {
         console.log('Error:' + xhr.status);
         // change navigation_container and remove upload_preview
-        state_change_after_upload();
+        stateChange.afterUpload();
         uploadtotal = 0;
       },
       success: function (response) {
@@ -1059,7 +939,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         // assign drag to added element
         assigndrag(response.dom_id);
         // change navigation container and remove upload_preview
-        state_change_after_upload();
+        stateChange.afterUpload();
         // emit to other clients
         socketdata.uploadedFilename = response.imageFilename;
         socket.emit('c-e:  share_upload', socketdata);
@@ -1071,56 +951,36 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
   // reject upload
   $('#reject_upload_button').on('click', function () {
-    state_change_after_upload();
+    stateChange.afterUpload();
   });
 
 
-  $('#exit_door').on('click', function () {
-    var delete_element = {};
+  $('#n4').on('click', function () {
 
-    if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
-      delete_element = document.getElementById(selected_file.image_id);
-
-      // gather data
-      imageToDelete.image_id = selected_file.image_id;
-      imageToDelete.imageFilename = delete_element.getAttribute('title');
-      imageToDelete.src = delete_element.src;
-      imageToDelete.width = delete_element.style.width;
-      imageToDelete.height = delete_element.style.height;
-      imageToDelete.zindex = delete_element.style.zIndex;
-
-      // hide original image
-      document.getElementById(imageToDelete.image_id).style.display = 'none';
-
-      // hide draggers
-      hide_draggers();
-
-      // show delete_preview_container
-      state_change_to_delete();
-
-      // send socket to hide on other clients
-      socket.emit('c-e:  hide_image', imageToDelete.image_id);
-    };
   });
 
   // reject delete
   $('#reject_delete_button').on('click', function () {
-    state_change_after_reject_delete();
+    var deleteTargetID = store.getState().deleteTarget.id;
+
+    stateChange.rejectDelete();
     // send socket to show on other clients
-    socket.emit('c-e:  show_image', imageToDelete.image_id);
+    socket.emit('c-e:  show_image', deleteTargetID);
   });
 
   // confirm delete
   $('#confirm_delete_button').on('click', function () {
-    var socketdata = {};
+    var socketdata = {},
+        deleteTarget = store.getState().deleteTarget;
+
 
     // remove image
-    document.getElementById(imageToDelete.image_id).remove();
+    deleteTarget.element.remove();
     // change navigation container
-    state_change_after_delete();
+    stateChange.afterDelete();
     // prepare data to send
-    socketdata.filenameToDelete = imageToDelete.imageFilename;
-    socketdata.id_to_delete = imageToDelete.image_id;
+    socketdata.filenameToDelete = deleteTarget.element.getAttribute('title');
+    socketdata.id_to_delete = deleteTarget.id;
     // send data to server
     socket.emit('c-e:  delete_image', socketdata);
     clear_selected_file();
@@ -1196,16 +1056,16 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     document.getElementById('close_explore_container').style.display = 'block';
 
 
-    document.getElementById('explore_image').src = document.getElementById(selected_file.image_id).src;
+    document.getElementById('explore_image').src = document.getElementById(store.getState().selectedImage.id).src;
 
 
-    if (document.getElementById(selected_file.image_id).getAttribute('data-link').length > 1) {
+    if (document.getElementById(store.getState().selectedImage.id).getAttribute('data-link').length > 1) {
 
-      document.getElementById('insta_link').setAttribute('href', document.getElementById(selected_file.image_id).getAttribute('data-link'));
+      document.getElementById('insta_link').setAttribute('href', document.getElementById(store.getState().selectedImage.id).getAttribute('data-link'));
     };
 
 
-    if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
+    if ( (typeof store.getState().selectedImage.id !== 'undefined') && (store.getState().selectedImage.id.length > 0 ) ) {
 
       // if selected file is empty, fill it.
 
@@ -1219,30 +1079,6 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
 
     };
-
-/*
-      // gather data
-      imageToDelete.image_id = selected_file.image_id;
-      imageToDelete.imageFilename = delete_element.getAttribute('title');
-      imageToDelete.src = delete_element.src;
-      imageToDelete.width = delete_element.style.width;
-      imageToDelete.height = delete_element.style.height;
-      imageToDelete.zindex = delete_element.style.zIndex;
-
-      // hide original image
-      document.getElementById(imageToDelete.image_id).style.display = 'none';
-
-      // hide draggers
-      hide_draggers();
-
-      // show delete_preview_container
-      state_change_to_delete();
-
-      // send socket to hide on other clients
-      socket.emit('c-e:  hide_image', imageToDelete.image_id);
-*/
-
-
   });
 
   $('#close_explore_container').on('click', function () {
@@ -1296,7 +1132,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
           // assign temporary z-index
           this.style.zIndex = 60000;
 
-          hide_draggers();
+          stateChange.hideDraggers();
 
           // remove filter
           // --this is necessary because dragging images with filter causes too much rendering lag
@@ -1369,24 +1205,26 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
           });
 
           // for set dragger locations
-          selected_file.image_id = this.getAttribute('id');
+          store.getState().selectedImage.id = this.getAttribute('id');
+          store.dispatch(setSelectedImage(this.getAttribute('id')));
+
 
           // reset click count
           click_count = 0;
 
-//          set_dragger_locations(selected_file.image_id);
+//          set_dragger_locations(store.getState().selectedImage.id);
         }
       }).click( function () {
         var i = 0,
-          image_objects = document.getElementsByClassName('wallPic'),
-          id_and_zindex = [],
-          clicked_ids_zindexes = [],
-          clickX = event.pageX,
-          clickY = event.pageY,
-          offset_left = 0,
-          offset_top = 0,
-          image_px_range = {},
-          clicked_ids = '';
+            image_objects = document.getElementsByClassName('wallPic'),
+            id_and_zindex = [],
+            clicked_ids_zindexes = [],
+            clickX = event.pageX,
+            clickY = event.pageY,
+            offset_left = 0,
+            offset_top = 0,
+            image_px_range = {},
+            clicked_ids = '';
 
         // for each .wallPic on the page...
         for (i = 0; i < image_objects.length; i ++) {
@@ -1410,20 +1248,21 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         });
 
         // if selected_file is not empty, remove selected_file_animation class
-        if ( (typeof selected_file.image_id !== 'undefined') && (selected_file.image_id.length > 0 ) ) {
-          document.getElementById(selected_file.image_id).classList.remove('selected_file_animation');
+        if ( (typeof store.getState().selectedImage.id !== 'undefined') && (store.getState().selectedImage.id.length > 0 ) ) {
+          document.getElementById(store.getState().selectedImage.id).classList.remove('selected_file_animation');
           // css-trick: this will 'trigger a reflow' which will allow the class to be added again before the animation ends.
-          document.getElementById(selected_file.image_id).offsetWidth;
+          document.getElementById(store.getState().selectedImage.id).offsetWidth;
         };
 
         // if one image is clicked...
         if (clicked_ids_zindexes.length === 1) {
 
           // set the selected_file
-          selected_file.image_id = this.getAttribute('id');
+          store.getState().selectedImage.id = this.getAttribute('id');
+          store.dispatch(setSelectedImage(this.getAttribute('id')));
 
           // add the selected_file_animation class
-          document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+          document.getElementById(store.getState().selectedImage.id).classList.add('selected_file_animation');
 
           // reset the click count
           click_count = 0;
@@ -1448,14 +1287,14 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
           // console.log((click_count - 1) % clicked_ids_zindexes.length);
 
           // set the selected image to an id in the clicked array using the remainder of the click_count divided by the number of clicked images
-          selected_file.image_id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
-          document.getElementById(selected_file.image_id).classList.add('selected_file_animation');
+          store.getState().selectedImage.id = clicked_ids_zindexes[(click_count - 1) % clicked_ids_zindexes.length][0];
+          document.getElementById(store.getState().selectedImage.id).classList.add('selected_file_animation');
 
           // add temp_fade class to all clicked images other than the one selected
           for (i = 0; i < clicked_ids_zindexes.length; i++) {
 
             // don't add temp_fade class to selected_file, or to an image already faded, or if the selected_file is already on top
-            if ((clicked_ids_zindexes[i][0] !== selected_file.image_id) && (document.getElementById(clicked_ids_zindexes[i][0]).style.opacity > 0.50)
+            if ((clicked_ids_zindexes[i][0] !== store.getState().selectedImage.id) && (document.getElementById(clicked_ids_zindexes[i][0]).style.opacity > 0.50)
                && ( (click_count % clicked_ids_zindexes.length) !== 1 )) {
               document.getElementById(clicked_ids_zindexes[i][0]).classList.add('temp_fade');
             };
@@ -1465,7 +1304,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
           previous_clicked_ids = clicked_ids;
         };
 
-        set_dragger_locations(selected_file.image_id);
+        set_dragger_locations(store.getState().selectedImage.id);
 
       });
   };
@@ -1479,7 +1318,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       this.image_id = event.target.getAttribute('id');
       this.image_element = event.target;
 
-      hide_draggers();
+      stateChange.hideDraggers();
 
       // retrieve original angle and scale
       this.angle = parseFloat(this.image_element.getAttribute('data-angle'));
@@ -1548,7 +1387,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
 // --Exit door.droppable, for preparing a dropped image to delete
 
-  $('#exit_door').droppable({
+  $('#n4').droppable({
     accept: '.wallPic',
     // activeClass: 'exit_active_class',
     hoverClass: 'exit_door_hover',
@@ -1562,26 +1401,23 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     },
     drop: function (event, ui) {
 //       console.log('Draggable wallPic dropped on exit door.');
+      var deleteTarget = ui.draggable[0];
 
-      // gather data
-      imageToDelete.image_id = ui.draggable.attr('id');
-      imageToDelete.imageFilename = ui.draggable.attr('title');
-      imageToDelete.src = ui.draggable.attr('src');
-      imageToDelete.width = ui.draggable.css('width');
-      imageToDelete.height = ui.draggable.css('height');
-      imageToDelete.zindex = ui.draggable.css('z-index');
+
+      store.dispatch(setDeleteTarget(deleteTarget));
+
 
       // hide original image
-      document.getElementById(imageToDelete.image_id).style.display = 'none';
+      deleteTarget.style.display = 'none';
 
       // hide draggers
-      hide_draggers();
+      stateChange.hideDraggers();
 
       // show delete_preview_container
-      state_change_to_delete();
+      stateChange.deletePreview();
 
       // send socket to hide on other clients
-      socket.emit('c-e:  hide_image', imageToDelete.image_id);
+      socket.emit('c-e:  hide_image', deleteTarget.id);
     }
   });
 
@@ -1709,10 +1545,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -1783,10 +1619,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -1829,10 +1665,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -1898,10 +1734,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -1946,10 +1782,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -1994,10 +1830,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -2042,10 +1878,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
       // prepare the socketdata
       this.socketdata = {};
       this.socketdata.image_id = this.image_id;
@@ -2095,10 +1931,10 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     scroll: false,
     start: function () {
       // hide other draggers
-      hide_other_draggers(this.getAttribute('id'));
+      stateChange.hideOtherDraggers(this.getAttribute('id'));
       // prepare dom elements for manipulation
-      this.image_id      = selected_file.image_id;
-      this.image_element = document.getElementById(selected_file.image_id);
+      this.image_id      = store.getState().selectedImage.id;
+      this.image_element = document.getElementById(store.getState().selectedImage.id);
 
       // prepare the socketdata
       this.socketdata = {};
@@ -2203,7 +2039,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     dragger_element.style.top     = dragger_location_top + 'px';
     dragger_element.style.display = 'block';
     // allow transitions
-    // setTimeout is needed because the dragger will otherwise transitioning from no selection to selection
+    // setTimeout is needed because the dragger will otherwise transition from no selection to selection
     setTimeout(function () {
       dragger_element.classList.add('dragger_transitions');
     }, 0);

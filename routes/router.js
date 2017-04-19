@@ -32,7 +32,7 @@ router.get('/', function (req, res) {
       // insta_step 5: Load the page with the instagram div open.
       // if the request contains the query parameter ?open_instagram_div (from i-gram auth)
       // set the open_instagram_div to true to pass to index.html
-      openInstagramDiv  : ("open_instagram_div" in req.query)
+      openInstagramDiv  : ('open_instagram_div' in req.query)
     });
   });
 });
@@ -80,7 +80,7 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
 // this route will clear the database and repopulate the database with a directory's contents
 router.get('/resetpage', function (req, res) {
   var i,
-  ImageDocuments = mongoose.model('images');
+      ImageDocuments = mongoose.model('images');
 
   // fs method to read a directory's filenames
   fs.readdir(config.staticImageDir, function (err, dirFilenames) {
