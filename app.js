@@ -18,8 +18,8 @@ var config = require('./config/config'),
     express = require('express'),
     app = express(),
 
-    // MongoDB; function to connect to database, create models
-    dbInit = require('./db/db-init'),
+    // MongoDB; functions to connect to database, create models
+    db = require('./db/db'),
 
     // instagram authorization middleware
     instaAuth = require('./i-gram/auth/instagram_auth.js'),
@@ -35,7 +35,7 @@ var config = require('./config/config'),
     hbHelpers = require('./views/helpers'),
 
     // express router
-    routes = require('./routes'),
+    router = require('./routes/router'),
 
     // utility modules
     path = require('path'),
@@ -59,7 +59,7 @@ app.set('view engine', 'handlebars');
 app.use(express.static(path.join(__dirname, 'public')));
 
 // set up database
-dbInit();
+db.init();
 
 // --Initialize server
 server = app.listen(port, function () {
@@ -83,6 +83,6 @@ if (config.useIGram) {
   app.use(instaAuth);
 };
 
-app.use('/', routes);
+app.use('/', router);
 
 module.exports = app;
