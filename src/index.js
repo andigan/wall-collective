@@ -18,38 +18,36 @@
 // Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
 
 import config from './config';
-import debug from './debug/debug';
-import configureStore from './store/configureStore';
+
+import configureStore from './_init/configureStore';
+const store = configureStore();
+
+
+import pageSettings from './_init/pageSettings';
 import stateChange from './views/state-change';
 import buttons from './components/buttons';
 
 // dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
 import { setDeleteTarget } from './actions';
-
-// dispatched when an image is clicked or dragged
+// dispatched when an image is clicked or dragged; used by draggers
 import { setSelectedImage } from './actions';
-const store = configureStore();
 
-// debug tools
+// DEBUG
+import debug from './debug/debug'; // DEBUG
 if (config.debugOn) debug.init(store);
 
+
+
 buttons.init();
+pageSettings.init();
+
+
+
+
+
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
-
-    // retrieve dragger size
-    dragger_width = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width),
-    dragger_height = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).height),
-
-    // retrieve window size; calculate inner_box size
-    mainwide     = window.innerWidth,
-    mainhigh     = window.innerHeight,
-    inner_width  = mainwide - dragger_width,
-    inner_height = mainhigh - dragger_height,
-
-    // assigned when an image is clicked or dragged; used by draggers
-    selected_file = {},
 
     // assigned by initial socket; used by upload counter
     sessionID = String,
@@ -79,52 +77,32 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
 
 
-  // set wrapper size; (css vh and vw were not working with mobile safari)
-  document.getElementById('wrapper').style.width = window.innerWidth + 'px';
-  document.getElementById('wrapper').style.height = window.innerHeight + 'px';
+var insta = {
+  init: function () {
+    // set insta_divs height
+    document.getElementById('insta_div').style.height = (window.innerHeight) + 'px';
+    document.getElementById('insta_image_container').style.height = (window.innerHeight * 0.8) + 'px';
+    document.getElementById('insta_image_container').style.top = (window.innerHeight * 0.1) + 'px';
+    document.getElementById('insta_header').style.height = (window.innerHeight * 0.07) + 'px';
+    document.getElementById('background_opacity_trick').style.height = (window.innerHeight * 0.8) + 'px';
+    document.getElementById('background_opacity_trick').style.top = (window.innerHeight * 0.1) + 'px';
+  }
 
-  // set app_info height
-  document.getElementById('app_info').style.height = (window.innerHeight * 0.9) + 'px';
 
-  // set explore_container height
-  document.getElementById('explore_container').style.height = (window.innerHeight * 0.9) + 'px';
+};
 
-
-  // set insta_divs height
-  document.getElementById('insta_div').style.height = (window.innerHeight) + 'px';
-  document.getElementById('insta_image_container').style.height = (window.innerHeight * 0.8) + 'px';
-  document.getElementById('insta_image_container').style.top = (window.innerHeight * 0.1) + 'px';
-  document.getElementById('insta_header').style.height = (window.innerHeight * 0.07) + 'px';
-  document.getElementById('background_opacity_trick').style.height = (window.innerHeight * 0.8) + 'px';
-  document.getElementById('background_opacity_trick').style.top = (window.innerHeight * 0.1) + 'px';
+insta.init();
 
 
 
-  // set position and size of the close_info container divs
-  document.getElementById('close_info_container').style.width = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
-  document.getElementById('close_info_container').style.height = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
-  document.getElementById('close_info_container').style.top = (mainhigh * 0.05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_info_container').style.height)) + 'px';
-
-  // set position and size of the x_icon container divs
-  document.getElementById('close_explore_container').style.width = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
-  document.getElementById('close_explore_container').style.height = (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1) + 'px';
-  document.getElementById('close_explore_container').style.top = (mainhigh * 0.05) + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_explore_container').style.height)) + 'px';
 
 
-  // add perspective to 3d transforms
-  document.getElementById('images').style.width = window.innerWidth + 'px';
-  document.getElementById('images').style.height = window.innerHeight + 'px';
-  document.getElementById('images').style.webkitPerspective = '500px';
-  document.getElementById('images').style.webkitPerspectiveOriginX = '50%';
-  document.getElementById('images').style.webkitPerspectiveOriginY = '50%';
-
-  // position the navigation_toggle_button_container on the bottom on startup.
-//  document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
-  document.getElementById('navigation_toggle_button_container').style.left = (mainwide - $('#navigation_toggle_button_container').width()) + 'px';
 
 
-  // assign draggable to all .wallPic elements
-  assigndrag();
+
+
+// assign draggable to all .wallPic elements
+assigndrag();
 
 
   // insta_step 6: Open the instagram_div and fetch instagram data
@@ -153,14 +131,6 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   $('#wrapper').on('click touchstart', function (event) {
     var dragger_elements = {};
 
-    // DEBUG:
-    // uncomment to log whichever element is clicked on
-    // console.log(event.target.getAttribute('id'));
-    // uncomment to log all the elements below the click
-    // console.log(document.querySelectorAll( ":hover" ));
-    // uncomment to log whichever elements are clicked on. ONLY WORKS WITH CHROME
-    // console.log(document.elementsFromPoint(event.pageX, event.pageY));
-
     // if the images div alone is clicked...
     if (event.target.getAttribute('id') === 'images') {
       dragger_elements = document.getElementsByClassName('dragger');
@@ -171,30 +141,16 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     }; // end of if
   }); // end of document.on.click
 
-  // listen for resize and orientation changes and make adjustments
-  window.addEventListener('resize', function () {
-    mainwide = window.innerWidth;
-    mainhigh = window.innerHeight;
-    inner_width  = mainwide - dragger_width;
-    inner_height = mainhigh - dragger_height;
-    // set wrapper size
-    document.getElementById('wrapper').style.width = window.innerWidth + 'px',
-    document.getElementById('wrapper').style.height = window.innerHeight + 'px',
-    // position the navigation_toggle_button_container on the bottom right on startup.
-    document.getElementById('navigation_toggle_button_container').style.top = (mainhigh - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).height) + 'px');
-    document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
-  }, false);
 
   // used by delete image button
   function clear_selected_file() {
-    console.log('hi');
-    store.getState().selectedImage.id        = '';
-    selected_file.imageFilename  = '';
-    selected_file.src             = '';
-    selected_file.width           = '';
-    selected_file.height          = '';
-    selected_file.transform       = '';
-    selected_file.zindex          = '';
+    store.getState().selectedImage.id = '';
+    // selected_file.imageFilename  = '';
+    // selected_file.src             = '';
+    // selected_file.width           = '';
+    // selected_file.height          = '';
+    // selected_file.transform       = '';
+    // selected_file.zindex          = '';
     store.dispatch(setSelectedImage(''));
   };
 
@@ -272,16 +228,16 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
       info_element = document.createElement('div');
 
     info_element.setAttribute('id', 'dragger_info');
-    info_element.style.left = ((dragger_width / 2) + 1) + 'px';
-    info_element.style.height = (dragger_height / 2) + 'px';
-    info_element.style.width = (mainwide - dragger_width - 2) + 'px';
+    info_element.style.left = ((pageSettings.draggerWidth / 2) + 1) + 'px';
+    info_element.style.height = (pageSettings.draggerHeight / 2) + 'px';
+    info_element.style.width = (pageSettings.mainWide - pageSettings.draggerWidth - 2) + 'px';
     // add 'info_element' to 'wrapper'
     wrapper_element.appendChild(info_element);
     // show grid lines
-    vline((mainwide - (dragger_width / 2))  + 'px', 'red'   , 'inner_right');
-    vline((dragger_width / 2)               + 'px', 'blue'  , 'inner_left');
-    hline((mainhigh - (dragger_height / 2)) + 'px', 'purple', 'inner_bottom');
-    hline((dragger_height / 2)              + 'px', 'yellow', 'inner_top');
+    vline((pageSettings.mainWide - (pageSettings.draggerWidth / 2))  + 'px', 'red'   , 'inner_right');
+    vline((pageSettings.draggerWidth / 2)               + 'px', 'blue'  , 'inner_left');
+    hline((pageSettings.mainHigh - (pageSettings.draggerHeight / 2)) + 'px', 'purple', 'inner_bottom');
+    hline((pageSettings.draggerHeight / 2)              + 'px', 'yellow', 'inner_top');
   }; // end of make_grid
 
   function remove_grid() {
@@ -583,8 +539,8 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     accept: '.insta_image',
     drop: function (event, ui) {
       var clone = {},
-        instaDropData = {},
-        timeout_counter = 0;
+          instaDropData = {},
+          timeout_counter = 0;
 
         // clone is a jQuery method.  false specifies that event handlers should not be copied.
         // create a clone of the ui.draggable within the images div
@@ -705,17 +661,9 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
 
 // --Buttons
-//     IMPORTANT: Delegated vs. Direct binding
-//     Example:  $('#id').on('click', function() { console.log('hi')};
-//     This is a direct binding, which means new elements added to the DOM won't work.
-//     Instead, use a delegated binding:
-//     Example:  $( document ).on('click', '.upload', function(){
-//     IMPORTANT: I've changed my mind.
-//     Delegated binding seems to cost more resources in the number of compares to process.
-//     Go with direct binding.
 
-  // main navigation toggle button
-  $('#navigation_toggle_button').on( 'click', function () {
+
+  document.getElementById('navigation_toggle_button').onclick = function () {
     var button_element = document.getElementById('navigation_toggle_button');
 
     // if the button is being dragged, don't use the click.  FUTURE WORK: stop event propagation
@@ -744,7 +692,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
         stateChange.hideDraggers();
       };
     };
-  });
+  };
 
 
   //
@@ -753,7 +701,7 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
   // </div>
 
 
-var exitDoor = require('./exit-door');
+//var exitDoor = require('./exit-door');
 
 
   // dragger_all_switch; used to toggle all dragger switches
@@ -1440,8 +1388,11 @@ var exitDoor = require('./exit-door');
       this.wide = $(this).width();
 
       // get values of top and left for bottom and right placements
-      this.top_when_on_bottom_num = (mainhigh - this.high);
-      this.left_when_on_right_num = (mainwide - this.wide);
+      this.top_when_on_bottom_num = (pageSettings.mainHigh - this.high);
+      this.left_when_on_right_num = (pageSettings.mainWide - this.wide);
+      console.log(this.left_when_on_right_num);
+      console.log(pageSettings.mainWide);
+
       this.top_when_on_bottom_px = this.top_when_on_bottom_num.toString().concat('px');
       this.left_when_on_right_px = this.left_when_on_right_num.toString().concat('px');
       this.commit_distance = 5;
@@ -1571,11 +1522,12 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
-      this.percentage_high = (inner_height - ui.position.top) / inner_height;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
+      this.percentage_high = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // calculate changes: define the selected_image's new width/height/left/right in relation to the window size
-      this.new_width  = this.percentage_wide * mainwide;
-      this.new_height = this.percentage_high * mainhigh;
+
+      this.new_width  = this.percentage_wide * pageSettings.mainWide;
+      this.new_height = this.percentage_high * pageSettings.mainHigh;
       this.new_left   = this.image_original_left + (this.image_original_width  - this.new_width)  / 2;
       this.new_top    = this.image_original_top  + (this.image_original_height - this.new_height) / 2;
       // display the percentages in the dragger_info div
@@ -1636,7 +1588,7 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
       // display the percentages in the dragger_info div
       this.dragger_info.textContent = 'opacity:' + (this.percentage_wide * 100).toFixed(0) +  '%';
       // make the calculated changes
@@ -1686,8 +1638,8 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // calculate changes: define the selected_image's new rotation in relation to the percentage of inner window size
-      this.new_rotation = Math.round(ui.position.left / inner_width * 100) * 3.6;
-      this.new_rotateZ = Math.round(ui.position.top / inner_height * 100) * 3.6;
+      this.new_rotation = Math.round(ui.position.left / pageSettings.innerWidth * 100) * 3.6;
+      this.new_rotateZ = Math.round(ui.position.top / pageSettings.innerHeight * 100) * 3.6;
 
       // display the percentages in the dragger_info div
       this.dragger_info.textContent = 'rotation: ' + this.new_rotation.toFixed(2) + 'deg   rotateZ: ' + this.new_rotateZ.toFixed(2) + 'deg';
@@ -1751,8 +1703,8 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
-      this.percentage_high = (inner_height - ui.position.top) / inner_height;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
+      this.percentage_high = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // display the percentages in the dragger_info div
       this.dragger_info.textContent = 'grayscale: ' + (this.percentage_high * 100).toFixed(0) + '% invert:' + (this.percentage_wide * 100).toFixed(0) + '%';
       // make the calculated changes and use regex to replace
@@ -1799,8 +1751,8 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
-      this.percentage_high = (inner_height - ui.position.top) / inner_height;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
+      this.percentage_high = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // display the percentages in the dragger_info div
       this.dragger_info.textContent = 'blur:' + ((1 - this.percentage_high) * config.blurLevel).toFixed(2) + 'px brightness: ' + (this.percentage_wide * config.brightnessLevel).toFixed(2);
       // make the calculated changes
@@ -1847,8 +1799,8 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
-      this.percentage_high = (inner_height - ui.position.top) / inner_height;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
+      this.percentage_high = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // display the percentages in the dragger_info div
       this.dragger_info.textContent = 'contrast:' + ((1 - this.percentage_high) * config.contrastLevel).toFixed(2) +  ' saturate: ' + (this.percentage_wide * config.saturateLevel).toFixed(2);
       // make the calculated changes
@@ -1893,8 +1845,8 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
-      this.percentage_high = (inner_height - ui.position.top) / inner_height;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
+      this.percentage_high = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // calculate changes
       this.new_opacity = this.percentage_wide;
       this.new_hue_rotate = Math.round(this.percentage_high * 100) * 3.6;
@@ -1947,8 +1899,8 @@ var exitDoor = require('./exit-door');
     },
     drag: function (event, ui) {
       // dynamic percentage defined by the dragger in relation to the inner window
-      this.percentage_wide = ui.position.left / inner_width;
-      this.percentage_high = (inner_height - ui.position.top) / inner_height;
+      this.percentage_wide = ui.position.left / pageSettings.innerWidth;
+      this.percentage_high = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // calculate changes
       this.new_rotate_x = (Math.round(this.percentage_high * 100) * 3.6) - 180;
       this.new_rotate_y = (Math.round(this.percentage_wide * 100) * 3.6) - 180;
@@ -2029,10 +1981,10 @@ var exitDoor = require('./exit-door');
         selected_imageWidth  = parseInt(image_element.style.width),
         selected_imageHeight = parseInt(image_element.style.height),
         // calculate the dragger location
-        selected_imageWidth_percentage  = selected_imageWidth / mainwide,
-        selected_imageHeight_percentage = selected_imageHeight / mainhigh,
-        dragger_location_left            = selected_imageWidth_percentage * inner_width,
-        dragger_location_top             = (1 - selected_imageHeight_percentage) * inner_height;
+        selected_imageWidth_percentage  = selected_imageWidth / pageSettings.mainWide,
+        selected_imageHeight_percentage = selected_imageHeight / pageSettings.mainHigh,
+        dragger_location_left            = selected_imageWidth_percentage * innerWidth,
+        dragger_location_top             = (1 - selected_imageHeight_percentage) * pageSettings.innerHeight;
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2051,11 +2003,11 @@ var exitDoor = require('./exit-door');
         // get the opacity percentage: 0-1
         selected_image_opacity = parseInt( image_element.style.opacity * 100) / 100,
         // calculate the dragger location
-        dragger_location_left = (selected_image_opacity * inner_width);
+        dragger_location_left = (selected_image_opacity * pageSettings.innerWidth);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
-    dragger_element.style.top     = (inner_height / 3 * 2) + 'px';
+    dragger_element.style.top     = (pageSettings.innerHeight / 3 * 2) + 'px';
     dragger_element.style.display = 'block';
     // allow transitions
     setTimeout(function () {
@@ -2067,8 +2019,8 @@ var exitDoor = require('./exit-door');
     var dragger_element = document.getElementById('rotation_dragger'),
       image_element = document.getElementById(id),
       // calculate the dragger location
-      dragger_location_left = parseFloat(image_element.getAttribute('data-angle') / 360 * inner_width),
-      dragger_location_top = parseFloat(image_element.getAttribute('data-rotateZ') / 360 * inner_height);
+      dragger_location_left = parseFloat(image_element.getAttribute('data-angle') / 360 * pageSettings.innerWidth),
+      dragger_location_top = parseFloat(image_element.getAttribute('data-rotateZ') / 360 * pageSettings.innerHeight);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2091,8 +2043,8 @@ var exitDoor = require('./exit-door');
         grayscale_matches = grayscale_Exp.exec(selected_image_filter),
         invert_matches    = invert_Exp.exec(selected_image_filter),
         // calculate the dragger location
-        dragger_location_top = ((1 - parseFloat(grayscale_matches[1])) * inner_height),
-        dragger_location_left = (parseFloat(invert_matches[1]) * inner_width);
+        dragger_location_top = ((1 - parseFloat(grayscale_matches[1])) * pageSettings.innerHeight),
+        dragger_location_left = (parseFloat(invert_matches[1]) * pageSettings.innerWidth);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2115,8 +2067,8 @@ var exitDoor = require('./exit-door');
         blur_matches = blur_Exp.exec(selected_image_filter),
         brightness_matches    = brightness_Exp.exec(selected_image_filter),
         // calculate the dragger location
-        dragger_location_top = (parseFloat(blur_matches[1]) * inner_height / config.blurLevel),
-        dragger_location_left = (parseFloat(brightness_matches[1]) * inner_width / config.brightnessLevel);
+        dragger_location_top = (parseFloat(blur_matches[1]) * pageSettings.innerHeight / config.blurLevel),
+        dragger_location_left = (parseFloat(brightness_matches[1]) * pageSettings.innerWidth / config.brightnessLevel);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2139,8 +2091,8 @@ var exitDoor = require('./exit-door');
         contrast_matches = contrast_Exp.exec(selected_image_filter),
         saturate_matches = saturate_Exp.exec(selected_image_filter),
         // calculate the dragger location
-        dragger_location_top = (parseFloat(contrast_matches[1]) * inner_height / config.contrastLevel),
-        dragger_location_left = (parseFloat(saturate_matches[1]) * inner_width / config.saturateLevel);
+        dragger_location_top = (parseFloat(contrast_matches[1]) * pageSettings.innerHeight / config.contrastLevel),
+        dragger_location_left = (parseFloat(saturate_matches[1]) * pageSettings.innerWidth / config.saturateLevel);
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2163,8 +2115,8 @@ var exitDoor = require('./exit-door');
         hue_rotate_Exp = /hue-rotate\(([^)]+)\)/,
         hue_rotate_matches = hue_rotate_Exp.exec(selected_image_filter),
         // calculate the dragger location
-        dragger_location_left = (selected_image_opacity * inner_width),
-        dragger_location_top = (inner_height - (parseFloat(hue_rotate_matches[1]) / 360 * inner_height));
+        dragger_location_left = (selected_image_opacity * pageSettings.innerWidth),
+        dragger_location_top = (pageSettings.innerHeight - (parseFloat(hue_rotate_matches[1]) / 360 * pageSettings.innerHeight));
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';
@@ -2180,8 +2132,8 @@ var exitDoor = require('./exit-door');
     var dragger_element = document.getElementById('threeD_dragger'),
       image_element = document.getElementById(id),
       // calculate the dragger location
-      dragger_location_top = inner_height - ((( 180 + parseFloat(image_element.getAttribute('data-rotateX')) ) / 360) * inner_height),
-      dragger_location_left = (( 180 + parseFloat(image_element.getAttribute('data-rotateY')) ) / 360) * inner_width;
+      dragger_location_top = pageSettings.innerHeight - ((( 180 + parseFloat(image_element.getAttribute('data-rotateX')) ) / 360) * pageSettings.innerHeight),
+      dragger_location_left = (( 180 + parseFloat(image_element.getAttribute('data-rotateY')) ) / 360) * pageSettings.innerWidth;
 
     // set the dragger location
     dragger_element.style.left    = dragger_location_left + 'px';

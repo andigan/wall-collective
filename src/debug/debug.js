@@ -1,8 +1,9 @@
 import helpers from '../helpers';
+
 module.exports = {
 
   init: function (store) {
-    helpers.clickme('navigation_toggle_button', 0);
+    helpers.clickme('navigation_toggle_button', 50);
     // helpers.clickme('debug-button', 0);
     // helpers.clickme('dragger_switches_button', 1000);
     // helpers.clickme('explore_button', 0);
@@ -12,8 +13,18 @@ module.exports = {
     this.createDebugDiv();
     this.setListeners();
 
-    document.addEventListener('click', function () {
+    // console log store
+    document.addEventListener('click touchstart', function () {
       console.log(store.getState());
+
+      // uncomment to log whichever element is clicked on
+      // console.log(event.target.getAttribute('id'));
+
+      // uncomment to log all the elements below the click
+      // console.log(document.querySelectorAll( ":hover" ));
+
+      // uncomment to log whichever elements are clicked on. ONLY WORKS WITH CHROME
+      // console.log(document.elementsFromPoint(event.pageX, event.pageY));
     });
 
   },

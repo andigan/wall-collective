@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 16);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,37 +73,1156 @@
 "use strict";
 
 
-var _config = __webpack_require__(9);
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.setDeleteTarget = setDeleteTarget;
+exports.setSelectedImage = setSelectedImage;
+function setDeleteTarget(deleteTarget) {
 
-var _config2 = _interopRequireDefault(_config);
+  return {
+    type: 'SET_DELETE_TARGET',
+    payload: deleteTarget
+  };
+}
 
-var _debug = __webpack_require__(10);
+function setSelectedImage(id) {
+  console.log('fired');
+  console.log(id);
 
-var _debug2 = _interopRequireDefault(_debug);
+  return {
+    type: "SET_SELECTED_IMAGE",
+    payload: id
+  };
+}
 
-var _configureStore = __webpack_require__(12);
+/***/ }),
+/* 1 */
+/***/ (function(module, exports, __webpack_require__) {
 
-var _configureStore2 = _interopRequireDefault(_configureStore);
+"use strict";
 
-var _stateChange = __webpack_require__(37);
+
+module.exports = {
+  hideDraggers: function hideDraggers() {
+    Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
+      this.hideElement(dragger);
+    }.bind(this));
+  },
+  hideOtherDraggers: function hideOtherDraggers(id) {
+    Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
+      if (dragger.id !== id) {
+        this.hideElement(dragger);
+      };
+    }.bind(this));
+  },
+  hideID: function hideID(id) {
+    document.getElementById(id).style.display = 'none';
+  },
+  hideElement: function hideElement(element) {
+    element.style.display = 'none';
+  },
+  showID: function showID(id) {
+    document.getElementById(id).style.display = 'block';
+  },
+  deletePreview: function deletePreview() {
+    var deleteTarget = window.store.getState().deleteTarget;
+
+    // show
+    document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
+    document.getElementById('delete_preview').src = deleteTarget.element.src;
+
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  openTools: function openTools() {
+    // show
+    document.getElementById('tools_container').classList.add('tools_container_is_open');
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+  },
+  openAccount: function openAccount() {
+    // show
+    document.getElementById('login_container').classList.add('login_container_is_open');
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  openUpload: function openUpload() {
+    // show
+    document.getElementById('upload_container').classList.add('upload_container_is_open');
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  uploadPreview: function uploadPreview() {
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+  },
+  afterUpload: function afterUpload() {
+    // show element
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    // hide elements
+    document.getElementById('upload_container').classList.remove('upload_container_is_open');
+    this.hideID('upload_preview_container');
+    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    document.getElementById('confirm_or_reject_container_info').textContent = '';
+    // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
+    // to visible after the transition effect takes place
+    setTimeout(function () {
+      this.showID('upload_preview_container');
+      document.getElementById('confirm_or_reject_container').style.display = 'flex';
+    }, 500);
+    // replace image_upload_preview image
+    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
+  },
+  afterDelete: function afterDelete() {
+    // show element
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    // hide elements
+    document.getElementById('delete_preview_container').style.display = 'none';
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    this.hideDraggers();
+    // This setTimeout is so that the delete_preview_container disappears immediately, and then resets
+    // to visible after the transition effect takes place
+    setTimeout(function () {
+      document.getElementById('delete_preview_container').style.display = 'block';
+    }, 500);
+    // replace delete_preview
+    document.getElementById('delete_preview').src = '/icons/1x1.png';
+  },
+  rejectDelete: function rejectDelete() {
+    var deleteTarget = window.store.getState().deleteTarget;
+
+    // show element
+    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    // hide elements
+    document.getElementById('delete_preview_container').style.display = 'none';
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    setTimeout(function () {
+      document.getElementById('delete_preview_container').style.display = 'block';
+    }, 500);
+    // reshow hidden image that wasn't deleted
+    deleteTarget.element.style.display = 'initial';
+
+    // show image on other clients
+    window.socket.emit('c-e:  show_image', deleteTarget.id);
+  },
+  closeAll: function closeAll() {
+    // hide
+    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
+    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+    document.getElementById('tools_container').classList.remove('tools_container_is_open');
+    document.getElementById('login_container').classList.remove('login_container_is_open');
+    document.getElementById('upload_container').classList.remove('upload_container_is_open');
+    document.getElementById('connect_info').classList.remove('connect_info_is_open');
+    document.getElementById('explore_container').style.display = 'none';
+    document.getElementById('insta_header').style.display = 'none';
+    document.getElementById('insta_div').style.display = 'none';
+
+    // replace image_upload_preview image and delete_preview image
+    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
+    document.getElementById('delete_preview').src = '/icons/1x1.png';
+    // close navigation button
+    document.body.classList.remove('button_container_is_open');
+    // animate close hamburgers
+    document.getElementById('line_one').style.top = '40%';
+    document.getElementById('line_three').style.top = '60%';
+  }
+};
+
+/***/ }),
+/* 2 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__root_js__ = __webpack_require__(26);
+
+
+/** Built-in value references. */
+var Symbol = __WEBPACK_IMPORTED_MODULE_0__root_js__["a" /* default */].Symbol;
+
+/* harmony default export */ __webpack_exports__["a"] = (Symbol);
+
+
+/***/ }),
+/* 3 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__baseGetTag_js__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getPrototype_js__ = __webpack_require__(22);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__isObjectLike_js__ = __webpack_require__(27);
+
+
+
+
+/** `Object#toString` result references. */
+var objectTag = '[object Object]';
+
+/** Used for built-in method references. */
+var funcProto = Function.prototype,
+    objectProto = Object.prototype;
+
+/** Used to resolve the decompiled source of functions. */
+var funcToString = funcProto.toString;
+
+/** Used to check objects for own properties. */
+var hasOwnProperty = objectProto.hasOwnProperty;
+
+/** Used to infer the `Object` constructor. */
+var objectCtorString = funcToString.call(Object);
+
+/**
+ * Checks if `value` is a plain object, that is, an object created by the
+ * `Object` constructor or one with a `[[Prototype]]` of `null`.
+ *
+ * @static
+ * @memberOf _
+ * @since 0.8.0
+ * @category Lang
+ * @param {*} value The value to check.
+ * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
+ * @example
+ *
+ * function Foo() {
+ *   this.a = 1;
+ * }
+ *
+ * _.isPlainObject(new Foo);
+ * // => false
+ *
+ * _.isPlainObject([1, 2, 3]);
+ * // => false
+ *
+ * _.isPlainObject({ 'x': 0, 'y': 0 });
+ * // => true
+ *
+ * _.isPlainObject(Object.create(null));
+ * // => true
+ */
+function isPlainObject(value) {
+  if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__isObjectLike_js__["a" /* default */])(value) || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__baseGetTag_js__["a" /* default */])(value) != objectTag) {
+    return false;
+  }
+  var proto = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__getPrototype_js__["a" /* default */])(value);
+  if (proto === null) {
+    return true;
+  }
+  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
+  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
+    funcToString.call(Ctor) == objectCtorString;
+}
+
+/* harmony default export */ __webpack_exports__["a"] = (isPlainObject);
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports) {
+
+// shim for using process in browser
+var process = module.exports = {};
+
+// cached from whatever global is present so that test runners that stub it
+// don't break things.  But we need to wrap it in a try catch in case it is
+// wrapped in strict mode code which doesn't define any globals.  It's inside a
+// function because try/catches deoptimize in certain engines.
+
+var cachedSetTimeout;
+var cachedClearTimeout;
+
+function defaultSetTimout() {
+    throw new Error('setTimeout has not been defined');
+}
+function defaultClearTimeout () {
+    throw new Error('clearTimeout has not been defined');
+}
+(function () {
+    try {
+        if (typeof setTimeout === 'function') {
+            cachedSetTimeout = setTimeout;
+        } else {
+            cachedSetTimeout = defaultSetTimout;
+        }
+    } catch (e) {
+        cachedSetTimeout = defaultSetTimout;
+    }
+    try {
+        if (typeof clearTimeout === 'function') {
+            cachedClearTimeout = clearTimeout;
+        } else {
+            cachedClearTimeout = defaultClearTimeout;
+        }
+    } catch (e) {
+        cachedClearTimeout = defaultClearTimeout;
+    }
+} ())
+function runTimeout(fun) {
+    if (cachedSetTimeout === setTimeout) {
+        //normal enviroments in sane situations
+        return setTimeout(fun, 0);
+    }
+    // if setTimeout wasn't available but was latter defined
+    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
+        cachedSetTimeout = setTimeout;
+        return setTimeout(fun, 0);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedSetTimeout(fun, 0);
+    } catch(e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
+            return cachedSetTimeout.call(null, fun, 0);
+        } catch(e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
+            return cachedSetTimeout.call(this, fun, 0);
+        }
+    }
+
+
+}
+function runClearTimeout(marker) {
+    if (cachedClearTimeout === clearTimeout) {
+        //normal enviroments in sane situations
+        return clearTimeout(marker);
+    }
+    // if clearTimeout wasn't available but was latter defined
+    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
+        cachedClearTimeout = clearTimeout;
+        return clearTimeout(marker);
+    }
+    try {
+        // when when somebody has screwed with setTimeout but no I.E. maddness
+        return cachedClearTimeout(marker);
+    } catch (e){
+        try {
+            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
+            return cachedClearTimeout.call(null, marker);
+        } catch (e){
+            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
+            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
+            return cachedClearTimeout.call(this, marker);
+        }
+    }
+
+
+
+}
+var queue = [];
+var draining = false;
+var currentQueue;
+var queueIndex = -1;
+
+function cleanUpNextTick() {
+    if (!draining || !currentQueue) {
+        return;
+    }
+    draining = false;
+    if (currentQueue.length) {
+        queue = currentQueue.concat(queue);
+    } else {
+        queueIndex = -1;
+    }
+    if (queue.length) {
+        drainQueue();
+    }
+}
+
+function drainQueue() {
+    if (draining) {
+        return;
+    }
+    var timeout = runTimeout(cleanUpNextTick);
+    draining = true;
+
+    var len = queue.length;
+    while(len) {
+        currentQueue = queue;
+        queue = [];
+        while (++queueIndex < len) {
+            if (currentQueue) {
+                currentQueue[queueIndex].run();
+            }
+        }
+        queueIndex = -1;
+        len = queue.length;
+    }
+    currentQueue = null;
+    draining = false;
+    runClearTimeout(timeout);
+}
+
+process.nextTick = function (fun) {
+    var args = new Array(arguments.length - 1);
+    if (arguments.length > 1) {
+        for (var i = 1; i < arguments.length; i++) {
+            args[i - 1] = arguments[i];
+        }
+    }
+    queue.push(new Item(fun, args));
+    if (queue.length === 1 && !draining) {
+        runTimeout(drainQueue);
+    }
+};
+
+// v8 likes predictible objects
+function Item(fun, array) {
+    this.fun = fun;
+    this.array = array;
+}
+Item.prototype.run = function () {
+    this.fun.apply(null, this.array);
+};
+process.title = 'browser';
+process.browser = true;
+process.env = {};
+process.argv = [];
+process.version = ''; // empty string to avoid regexp issues
+process.versions = {};
+
+function noop() {}
+
+process.on = noop;
+process.addListener = noop;
+process.once = noop;
+process.off = noop;
+process.removeListener = noop;
+process.removeAllListeners = noop;
+process.emit = noop;
+
+process.binding = function (name) {
+    throw new Error('process.binding is not supported');
+};
+
+process.cwd = function () { return '/' };
+process.chdir = function (dir) {
+    throw new Error('process.chdir is not supported');
+};
+process.umask = function() { return 0; };
+
+
+/***/ }),
+/* 5 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = compose;
+/**
+ * Composes single-argument functions from right to left. The rightmost
+ * function can take multiple arguments as it provides the signature for
+ * the resulting composite function.
+ *
+ * @param {...Function} funcs The functions to compose.
+ * @returns {Function} A function obtained by composing the argument functions
+ * from right to left. For example, compose(f, g, h) is identical to doing
+ * (...args) => f(g(h(...args))).
+ */
+
+function compose() {
+  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
+    funcs[_key] = arguments[_key];
+  }
+
+  if (funcs.length === 0) {
+    return function (arg) {
+      return arg;
+    };
+  }
+
+  if (funcs.length === 1) {
+    return funcs[0];
+  }
+
+  var last = funcs[funcs.length - 1];
+  var rest = funcs.slice(0, -1);
+  return function () {
+    return rest.reduceRight(function (composed, f) {
+      return f(composed);
+    }, last.apply(undefined, arguments));
+  };
+}
+
+/***/ }),
+/* 6 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable__ = __webpack_require__(31);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_symbol_observable__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ActionTypes; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = createStore;
+
+
+
+/**
+ * These are private action types reserved by Redux.
+ * For any unknown actions, you must return the current state.
+ * If the current state is undefined, you must return the initial state.
+ * Do not reference these action types directly in your code.
+ */
+var ActionTypes = {
+  INIT: '@@redux/INIT'
+};
+
+/**
+ * Creates a Redux store that holds the state tree.
+ * The only way to change the data in the store is to call `dispatch()` on it.
+ *
+ * There should only be a single store in your app. To specify how different
+ * parts of the state tree respond to actions, you may combine several reducers
+ * into a single reducer function by using `combineReducers`.
+ *
+ * @param {Function} reducer A function that returns the next state tree, given
+ * the current state tree and the action to handle.
+ *
+ * @param {any} [preloadedState] The initial state. You may optionally specify it
+ * to hydrate the state from the server in universal apps, or to restore a
+ * previously serialized user session.
+ * If you use `combineReducers` to produce the root reducer function, this must be
+ * an object with the same shape as `combineReducers` keys.
+ *
+ * @param {Function} enhancer The store enhancer. You may optionally specify it
+ * to enhance the store with third-party capabilities such as middleware,
+ * time travel, persistence, etc. The only store enhancer that ships with Redux
+ * is `applyMiddleware()`.
+ *
+ * @returns {Store} A Redux store that lets you read the state, dispatch actions
+ * and subscribe to changes.
+ */
+function createStore(reducer, preloadedState, enhancer) {
+  var _ref2;
+
+  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
+    enhancer = preloadedState;
+    preloadedState = undefined;
+  }
+
+  if (typeof enhancer !== 'undefined') {
+    if (typeof enhancer !== 'function') {
+      throw new Error('Expected the enhancer to be a function.');
+    }
+
+    return enhancer(createStore)(reducer, preloadedState);
+  }
+
+  if (typeof reducer !== 'function') {
+    throw new Error('Expected the reducer to be a function.');
+  }
+
+  var currentReducer = reducer;
+  var currentState = preloadedState;
+  var currentListeners = [];
+  var nextListeners = currentListeners;
+  var isDispatching = false;
+
+  function ensureCanMutateNextListeners() {
+    if (nextListeners === currentListeners) {
+      nextListeners = currentListeners.slice();
+    }
+  }
+
+  /**
+   * Reads the state tree managed by the store.
+   *
+   * @returns {any} The current state tree of your application.
+   */
+  function getState() {
+    return currentState;
+  }
+
+  /**
+   * Adds a change listener. It will be called any time an action is dispatched,
+   * and some part of the state tree may potentially have changed. You may then
+   * call `getState()` to read the current state tree inside the callback.
+   *
+   * You may call `dispatch()` from a change listener, with the following
+   * caveats:
+   *
+   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
+   * If you subscribe or unsubscribe while the listeners are being invoked, this
+   * will not have any effect on the `dispatch()` that is currently in progress.
+   * However, the next `dispatch()` call, whether nested or not, will use a more
+   * recent snapshot of the subscription list.
+   *
+   * 2. The listener should not expect to see all state changes, as the state
+   * might have been updated multiple times during a nested `dispatch()` before
+   * the listener is called. It is, however, guaranteed that all subscribers
+   * registered before the `dispatch()` started will be called with the latest
+   * state by the time it exits.
+   *
+   * @param {Function} listener A callback to be invoked on every dispatch.
+   * @returns {Function} A function to remove this change listener.
+   */
+  function subscribe(listener) {
+    if (typeof listener !== 'function') {
+      throw new Error('Expected listener to be a function.');
+    }
+
+    var isSubscribed = true;
+
+    ensureCanMutateNextListeners();
+    nextListeners.push(listener);
+
+    return function unsubscribe() {
+      if (!isSubscribed) {
+        return;
+      }
+
+      isSubscribed = false;
+
+      ensureCanMutateNextListeners();
+      var index = nextListeners.indexOf(listener);
+      nextListeners.splice(index, 1);
+    };
+  }
+
+  /**
+   * Dispatches an action. It is the only way to trigger a state change.
+   *
+   * The `reducer` function, used to create the store, will be called with the
+   * current state tree and the given `action`. Its return value will
+   * be considered the **next** state of the tree, and the change listeners
+   * will be notified.
+   *
+   * The base implementation only supports plain object actions. If you want to
+   * dispatch a Promise, an Observable, a thunk, or something else, you need to
+   * wrap your store creating function into the corresponding middleware. For
+   * example, see the documentation for the `redux-thunk` package. Even the
+   * middleware will eventually dispatch plain object actions using this method.
+   *
+   * @param {Object} action A plain object representing “what changed”. It is
+   * a good idea to keep actions serializable so you can record and replay user
+   * sessions, or use the time travelling `redux-devtools`. An action must have
+   * a `type` property which may not be `undefined`. It is a good idea to use
+   * string constants for action types.
+   *
+   * @returns {Object} For convenience, the same action object you dispatched.
+   *
+   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
+   * return something else (for example, a Promise you can await).
+   */
+  function dispatch(action) {
+    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__["a" /* default */])(action)) {
+      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
+    }
+
+    if (typeof action.type === 'undefined') {
+      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
+    }
+
+    if (isDispatching) {
+      throw new Error('Reducers may not dispatch actions.');
+    }
+
+    try {
+      isDispatching = true;
+      currentState = currentReducer(currentState, action);
+    } finally {
+      isDispatching = false;
+    }
+
+    var listeners = currentListeners = nextListeners;
+    for (var i = 0; i < listeners.length; i++) {
+      listeners[i]();
+    }
+
+    return action;
+  }
+
+  /**
+   * Replaces the reducer currently used by the store to calculate the state.
+   *
+   * You might need this if your app implements code splitting and you want to
+   * load some of the reducers dynamically. You might also need this if you
+   * implement a hot reloading mechanism for Redux.
+   *
+   * @param {Function} nextReducer The reducer for the store to use instead.
+   * @returns {void}
+   */
+  function replaceReducer(nextReducer) {
+    if (typeof nextReducer !== 'function') {
+      throw new Error('Expected the nextReducer to be a function.');
+    }
+
+    currentReducer = nextReducer;
+    dispatch({ type: ActionTypes.INIT });
+  }
+
+  /**
+   * Interoperability point for observable/reactive libraries.
+   * @returns {observable} A minimal observable of state changes.
+   * For more information, see the observable proposal:
+   * https://github.com/zenparsing/es-observable
+   */
+  function observable() {
+    var _ref;
+
+    var outerSubscribe = subscribe;
+    return _ref = {
+      /**
+       * The minimal observable subscription method.
+       * @param {Object} observer Any object that can be used as an observer.
+       * The observer object should have a `next` method.
+       * @returns {subscription} An object with an `unsubscribe` method that can
+       * be used to unsubscribe the observable from the store, and prevent further
+       * emission of values from the observable.
+       */
+      subscribe: function subscribe(observer) {
+        if (typeof observer !== 'object') {
+          throw new TypeError('Expected the observer to be an object.');
+        }
+
+        function observeState() {
+          if (observer.next) {
+            observer.next(getState());
+          }
+        }
+
+        observeState();
+        var unsubscribe = outerSubscribe(observeState);
+        return { unsubscribe: unsubscribe };
+      }
+    }, _ref[__WEBPACK_IMPORTED_MODULE_1_symbol_observable___default.a] = function () {
+      return this;
+    }, _ref;
+  }
+
+  // When a store is created, an "INIT" action is dispatched so that every
+  // reducer returns their initial state. This effectively populates
+  // the initial state tree.
+  dispatch({ type: ActionTypes.INIT });
+
+  return _ref2 = {
+    dispatch: dispatch,
+    subscribe: subscribe,
+    getState: getState,
+    replaceReducer: replaceReducer
+  }, _ref2[__WEBPACK_IMPORTED_MODULE_1_symbol_observable___default.a] = observable, _ref2;
+}
+
+/***/ }),
+/* 7 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__combineReducers__ = __webpack_require__(30);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__ = __webpack_require__(29);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__ = __webpack_require__(28);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__compose__ = __webpack_require__(5);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_warning__ = __webpack_require__(8);
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createStore", function() { return __WEBPACK_IMPORTED_MODULE_0__createStore__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "combineReducers", function() { return __WEBPACK_IMPORTED_MODULE_1__combineReducers__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "bindActionCreators", function() { return __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "applyMiddleware", function() { return __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__["a"]; });
+/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "compose", function() { return __WEBPACK_IMPORTED_MODULE_4__compose__["a"]; });
+
+
+
+
+
+
+
+/*
+* This is a dummy function to check if the function name has been altered by minification.
+* If the function has been minified and NODE_ENV !== 'production', warn the user.
+*/
+function isCrushed() {}
+
+if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
+  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__utils_warning__["a" /* default */])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
+}
+
+
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(4)))
+
+/***/ }),
+/* 8 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+/* harmony export (immutable) */ __webpack_exports__["a"] = warning;
+/**
+ * Prints a warning in the console if it exists.
+ *
+ * @param {String} message The warning message.
+ * @returns {void}
+ */
+function warning(message) {
+  /* eslint-disable no-console */
+  if (typeof console !== 'undefined' && typeof console.error === 'function') {
+    console.error(message);
+  }
+  /* eslint-enable no-console */
+  try {
+    // This error was thrown as a convenience so that if you enable
+    // "break on all exceptions" in your console,
+    // it would pause the execution at this line.
+    throw new Error(message);
+    /* eslint-disable no-empty */
+  } catch (e) {}
+  /* eslint-enable no-empty */
+}
+
+/***/ }),
+/* 9 */
+/***/ (function(module, exports) {
+
+var g;
+
+// This works in non-strict mode
+g = (function() {
+	return this;
+})();
+
+try {
+	// This works if eval is allowed (see CSP)
+	g = g || Function("return this")() || (1,eval)("this");
+} catch(e) {
+	// This works if the window reference is available
+	if(typeof window === "object")
+		g = window;
+}
+
+// g can still be undefined, but nothing to do about it...
+// We return undefined, instead of nothing here, so it's
+// easier to handle this case. if(!global) { ...}
+
+module.exports = g;
+
+
+/***/ }),
+/* 10 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _stateChange = __webpack_require__(1);
 
 var _stateChange2 = _interopRequireDefault(_stateChange);
 
-var _buttons = __webpack_require__(39);
-
-var _buttons2 = _interopRequireDefault(_buttons);
-
-var _actions = __webpack_require__(32);
+var _actions = __webpack_require__(0);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-// dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
-var store = (0, _configureStore2.default)();
+module.exports = {
+  init: function init() {
+    this.buttons = [];
+    this.createButton('n1', 'open-account', 'account', '/icons/person_circle_icon.png');
+    this.createButton('n2', 'open-tools', 'tools', '/icons/tools_icon.png');
+    this.createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png');
+    this.createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png');
 
-// debug tools
+    this.addEvents();
+  },
+  createButton: function createButton(domLocation, action, text, iconPath) {
+    var targetDiv = document.getElementById(domLocation),
+        iconDiv = document.createElement('img');
+
+    targetDiv.classList.remove('button_no_show');
+    targetDiv.classList.add('button', 'navigation_button');
+    targetDiv.setAttribute('data-action', action);
+    targetDiv.innerText = text;
+    iconDiv.classList.add('icon_image');
+    iconDiv.src = iconPath;
+    targetDiv.appendChild(iconDiv);
+
+    this.buttons.push(targetDiv);
+  },
+  onClick: function onClick(e) {
+    console.log(e.currentTarget);
+    switch (e.currentTarget.getAttribute('data-action')) {
+      case 'open-tools':
+        _stateChange2.default.openTools();
+        // NOTES: this.store.dispatch(open-tools())
+        break;
+
+      case 'open-account':
+        _stateChange2.default.openAccount();
+        break;
+
+      case 'open-upload':
+        _stateChange2.default.openUpload();
+        break;
+      case 'exit-door':
+        // hide original image
+        _stateChange2.default.hideElement(selectedImage);
+        // hide draggers
+        _stateChange2.default.hideDraggers();
+        // show delete_preview_container
+        _stateChange2.default.deletePreview();
+        this.handleDelete();
+        break;
+      default:
+        break;
+    }
+  },
+  handleDelete: function handleDelete() {
+    var selectedImageID = window.store.getState().selectedImage.id,
+        selectedImage = document.getElementById(selectedImageID);
+
+    if (selectedImageID !== '') {
+      window.store.dispatch((0, _actions.setDeleteTarget)(selectedImage));
+
+      // send socket to hide on other clients
+      window.socket.emit('c-e:  hide_image', selectedImageID);
+    };
+  },
+  addEvents: function addEvents() {
+    var _this = this;
+
+    this.buttons.forEach(function (button) {
+      button.addEventListener('click', _this.onClick.bind(_this));
+    });
+  }
+};
+// import socketFile from '../socket-file';
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 
 
-// dispatched when an image is clicked or dragged
+module.exports = {
+  debugOn: true, // set debug div
+
+  // set upload placement
+  uploadTop: '0px',
+  uploadLeft: '0px',
+  uploadWidth: '75px',
+  uploadheight: '100px',
+
+  // set maximum limit for draggers
+  blurLevel: 7,
+  brightnessLevel: 8,
+  contrastLevel: 10,
+  saturateLevel: 10
+
+};
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _helpers = __webpack_require__(15);
+
+var _helpers2 = _interopRequireDefault(_helpers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+module.exports = {
+
+  init: function init(store) {
+    _helpers2.default.clickme('navigation_toggle_button', 50);
+    // helpers.clickme('debug-button', 0);
+    // helpers.clickme('dragger_switches_button', 1000);
+    // helpers.clickme('explore_button', 0);
+    // helpers.clickme('upload_container_button', 1000);
+
+    this.createDebugButton();
+    this.createDebugDiv();
+    this.setListeners();
+
+    // console log store
+    document.addEventListener('click touchstart', function () {
+      console.log(store.getState());
+
+      // uncomment to log whichever element is clicked on
+      // console.log(event.target.getAttribute('id'));
+
+      // uncomment to log all the elements below the click
+      // console.log(document.querySelectorAll( ":hover" ));
+
+      // uncomment to log whichever elements are clicked on. ONLY WORKS WITH CHROME
+      // console.log(document.elementsFromPoint(event.pageX, event.pageY));
+    });
+  },
+
+  createDebugButton: function createDebugButton() {
+    var debugButton = document.getElementById('debug-holder'),
+        debugIcon = document.createElement('img'),
+        debugText = document.createElement('span');
+
+    // create debug button
+    debugButton.setAttribute('id', 'debug-button');
+    debugButton.classList.add('button', 'tools_button');
+    debugButton.classList.remove('button_no_show');
+
+    debugText.textContent = 'report is off';
+    debugText.setAttribute('id', 'debug-text');
+
+    debugIcon.classList.add('icon_image');
+    debugIcon.src = '/icons/debug_icon.png';
+    debugButton.appendChild(debugText);
+    debugButton.appendChild(debugIcon);
+
+    // add button functionality
+    debugButton.addEventListener('click', function () {
+
+      if (this.classList.contains('debug-on')) {
+        this.classList.remove('debug-on');
+        document.getElementById('debug-container').style.display = 'none';
+        document.getElementById('debug-text').innerText = 'report is off';
+      } else {
+        this.classList.add('debug-on');
+        document.getElementById('debug-container').style.display = 'block';
+        document.getElementById('debug-text').innerText = 'report is on';
+      };
+    });
+  },
+
+  createDebugDiv: function createDebugDiv() {
+    var wrapperEl = document.getElementById('wrapper'),
+        debugEl = document.createElement('div'),
+        infoLineEl,
+        i,
+        that = this;
+
+    // create debug div
+    debugEl.setAttribute('id', 'debug-container');
+    debugEl.style.display = 'none';
+    for (i = 1; i <= 10; i++) {
+      infoLineEl = document.createElement('div');
+      infoLineEl.setAttribute('id', 'info' + i);
+      infoLineEl.classList.add('info');
+      debugEl.appendChild(infoLineEl);
+    };
+
+    wrapperEl.appendChild(debugEl);
+
+    // make debug-container draggable
+    $('#debug-container').draggable({
+      containment: 'parent',
+      start: function start() {
+        that.clearDebugInfo();
+        that.addDebugInfo([[1, 'this div width    : ' + $(this).css('width')], [2, 'wrapper width     : ' + document.getElementById('wrapper').style.width], [3, 'screen.width      : ' + screen.width.toString()], [4, 'window.innerWidth : ' + window.innerWidth.toString()], [5, 'screen.availWidth : ' + screen.availWidth.toString()]]);
+      },
+      drag: function drag() {
+        var debugEl = document.getElementById('debug-container'),
+            debugDivInfo = debugEl.getBoundingClientRect();
+
+        that.addDebugInfo([[6, ''], [7, this.style.left + ' <css> ' + $(this).css('right')], [8, debugDivInfo.left.toString() + ' <dom> ' + debugDivInfo.right.toString()]]);
+      }
+    });
+  },
+
+  setListeners: function setListeners() {
+    var that = this;
+
+    // resize window
+    window.addEventListener('resize', function () {
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'resize: new width  : ' + window.innerWidth + 'px'], [2, 'resize: new height : ' + window.innerHeight + 'px']]);
+    });
+
+    // click on image
+    document.getElementById('images').addEventListener('click', function (e) {
+      var clickedEl = e.target;
+
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'Filename: ' + clickedEl.getAttribute('title')], [2, 'Z-index: ' + clickedEl.style.zIndex], [3, 'Start: Left: ' + clickedEl.style.left + ' Top: ' + clickedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
+    });
+
+    // dragged images
+    $(document).on('dragstart', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.clearDebugInfo();
+      that.addDebugInfo([[1, 'Filename: ' + draggedEl.getAttribute('title')], [2, 'Z-index: ' + draggedEl.style.zIndex], [3, 'Start: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
+    });
+
+    $(document).on('drag', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.addDebugInfo([[4, 'Current: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
+    });
+
+    $(document).on('dragstop', '.wallPic', function (e) {
+      var draggedEl = e.target;
+
+      that.addDebugInfo([[5, 'Stop: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
+    });
+  },
+
+  // debugInfoText: a multidimensional array: [[1, string], [2, string]]
+  addDebugInfo: function addDebugInfo(debugInfoText) {
+    debugInfoText.forEach(function (item) {
+      document.getElementById('info' + item[0]).textContent = item[1];
+    });
+  },
+
+  clearDebugInfo: function clearDebugInfo() {
+    Array.from(document.getElementsByClassName('info')).forEach(function (element) {
+      element.textContent = '';
+    });
+  }
+};
+
+/***/ }),
+/* 13 */,
+/* 14 */,
+/* 15 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+
+  clickme: function clickme(id, time) {
+    setTimeout(function () {
+      document.getElementById(id).dispatchEvent(new Event('click'));
+    }, time);
+  }
+
+};
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+var _config = __webpack_require__(11);
+
+var _config2 = _interopRequireDefault(_config);
+
+var _configureStore = __webpack_require__(35);
+
+var _configureStore2 = _interopRequireDefault(_configureStore);
+
+var _pageSettings = __webpack_require__(36);
+
+var _pageSettings2 = _interopRequireDefault(_pageSettings);
+
+var _stateChange = __webpack_require__(1);
+
+var _stateChange2 = _interopRequireDefault(_stateChange);
+
+var _buttons = __webpack_require__(10);
+
+var _buttons2 = _interopRequireDefault(_buttons);
+
+var _actions = __webpack_require__(0);
+
+var _debug = __webpack_require__(12);
+
+var _debug2 = _interopRequireDefault(_debug);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
 // keep modularizing
 // state changes
 // buttons
@@ -123,28 +1242,22 @@ var store = (0, _configureStore2.default)();
 //
 // Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
 
+var store = (0, _configureStore2.default)();
+
+// dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
+
+// dispatched when an image is clicked or dragged; used by draggers
+
+
+// DEBUG
+// DEBUG
 if (_config2.default.debugOn) _debug2.default.init(store);
 
 _buttons2.default.init();
+_pageSettings2.default.init();
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
-
-
-// retrieve dragger size
-dragger_width = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width),
-    dragger_height = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).height),
-
-
-// retrieve window size; calculate inner_box size
-mainwide = window.innerWidth,
-    mainhigh = window.innerHeight,
-    inner_width = mainwide - dragger_width,
-    inner_height = mainhigh - dragger_height,
-
-
-// assigned when an image is clicked or dragged; used by draggers
-selected_file = {},
 
 
 // assigned by initial socket; used by upload counter
@@ -178,44 +1291,20 @@ instaAccessReady = false;
 window.store = store;
 window.socket = socket;
 
-// set wrapper size; (css vh and vw were not working with mobile safari)
-document.getElementById('wrapper').style.width = window.innerWidth + 'px';
-document.getElementById('wrapper').style.height = window.innerHeight + 'px';
+var insta = {
+  init: function init() {
+    // set insta_divs height
+    document.getElementById('insta_div').style.height = window.innerHeight + 'px';
+    document.getElementById('insta_image_container').style.height = window.innerHeight * 0.8 + 'px';
+    document.getElementById('insta_image_container').style.top = window.innerHeight * 0.1 + 'px';
+    document.getElementById('insta_header').style.height = window.innerHeight * 0.07 + 'px';
+    document.getElementById('background_opacity_trick').style.height = window.innerHeight * 0.8 + 'px';
+    document.getElementById('background_opacity_trick').style.top = window.innerHeight * 0.1 + 'px';
+  }
 
-// set app_info height
-document.getElementById('app_info').style.height = window.innerHeight * 0.9 + 'px';
+};
 
-// set explore_container height
-document.getElementById('explore_container').style.height = window.innerHeight * 0.9 + 'px';
-
-// set insta_divs height
-document.getElementById('insta_div').style.height = window.innerHeight + 'px';
-document.getElementById('insta_image_container').style.height = window.innerHeight * 0.8 + 'px';
-document.getElementById('insta_image_container').style.top = window.innerHeight * 0.1 + 'px';
-document.getElementById('insta_header').style.height = window.innerHeight * 0.07 + 'px';
-document.getElementById('background_opacity_trick').style.height = window.innerHeight * 0.8 + 'px';
-document.getElementById('background_opacity_trick').style.top = window.innerHeight * 0.1 + 'px';
-
-// set position and size of the close_info container divs
-document.getElementById('close_info_container').style.width = parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1 + 'px';
-document.getElementById('close_info_container').style.height = parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1 + 'px';
-document.getElementById('close_info_container').style.top = mainhigh * 0.05 + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_info_container').style.height)) + 'px';
-
-// set position and size of the x_icon container divs
-document.getElementById('close_explore_container').style.width = parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1 + 'px';
-document.getElementById('close_explore_container').style.height = parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) * 0.1 + 'px';
-document.getElementById('close_explore_container').style.top = mainhigh * 0.05 + (parseFloat(window.getComputedStyle(document.getElementById('app_info')).height) - parseInt(document.getElementById('close_explore_container').style.height)) + 'px';
-
-// add perspective to 3d transforms
-document.getElementById('images').style.width = window.innerWidth + 'px';
-document.getElementById('images').style.height = window.innerHeight + 'px';
-document.getElementById('images').style.webkitPerspective = '500px';
-document.getElementById('images').style.webkitPerspectiveOriginX = '50%';
-document.getElementById('images').style.webkitPerspectiveOriginY = '50%';
-
-// position the navigation_toggle_button_container on the bottom on startup.
-//  document.getElementById('navigation_toggle_button_container').style.left = (mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px');
-document.getElementById('navigation_toggle_button_container').style.left = mainwide - $('#navigation_toggle_button_container').width() + 'px';
+insta.init();
 
 // assign draggable to all .wallPic elements
 assigndrag();
@@ -245,14 +1334,6 @@ if (openInstagramDiv === true) {
 $('#wrapper').on('click touchstart', function (event) {
   var dragger_elements = {};
 
-  // DEBUG:
-  // uncomment to log whichever element is clicked on
-  // console.log(event.target.getAttribute('id'));
-  // uncomment to log all the elements below the click
-  // console.log(document.querySelectorAll( ":hover" ));
-  // uncomment to log whichever elements are clicked on. ONLY WORKS WITH CHROME
-  // console.log(document.elementsFromPoint(event.pageX, event.pageY));
-
   // if the images div alone is clicked...
   if (event.target.getAttribute('id') === 'images') {
     dragger_elements = document.getElementsByClassName('dragger');
@@ -263,29 +1344,16 @@ $('#wrapper').on('click touchstart', function (event) {
   }; // end of if
 }); // end of document.on.click
 
-// listen for resize and orientation changes and make adjustments
-window.addEventListener('resize', function () {
-  mainwide = window.innerWidth;
-  mainhigh = window.innerHeight;
-  inner_width = mainwide - dragger_width;
-  inner_height = mainhigh - dragger_height;
-  // set wrapper size
-  document.getElementById('wrapper').style.width = window.innerWidth + 'px', document.getElementById('wrapper').style.height = window.innerHeight + 'px',
-  // position the navigation_toggle_button_container on the bottom right on startup.
-  document.getElementById('navigation_toggle_button_container').style.top = mainhigh - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).height) + 'px';
-  document.getElementById('navigation_toggle_button_container').style.left = mainwide - parseFloat(window.getComputedStyle(document.getElementById('navigation_toggle_button_container')).width) + 'px';
-}, false);
 
 // used by delete image button
 function clear_selected_file() {
-  console.log('hi');
   store.getState().selectedImage.id = '';
-  selected_file.imageFilename = '';
-  selected_file.src = '';
-  selected_file.width = '';
-  selected_file.height = '';
-  selected_file.transform = '';
-  selected_file.zindex = '';
+  // selected_file.imageFilename  = '';
+  // selected_file.src             = '';
+  // selected_file.width           = '';
+  // selected_file.height          = '';
+  // selected_file.transform       = '';
+  // selected_file.zindex          = '';
   store.dispatch((0, _actions.setSelectedImage)(''));
 };
 
@@ -362,16 +1430,16 @@ function make_grid() {
       info_element = document.createElement('div');
 
   info_element.setAttribute('id', 'dragger_info');
-  info_element.style.left = dragger_width / 2 + 1 + 'px';
-  info_element.style.height = dragger_height / 2 + 'px';
-  info_element.style.width = mainwide - dragger_width - 2 + 'px';
+  info_element.style.left = _pageSettings2.default.draggerWidth / 2 + 1 + 'px';
+  info_element.style.height = _pageSettings2.default.draggerHeight / 2 + 'px';
+  info_element.style.width = _pageSettings2.default.mainWide - _pageSettings2.default.draggerWidth - 2 + 'px';
   // add 'info_element' to 'wrapper'
   wrapper_element.appendChild(info_element);
   // show grid lines
-  vline(mainwide - dragger_width / 2 + 'px', 'red', 'inner_right');
-  vline(dragger_width / 2 + 'px', 'blue', 'inner_left');
-  hline(mainhigh - dragger_height / 2 + 'px', 'purple', 'inner_bottom');
-  hline(dragger_height / 2 + 'px', 'yellow', 'inner_top');
+  vline(_pageSettings2.default.mainWide - _pageSettings2.default.draggerWidth / 2 + 'px', 'red', 'inner_right');
+  vline(_pageSettings2.default.draggerWidth / 2 + 'px', 'blue', 'inner_left');
+  hline(_pageSettings2.default.mainHigh - _pageSettings2.default.draggerHeight / 2 + 'px', 'purple', 'inner_bottom');
+  hline(_pageSettings2.default.draggerHeight / 2 + 'px', 'yellow', 'inner_top');
 }; // end of make_grid
 
 function remove_grid() {
@@ -780,17 +1848,9 @@ socket.on('be: add_insta_image_to_other_clients', function (instaDBData) {
 });
 
 // --Buttons
-//     IMPORTANT: Delegated vs. Direct binding
-//     Example:  $('#id').on('click', function() { console.log('hi')};
-//     This is a direct binding, which means new elements added to the DOM won't work.
-//     Instead, use a delegated binding:
-//     Example:  $( document ).on('click', '.upload', function(){
-//     IMPORTANT: I've changed my mind.
-//     Delegated binding seems to cost more resources in the number of compares to process.
-//     Go with direct binding.
 
-// main navigation toggle button
-$('#navigation_toggle_button').on('click', function () {
+
+document.getElementById('navigation_toggle_button').onclick = function () {
   var button_element = document.getElementById('navigation_toggle_button');
 
   // if the button is being dragged, don't use the click.  FUTURE WORK: stop event propagation
@@ -819,7 +1879,7 @@ $('#navigation_toggle_button').on('click', function () {
       _stateChange2.default.hideDraggers();
     };
   };
-});
+};
 
 //
 // <div id='exit_door' class='button navigation_button'> remove
@@ -827,7 +1887,8 @@ $('#navigation_toggle_button').on('click', function () {
 // </div>
 
 
-var exitDoor = __webpack_require__(11);
+//var exitDoor = require('./exit-door');
+
 
 // dragger_all_switch; used to toggle all dragger switches
 $('#dragger_all_switch').click(function () {
@@ -1472,8 +2533,11 @@ $('#navigation_toggle_button_container').draggable({
     this.wide = $(this).width();
 
     // get values of top and left for bottom and right placements
-    this.top_when_on_bottom_num = mainhigh - this.high;
-    this.left_when_on_right_num = mainwide - this.wide;
+    this.top_when_on_bottom_num = _pageSettings2.default.mainHigh - this.high;
+    this.left_when_on_right_num = _pageSettings2.default.mainWide - this.wide;
+    console.log(this.left_when_on_right_num);
+    console.log(_pageSettings2.default.mainWide);
+
     this.top_when_on_bottom_px = this.top_when_on_bottom_num.toString().concat('px');
     this.left_when_on_right_px = this.left_when_on_right_num.toString().concat('px');
     this.commit_distance = 5;
@@ -1602,11 +2666,12 @@ $('#stretch_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
-    this.percentage_high = (inner_height - ui.position.top) / inner_height;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
+    this.percentage_high = (_pageSettings2.default.innerHeight - ui.position.top) / _pageSettings2.default.innerHeight;
     // calculate changes: define the selected_image's new width/height/left/right in relation to the window size
-    this.new_width = this.percentage_wide * mainwide;
-    this.new_height = this.percentage_high * mainhigh;
+
+    this.new_width = this.percentage_wide * _pageSettings2.default.mainWide;
+    this.new_height = this.percentage_high * _pageSettings2.default.mainHigh;
     this.new_left = this.image_original_left + (this.image_original_width - this.new_width) / 2;
     this.new_top = this.image_original_top + (this.image_original_height - this.new_height) / 2;
     // display the percentages in the dragger_info div
@@ -1667,7 +2732,7 @@ $('#opacity_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
     // display the percentages in the dragger_info div
     this.dragger_info.textContent = 'opacity:' + (this.percentage_wide * 100).toFixed(0) + '%';
     // make the calculated changes
@@ -1717,8 +2782,8 @@ $('#rotation_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // calculate changes: define the selected_image's new rotation in relation to the percentage of inner window size
-    this.new_rotation = Math.round(ui.position.left / inner_width * 100) * 3.6;
-    this.new_rotateZ = Math.round(ui.position.top / inner_height * 100) * 3.6;
+    this.new_rotation = Math.round(ui.position.left / _pageSettings2.default.innerWidth * 100) * 3.6;
+    this.new_rotateZ = Math.round(ui.position.top / _pageSettings2.default.innerHeight * 100) * 3.6;
 
     // display the percentages in the dragger_info div
     this.dragger_info.textContent = 'rotation: ' + this.new_rotation.toFixed(2) + 'deg   rotateZ: ' + this.new_rotateZ.toFixed(2) + 'deg';
@@ -1782,8 +2847,8 @@ $('#grayscale_invert_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
-    this.percentage_high = (inner_height - ui.position.top) / inner_height;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
+    this.percentage_high = (_pageSettings2.default.innerHeight - ui.position.top) / _pageSettings2.default.innerHeight;
     // display the percentages in the dragger_info div
     this.dragger_info.textContent = 'grayscale: ' + (this.percentage_high * 100).toFixed(0) + '% invert:' + (this.percentage_wide * 100).toFixed(0) + '%';
     // make the calculated changes and use regex to replace
@@ -1830,8 +2895,8 @@ $('#blur_brightness_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
-    this.percentage_high = (inner_height - ui.position.top) / inner_height;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
+    this.percentage_high = (_pageSettings2.default.innerHeight - ui.position.top) / _pageSettings2.default.innerHeight;
     // display the percentages in the dragger_info div
     this.dragger_info.textContent = 'blur:' + ((1 - this.percentage_high) * _config2.default.blurLevel).toFixed(2) + 'px brightness: ' + (this.percentage_wide * _config2.default.brightnessLevel).toFixed(2);
     // make the calculated changes
@@ -1878,8 +2943,8 @@ $('#contrast_saturate_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
-    this.percentage_high = (inner_height - ui.position.top) / inner_height;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
+    this.percentage_high = (_pageSettings2.default.innerHeight - ui.position.top) / _pageSettings2.default.innerHeight;
     // display the percentages in the dragger_info div
     this.dragger_info.textContent = 'contrast:' + ((1 - this.percentage_high) * _config2.default.contrastLevel).toFixed(2) + ' saturate: ' + (this.percentage_wide * _config2.default.saturateLevel).toFixed(2);
     // make the calculated changes
@@ -1924,8 +2989,8 @@ $('#party_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
-    this.percentage_high = (inner_height - ui.position.top) / inner_height;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
+    this.percentage_high = (_pageSettings2.default.innerHeight - ui.position.top) / _pageSettings2.default.innerHeight;
     // calculate changes
     this.new_opacity = this.percentage_wide;
     this.new_hue_rotate = Math.round(this.percentage_high * 100) * 3.6;
@@ -1978,8 +3043,8 @@ $('#threeD_dragger').draggable({
   },
   drag: function drag(event, ui) {
     // dynamic percentage defined by the dragger in relation to the inner window
-    this.percentage_wide = ui.position.left / inner_width;
-    this.percentage_high = (inner_height - ui.position.top) / inner_height;
+    this.percentage_wide = ui.position.left / _pageSettings2.default.innerWidth;
+    this.percentage_high = (_pageSettings2.default.innerHeight - ui.position.top) / _pageSettings2.default.innerHeight;
     // calculate changes
     this.new_rotate_x = Math.round(this.percentage_high * 100) * 3.6 - 180;
     this.new_rotate_y = Math.round(this.percentage_wide * 100) * 3.6 - 180;
@@ -2062,10 +3127,10 @@ function set_stretch_dragger_to(id) {
       selected_imageHeight = parseInt(image_element.style.height),
 
   // calculate the dragger location
-  selected_imageWidth_percentage = selected_imageWidth / mainwide,
-      selected_imageHeight_percentage = selected_imageHeight / mainhigh,
-      dragger_location_left = selected_imageWidth_percentage * inner_width,
-      dragger_location_top = (1 - selected_imageHeight_percentage) * inner_height;
+  selected_imageWidth_percentage = selected_imageWidth / _pageSettings2.default.mainWide,
+      selected_imageHeight_percentage = selected_imageHeight / _pageSettings2.default.mainHigh,
+      dragger_location_left = selected_imageWidth_percentage * innerWidth,
+      dragger_location_top = (1 - selected_imageHeight_percentage) * _pageSettings2.default.innerHeight;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2086,11 +3151,11 @@ function set_opacity_dragger_to(id) {
   selected_image_opacity = parseInt(image_element.style.opacity * 100) / 100,
 
   // calculate the dragger location
-  dragger_location_left = selected_image_opacity * inner_width;
+  dragger_location_left = selected_image_opacity * _pageSettings2.default.innerWidth;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
-  dragger_element.style.top = inner_height / 3 * 2 + 'px';
+  dragger_element.style.top = _pageSettings2.default.innerHeight / 3 * 2 + 'px';
   dragger_element.style.display = 'block';
   // allow transitions
   setTimeout(function () {
@@ -2103,8 +3168,8 @@ function set_rotation_dragger_to(id) {
       image_element = document.getElementById(id),
 
   // calculate the dragger location
-  dragger_location_left = parseFloat(image_element.getAttribute('data-angle') / 360 * inner_width),
-      dragger_location_top = parseFloat(image_element.getAttribute('data-rotateZ') / 360 * inner_height);
+  dragger_location_left = parseFloat(image_element.getAttribute('data-angle') / 360 * _pageSettings2.default.innerWidth),
+      dragger_location_top = parseFloat(image_element.getAttribute('data-rotateZ') / 360 * _pageSettings2.default.innerHeight);
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2130,8 +3195,8 @@ function set_grayscale_invert_dragger_to(id) {
       invert_matches = invert_Exp.exec(selected_image_filter),
 
   // calculate the dragger location
-  dragger_location_top = (1 - parseFloat(grayscale_matches[1])) * inner_height,
-      dragger_location_left = parseFloat(invert_matches[1]) * inner_width;
+  dragger_location_top = (1 - parseFloat(grayscale_matches[1])) * _pageSettings2.default.innerHeight,
+      dragger_location_left = parseFloat(invert_matches[1]) * _pageSettings2.default.innerWidth;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2157,8 +3222,8 @@ function set_blur_brightness_dragger_to(id) {
       brightness_matches = brightness_Exp.exec(selected_image_filter),
 
   // calculate the dragger location
-  dragger_location_top = parseFloat(blur_matches[1]) * inner_height / _config2.default.blurLevel,
-      dragger_location_left = parseFloat(brightness_matches[1]) * inner_width / _config2.default.brightnessLevel;
+  dragger_location_top = parseFloat(blur_matches[1]) * _pageSettings2.default.innerHeight / _config2.default.blurLevel,
+      dragger_location_left = parseFloat(brightness_matches[1]) * _pageSettings2.default.innerWidth / _config2.default.brightnessLevel;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2184,8 +3249,8 @@ function set_contrast_saturate_dragger_to(id) {
       saturate_matches = saturate_Exp.exec(selected_image_filter),
 
   // calculate the dragger location
-  dragger_location_top = parseFloat(contrast_matches[1]) * inner_height / _config2.default.contrastLevel,
-      dragger_location_left = parseFloat(saturate_matches[1]) * inner_width / _config2.default.saturateLevel;
+  dragger_location_top = parseFloat(contrast_matches[1]) * _pageSettings2.default.innerHeight / _config2.default.contrastLevel,
+      dragger_location_left = parseFloat(saturate_matches[1]) * _pageSettings2.default.innerWidth / _config2.default.saturateLevel;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2211,8 +3276,8 @@ function set_party_dragger_to(id) {
       hue_rotate_matches = hue_rotate_Exp.exec(selected_image_filter),
 
   // calculate the dragger location
-  dragger_location_left = selected_image_opacity * inner_width,
-      dragger_location_top = inner_height - parseFloat(hue_rotate_matches[1]) / 360 * inner_height;
+  dragger_location_left = selected_image_opacity * _pageSettings2.default.innerWidth,
+      dragger_location_top = _pageSettings2.default.innerHeight - parseFloat(hue_rotate_matches[1]) / 360 * _pageSettings2.default.innerHeight;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2229,8 +3294,8 @@ function set_threeD_dragger_to(id) {
       image_element = document.getElementById(id),
 
   // calculate the dragger location
-  dragger_location_top = inner_height - (180 + parseFloat(image_element.getAttribute('data-rotateX'))) / 360 * inner_height,
-      dragger_location_left = (180 + parseFloat(image_element.getAttribute('data-rotateY'))) / 360 * inner_width;
+  dragger_location_top = _pageSettings2.default.innerHeight - (180 + parseFloat(image_element.getAttribute('data-rotateX'))) / 360 * _pageSettings2.default.innerHeight,
+      dragger_location_left = (180 + parseFloat(image_element.getAttribute('data-rotateY'))) / 360 * _pageSettings2.default.innerWidth;
 
   // set the dragger location
   dragger_element.style.left = dragger_location_left + 'px';
@@ -2243,861 +3308,7 @@ function set_threeD_dragger_to(id) {
 };
 
 /***/ }),
-/* 1 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__root_js__ = __webpack_require__(22);
-
-
-/** Built-in value references. */
-var Symbol = __WEBPACK_IMPORTED_MODULE_0__root_js__["a" /* default */].Symbol;
-
-/* harmony default export */ __webpack_exports__["a"] = (Symbol);
-
-
-/***/ }),
-/* 2 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__baseGetTag_js__ = __webpack_require__(16);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getPrototype_js__ = __webpack_require__(18);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__isObjectLike_js__ = __webpack_require__(23);
-
-
-
-
-/** `Object#toString` result references. */
-var objectTag = '[object Object]';
-
-/** Used for built-in method references. */
-var funcProto = Function.prototype,
-    objectProto = Object.prototype;
-
-/** Used to resolve the decompiled source of functions. */
-var funcToString = funcProto.toString;
-
-/** Used to check objects for own properties. */
-var hasOwnProperty = objectProto.hasOwnProperty;
-
-/** Used to infer the `Object` constructor. */
-var objectCtorString = funcToString.call(Object);
-
-/**
- * Checks if `value` is a plain object, that is, an object created by the
- * `Object` constructor or one with a `[[Prototype]]` of `null`.
- *
- * @static
- * @memberOf _
- * @since 0.8.0
- * @category Lang
- * @param {*} value The value to check.
- * @returns {boolean} Returns `true` if `value` is a plain object, else `false`.
- * @example
- *
- * function Foo() {
- *   this.a = 1;
- * }
- *
- * _.isPlainObject(new Foo);
- * // => false
- *
- * _.isPlainObject([1, 2, 3]);
- * // => false
- *
- * _.isPlainObject({ 'x': 0, 'y': 0 });
- * // => true
- *
- * _.isPlainObject(Object.create(null));
- * // => true
- */
-function isPlainObject(value) {
-  if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__isObjectLike_js__["a" /* default */])(value) || __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__baseGetTag_js__["a" /* default */])(value) != objectTag) {
-    return false;
-  }
-  var proto = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_1__getPrototype_js__["a" /* default */])(value);
-  if (proto === null) {
-    return true;
-  }
-  var Ctor = hasOwnProperty.call(proto, 'constructor') && proto.constructor;
-  return typeof Ctor == 'function' && Ctor instanceof Ctor &&
-    funcToString.call(Ctor) == objectCtorString;
-}
-
-/* harmony default export */ __webpack_exports__["a"] = (isPlainObject);
-
-
-/***/ }),
-/* 3 */
-/***/ (function(module, exports) {
-
-// shim for using process in browser
-var process = module.exports = {};
-
-// cached from whatever global is present so that test runners that stub it
-// don't break things.  But we need to wrap it in a try catch in case it is
-// wrapped in strict mode code which doesn't define any globals.  It's inside a
-// function because try/catches deoptimize in certain engines.
-
-var cachedSetTimeout;
-var cachedClearTimeout;
-
-function defaultSetTimout() {
-    throw new Error('setTimeout has not been defined');
-}
-function defaultClearTimeout () {
-    throw new Error('clearTimeout has not been defined');
-}
-(function () {
-    try {
-        if (typeof setTimeout === 'function') {
-            cachedSetTimeout = setTimeout;
-        } else {
-            cachedSetTimeout = defaultSetTimout;
-        }
-    } catch (e) {
-        cachedSetTimeout = defaultSetTimout;
-    }
-    try {
-        if (typeof clearTimeout === 'function') {
-            cachedClearTimeout = clearTimeout;
-        } else {
-            cachedClearTimeout = defaultClearTimeout;
-        }
-    } catch (e) {
-        cachedClearTimeout = defaultClearTimeout;
-    }
-} ())
-function runTimeout(fun) {
-    if (cachedSetTimeout === setTimeout) {
-        //normal enviroments in sane situations
-        return setTimeout(fun, 0);
-    }
-    // if setTimeout wasn't available but was latter defined
-    if ((cachedSetTimeout === defaultSetTimout || !cachedSetTimeout) && setTimeout) {
-        cachedSetTimeout = setTimeout;
-        return setTimeout(fun, 0);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedSetTimeout(fun, 0);
-    } catch(e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't trust the global object when called normally
-            return cachedSetTimeout.call(null, fun, 0);
-        } catch(e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error
-            return cachedSetTimeout.call(this, fun, 0);
-        }
-    }
-
-
-}
-function runClearTimeout(marker) {
-    if (cachedClearTimeout === clearTimeout) {
-        //normal enviroments in sane situations
-        return clearTimeout(marker);
-    }
-    // if clearTimeout wasn't available but was latter defined
-    if ((cachedClearTimeout === defaultClearTimeout || !cachedClearTimeout) && clearTimeout) {
-        cachedClearTimeout = clearTimeout;
-        return clearTimeout(marker);
-    }
-    try {
-        // when when somebody has screwed with setTimeout but no I.E. maddness
-        return cachedClearTimeout(marker);
-    } catch (e){
-        try {
-            // When we are in I.E. but the script has been evaled so I.E. doesn't  trust the global object when called normally
-            return cachedClearTimeout.call(null, marker);
-        } catch (e){
-            // same as above but when it's a version of I.E. that must have the global object for 'this', hopfully our context correct otherwise it will throw a global error.
-            // Some versions of I.E. have different rules for clearTimeout vs setTimeout
-            return cachedClearTimeout.call(this, marker);
-        }
-    }
-
-
-
-}
-var queue = [];
-var draining = false;
-var currentQueue;
-var queueIndex = -1;
-
-function cleanUpNextTick() {
-    if (!draining || !currentQueue) {
-        return;
-    }
-    draining = false;
-    if (currentQueue.length) {
-        queue = currentQueue.concat(queue);
-    } else {
-        queueIndex = -1;
-    }
-    if (queue.length) {
-        drainQueue();
-    }
-}
-
-function drainQueue() {
-    if (draining) {
-        return;
-    }
-    var timeout = runTimeout(cleanUpNextTick);
-    draining = true;
-
-    var len = queue.length;
-    while(len) {
-        currentQueue = queue;
-        queue = [];
-        while (++queueIndex < len) {
-            if (currentQueue) {
-                currentQueue[queueIndex].run();
-            }
-        }
-        queueIndex = -1;
-        len = queue.length;
-    }
-    currentQueue = null;
-    draining = false;
-    runClearTimeout(timeout);
-}
-
-process.nextTick = function (fun) {
-    var args = new Array(arguments.length - 1);
-    if (arguments.length > 1) {
-        for (var i = 1; i < arguments.length; i++) {
-            args[i - 1] = arguments[i];
-        }
-    }
-    queue.push(new Item(fun, args));
-    if (queue.length === 1 && !draining) {
-        runTimeout(drainQueue);
-    }
-};
-
-// v8 likes predictible objects
-function Item(fun, array) {
-    this.fun = fun;
-    this.array = array;
-}
-Item.prototype.run = function () {
-    this.fun.apply(null, this.array);
-};
-process.title = 'browser';
-process.browser = true;
-process.env = {};
-process.argv = [];
-process.version = ''; // empty string to avoid regexp issues
-process.versions = {};
-
-function noop() {}
-
-process.on = noop;
-process.addListener = noop;
-process.once = noop;
-process.off = noop;
-process.removeListener = noop;
-process.removeAllListeners = noop;
-process.emit = noop;
-
-process.binding = function (name) {
-    throw new Error('process.binding is not supported');
-};
-
-process.cwd = function () { return '/' };
-process.chdir = function (dir) {
-    throw new Error('process.chdir is not supported');
-};
-process.umask = function() { return 0; };
-
-
-/***/ }),
-/* 4 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = compose;
-/**
- * Composes single-argument functions from right to left. The rightmost
- * function can take multiple arguments as it provides the signature for
- * the resulting composite function.
- *
- * @param {...Function} funcs The functions to compose.
- * @returns {Function} A function obtained by composing the argument functions
- * from right to left. For example, compose(f, g, h) is identical to doing
- * (...args) => f(g(h(...args))).
- */
-
-function compose() {
-  for (var _len = arguments.length, funcs = Array(_len), _key = 0; _key < _len; _key++) {
-    funcs[_key] = arguments[_key];
-  }
-
-  if (funcs.length === 0) {
-    return function (arg) {
-      return arg;
-    };
-  }
-
-  if (funcs.length === 1) {
-    return funcs[0];
-  }
-
-  var last = funcs[funcs.length - 1];
-  var rest = funcs.slice(0, -1);
-  return function () {
-    return rest.reduceRight(function (composed, f) {
-      return f(composed);
-    }, last.apply(undefined, arguments));
-  };
-}
-
-/***/ }),
-/* 5 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable__ = __webpack_require__(27);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_symbol_observable__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ActionTypes; });
-/* harmony export (immutable) */ __webpack_exports__["a"] = createStore;
-
-
-
-/**
- * These are private action types reserved by Redux.
- * For any unknown actions, you must return the current state.
- * If the current state is undefined, you must return the initial state.
- * Do not reference these action types directly in your code.
- */
-var ActionTypes = {
-  INIT: '@@redux/INIT'
-};
-
-/**
- * Creates a Redux store that holds the state tree.
- * The only way to change the data in the store is to call `dispatch()` on it.
- *
- * There should only be a single store in your app. To specify how different
- * parts of the state tree respond to actions, you may combine several reducers
- * into a single reducer function by using `combineReducers`.
- *
- * @param {Function} reducer A function that returns the next state tree, given
- * the current state tree and the action to handle.
- *
- * @param {any} [preloadedState] The initial state. You may optionally specify it
- * to hydrate the state from the server in universal apps, or to restore a
- * previously serialized user session.
- * If you use `combineReducers` to produce the root reducer function, this must be
- * an object with the same shape as `combineReducers` keys.
- *
- * @param {Function} enhancer The store enhancer. You may optionally specify it
- * to enhance the store with third-party capabilities such as middleware,
- * time travel, persistence, etc. The only store enhancer that ships with Redux
- * is `applyMiddleware()`.
- *
- * @returns {Store} A Redux store that lets you read the state, dispatch actions
- * and subscribe to changes.
- */
-function createStore(reducer, preloadedState, enhancer) {
-  var _ref2;
-
-  if (typeof preloadedState === 'function' && typeof enhancer === 'undefined') {
-    enhancer = preloadedState;
-    preloadedState = undefined;
-  }
-
-  if (typeof enhancer !== 'undefined') {
-    if (typeof enhancer !== 'function') {
-      throw new Error('Expected the enhancer to be a function.');
-    }
-
-    return enhancer(createStore)(reducer, preloadedState);
-  }
-
-  if (typeof reducer !== 'function') {
-    throw new Error('Expected the reducer to be a function.');
-  }
-
-  var currentReducer = reducer;
-  var currentState = preloadedState;
-  var currentListeners = [];
-  var nextListeners = currentListeners;
-  var isDispatching = false;
-
-  function ensureCanMutateNextListeners() {
-    if (nextListeners === currentListeners) {
-      nextListeners = currentListeners.slice();
-    }
-  }
-
-  /**
-   * Reads the state tree managed by the store.
-   *
-   * @returns {any} The current state tree of your application.
-   */
-  function getState() {
-    return currentState;
-  }
-
-  /**
-   * Adds a change listener. It will be called any time an action is dispatched,
-   * and some part of the state tree may potentially have changed. You may then
-   * call `getState()` to read the current state tree inside the callback.
-   *
-   * You may call `dispatch()` from a change listener, with the following
-   * caveats:
-   *
-   * 1. The subscriptions are snapshotted just before every `dispatch()` call.
-   * If you subscribe or unsubscribe while the listeners are being invoked, this
-   * will not have any effect on the `dispatch()` that is currently in progress.
-   * However, the next `dispatch()` call, whether nested or not, will use a more
-   * recent snapshot of the subscription list.
-   *
-   * 2. The listener should not expect to see all state changes, as the state
-   * might have been updated multiple times during a nested `dispatch()` before
-   * the listener is called. It is, however, guaranteed that all subscribers
-   * registered before the `dispatch()` started will be called with the latest
-   * state by the time it exits.
-   *
-   * @param {Function} listener A callback to be invoked on every dispatch.
-   * @returns {Function} A function to remove this change listener.
-   */
-  function subscribe(listener) {
-    if (typeof listener !== 'function') {
-      throw new Error('Expected listener to be a function.');
-    }
-
-    var isSubscribed = true;
-
-    ensureCanMutateNextListeners();
-    nextListeners.push(listener);
-
-    return function unsubscribe() {
-      if (!isSubscribed) {
-        return;
-      }
-
-      isSubscribed = false;
-
-      ensureCanMutateNextListeners();
-      var index = nextListeners.indexOf(listener);
-      nextListeners.splice(index, 1);
-    };
-  }
-
-  /**
-   * Dispatches an action. It is the only way to trigger a state change.
-   *
-   * The `reducer` function, used to create the store, will be called with the
-   * current state tree and the given `action`. Its return value will
-   * be considered the **next** state of the tree, and the change listeners
-   * will be notified.
-   *
-   * The base implementation only supports plain object actions. If you want to
-   * dispatch a Promise, an Observable, a thunk, or something else, you need to
-   * wrap your store creating function into the corresponding middleware. For
-   * example, see the documentation for the `redux-thunk` package. Even the
-   * middleware will eventually dispatch plain object actions using this method.
-   *
-   * @param {Object} action A plain object representing “what changed”. It is
-   * a good idea to keep actions serializable so you can record and replay user
-   * sessions, or use the time travelling `redux-devtools`. An action must have
-   * a `type` property which may not be `undefined`. It is a good idea to use
-   * string constants for action types.
-   *
-   * @returns {Object} For convenience, the same action object you dispatched.
-   *
-   * Note that, if you use a custom middleware, it may wrap `dispatch()` to
-   * return something else (for example, a Promise you can await).
-   */
-  function dispatch(action) {
-    if (!__webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__["a" /* default */])(action)) {
-      throw new Error('Actions must be plain objects. ' + 'Use custom middleware for async actions.');
-    }
-
-    if (typeof action.type === 'undefined') {
-      throw new Error('Actions may not have an undefined "type" property. ' + 'Have you misspelled a constant?');
-    }
-
-    if (isDispatching) {
-      throw new Error('Reducers may not dispatch actions.');
-    }
-
-    try {
-      isDispatching = true;
-      currentState = currentReducer(currentState, action);
-    } finally {
-      isDispatching = false;
-    }
-
-    var listeners = currentListeners = nextListeners;
-    for (var i = 0; i < listeners.length; i++) {
-      listeners[i]();
-    }
-
-    return action;
-  }
-
-  /**
-   * Replaces the reducer currently used by the store to calculate the state.
-   *
-   * You might need this if your app implements code splitting and you want to
-   * load some of the reducers dynamically. You might also need this if you
-   * implement a hot reloading mechanism for Redux.
-   *
-   * @param {Function} nextReducer The reducer for the store to use instead.
-   * @returns {void}
-   */
-  function replaceReducer(nextReducer) {
-    if (typeof nextReducer !== 'function') {
-      throw new Error('Expected the nextReducer to be a function.');
-    }
-
-    currentReducer = nextReducer;
-    dispatch({ type: ActionTypes.INIT });
-  }
-
-  /**
-   * Interoperability point for observable/reactive libraries.
-   * @returns {observable} A minimal observable of state changes.
-   * For more information, see the observable proposal:
-   * https://github.com/zenparsing/es-observable
-   */
-  function observable() {
-    var _ref;
-
-    var outerSubscribe = subscribe;
-    return _ref = {
-      /**
-       * The minimal observable subscription method.
-       * @param {Object} observer Any object that can be used as an observer.
-       * The observer object should have a `next` method.
-       * @returns {subscription} An object with an `unsubscribe` method that can
-       * be used to unsubscribe the observable from the store, and prevent further
-       * emission of values from the observable.
-       */
-      subscribe: function subscribe(observer) {
-        if (typeof observer !== 'object') {
-          throw new TypeError('Expected the observer to be an object.');
-        }
-
-        function observeState() {
-          if (observer.next) {
-            observer.next(getState());
-          }
-        }
-
-        observeState();
-        var unsubscribe = outerSubscribe(observeState);
-        return { unsubscribe: unsubscribe };
-      }
-    }, _ref[__WEBPACK_IMPORTED_MODULE_1_symbol_observable___default.a] = function () {
-      return this;
-    }, _ref;
-  }
-
-  // When a store is created, an "INIT" action is dispatched so that every
-  // reducer returns their initial state. This effectively populates
-  // the initial state tree.
-  dispatch({ type: ActionTypes.INIT });
-
-  return _ref2 = {
-    dispatch: dispatch,
-    subscribe: subscribe,
-    getState: getState,
-    replaceReducer: replaceReducer
-  }, _ref2[__WEBPACK_IMPORTED_MODULE_1_symbol_observable___default.a] = observable, _ref2;
-}
-
-/***/ }),
-/* 6 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__combineReducers__ = __webpack_require__(26);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__ = __webpack_require__(25);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__ = __webpack_require__(24);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_4__compose__ = __webpack_require__(4);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_5__utils_warning__ = __webpack_require__(7);
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "createStore", function() { return __WEBPACK_IMPORTED_MODULE_0__createStore__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "combineReducers", function() { return __WEBPACK_IMPORTED_MODULE_1__combineReducers__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "bindActionCreators", function() { return __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "applyMiddleware", function() { return __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__["a"]; });
-/* harmony reexport (binding) */ __webpack_require__.d(__webpack_exports__, "compose", function() { return __WEBPACK_IMPORTED_MODULE_4__compose__["a"]; });
-
-
-
-
-
-
-
-/*
-* This is a dummy function to check if the function name has been altered by minification.
-* If the function has been minified and NODE_ENV !== 'production', warn the user.
-*/
-function isCrushed() {}
-
-if (process.env.NODE_ENV !== 'production' && typeof isCrushed.name === 'string' && isCrushed.name !== 'isCrushed') {
-  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_5__utils_warning__["a" /* default */])('You are currently using minified code outside of NODE_ENV === \'production\'. ' + 'This means that you are running a slower development build of Redux. ' + 'You can use loose-envify (https://github.com/zertosh/loose-envify) for browserify ' + 'or DefinePlugin for webpack (http://stackoverflow.com/questions/30030031) ' + 'to ensure you have the correct code for your production build.');
-}
-
-
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
-
-/***/ }),
-/* 7 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony export (immutable) */ __webpack_exports__["a"] = warning;
-/**
- * Prints a warning in the console if it exists.
- *
- * @param {String} message The warning message.
- * @returns {void}
- */
-function warning(message) {
-  /* eslint-disable no-console */
-  if (typeof console !== 'undefined' && typeof console.error === 'function') {
-    console.error(message);
-  }
-  /* eslint-enable no-console */
-  try {
-    // This error was thrown as a convenience so that if you enable
-    // "break on all exceptions" in your console,
-    // it would pause the execution at this line.
-    throw new Error(message);
-    /* eslint-disable no-empty */
-  } catch (e) {}
-  /* eslint-enable no-empty */
-}
-
-/***/ }),
-/* 8 */
-/***/ (function(module, exports) {
-
-var g;
-
-// This works in non-strict mode
-g = (function() {
-	return this;
-})();
-
-try {
-	// This works if eval is allowed (see CSP)
-	g = g || Function("return this")() || (1,eval)("this");
-} catch(e) {
-	// This works if the window reference is available
-	if(typeof window === "object")
-		g = window;
-}
-
-// g can still be undefined, but nothing to do about it...
-// We return undefined, instead of nothing here, so it's
-// easier to handle this case. if(!global) { ...}
-
-module.exports = g;
-
-
-/***/ }),
-/* 9 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  debugOn: true, // set debug div
-
-  // set upload placement
-  uploadTop: '0px',
-  uploadLeft: '0px',
-  uploadWidth: '75px',
-  uploadheight: '100px',
-
-  // set maximum limit for draggers
-  blurLevel: 7,
-  brightnessLevel: 8,
-  contrastLevel: 10,
-  saturateLevel: 10
-
-};
-
-/***/ }),
-/* 10 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _helpers = __webpack_require__(13);
-
-var _helpers2 = _interopRequireDefault(_helpers);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-module.exports = {
-
-  init: function init(store) {
-    _helpers2.default.clickme('navigation_toggle_button', 0);
-    // helpers.clickme('debug-button', 0);
-    // helpers.clickme('dragger_switches_button', 1000);
-    // helpers.clickme('explore_button', 0);
-    // helpers.clickme('upload_container_button', 1000);
-
-    this.createDebugButton();
-    this.createDebugDiv();
-    this.setListeners();
-
-    document.addEventListener('click', function () {
-      console.log(store.getState());
-    });
-  },
-
-  createDebugButton: function createDebugButton() {
-    var debugButton = document.getElementById('debug-holder'),
-        debugIcon = document.createElement('img'),
-        debugText = document.createElement('span');
-
-    // create debug button
-    debugButton.setAttribute('id', 'debug-button');
-    debugButton.classList.add('button', 'tools_button');
-    debugButton.classList.remove('button_no_show');
-
-    debugText.textContent = 'report is off';
-    debugText.setAttribute('id', 'debug-text');
-
-    debugIcon.classList.add('icon_image');
-    debugIcon.src = '/icons/debug_icon.png';
-    debugButton.appendChild(debugText);
-    debugButton.appendChild(debugIcon);
-
-    // add button functionality
-    debugButton.addEventListener('click', function () {
-
-      if (this.classList.contains('debug-on')) {
-        this.classList.remove('debug-on');
-        document.getElementById('debug-container').style.display = 'none';
-        document.getElementById('debug-text').innerText = 'report is off';
-      } else {
-        this.classList.add('debug-on');
-        document.getElementById('debug-container').style.display = 'block';
-        document.getElementById('debug-text').innerText = 'report is on';
-      };
-    });
-  },
-
-  createDebugDiv: function createDebugDiv() {
-    var wrapperEl = document.getElementById('wrapper'),
-        debugEl = document.createElement('div'),
-        infoLineEl,
-        i,
-        that = this;
-
-    // create debug div
-    debugEl.setAttribute('id', 'debug-container');
-    debugEl.style.display = 'none';
-    for (i = 1; i <= 10; i++) {
-      infoLineEl = document.createElement('div');
-      infoLineEl.setAttribute('id', 'info' + i);
-      infoLineEl.classList.add('info');
-      debugEl.appendChild(infoLineEl);
-    };
-
-    wrapperEl.appendChild(debugEl);
-
-    // make debug-container draggable
-    $('#debug-container').draggable({
-      containment: 'parent',
-      start: function start() {
-        that.clearDebugInfo();
-        that.addDebugInfo([[1, 'this div width    : ' + $(this).css('width')], [2, 'wrapper width     : ' + document.getElementById('wrapper').style.width], [3, 'screen.width      : ' + screen.width.toString()], [4, 'window.innerWidth : ' + window.innerWidth.toString()], [5, 'screen.availWidth : ' + screen.availWidth.toString()]]);
-      },
-      drag: function drag() {
-        var debugEl = document.getElementById('debug-container'),
-            debugDivInfo = debugEl.getBoundingClientRect();
-
-        that.addDebugInfo([[6, ''], [7, this.style.left + ' <css> ' + $(this).css('right')], [8, debugDivInfo.left.toString() + ' <dom> ' + debugDivInfo.right.toString()]]);
-      }
-    });
-  },
-
-  setListeners: function setListeners() {
-    var that = this;
-
-    // resize window
-    window.addEventListener('resize', function () {
-      that.clearDebugInfo();
-      that.addDebugInfo([[1, 'resize: new width  : ' + window.innerWidth + 'px'], [2, 'resize: new height : ' + window.innerHeight + 'px']]);
-    });
-
-    // click on image
-    document.getElementById('images').addEventListener('click', function (e) {
-      var clickedEl = e.target;
-
-      that.clearDebugInfo();
-      that.addDebugInfo([[1, 'Filename: ' + clickedEl.getAttribute('title')], [2, 'Z-index: ' + clickedEl.style.zIndex], [3, 'Start: Left: ' + clickedEl.style.left + ' Top: ' + clickedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
-    });
-
-    // dragged images
-    $(document).on('dragstart', '.wallPic', function (e) {
-      var draggedEl = e.target;
-
-      that.clearDebugInfo();
-      that.addDebugInfo([[1, 'Filename: ' + draggedEl.getAttribute('title')], [2, 'Z-index: ' + draggedEl.style.zIndex], [3, 'Start: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top], [4, 'Current: '], [5, 'Stop: ']]);
-    });
-
-    $(document).on('drag', '.wallPic', function (e) {
-      var draggedEl = e.target;
-
-      that.addDebugInfo([[4, 'Current: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
-    });
-
-    $(document).on('dragstop', '.wallPic', function (e) {
-      var draggedEl = e.target;
-
-      that.addDebugInfo([[5, 'Stop: Left: ' + draggedEl.style.left + ' Top: ' + draggedEl.style.top]]);
-    });
-  },
-
-  // debugInfoText: a multidimensional array: [[1, string], [2, string]]
-  addDebugInfo: function addDebugInfo(debugInfoText) {
-    debugInfoText.forEach(function (item) {
-      document.getElementById('info' + item[0]).textContent = item[1];
-    });
-  },
-
-  clearDebugInfo: function clearDebugInfo() {
-    Array.from(document.getElementsByClassName('info')).forEach(function (element) {
-      element.textContent = '';
-    });
-  }
-};
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  init: function init() {
-    this.imageToDelete = {};
-
-    console.log('and now?');
-  }
-};
-
-/***/ }),
-/* 12 */
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3106,40 +3317,25 @@ module.exports = {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.default = configureStore;
 
-var _redux = __webpack_require__(6);
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-var _reducers = __webpack_require__(14);
+exports.default = function () {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { element: {}, id: '' };
+  var action = arguments[1];
 
-var _reducers2 = _interopRequireDefault(_reducers);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function configureStore() {
-  // return createStore(reducers, {}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
-  return (0, _redux.createStore)(_reducers2.default, {});
-};
-
-/***/ }),
-/* 13 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-
-  clickme: function clickme(id, time) {
-    setTimeout(function () {
-      document.getElementById(id).dispatchEvent(new Event('click'));
-    }, time);
+  switch (action.type) {
+    case "SET_DELETE_TARGET":
+      return _extends({}, state, { element: action.payload, id: action.payload.id });
+    default:
+      return state;
   }
-
 };
 
+;
+
 /***/ }),
-/* 14 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3149,13 +3345,13 @@ Object.defineProperty(exports, "__esModule", {
 	value: true
 });
 
-var _redux = __webpack_require__(6);
+var _redux = __webpack_require__(7);
 
-var _deleteTarget = __webpack_require__(35);
+var _deleteTarget = __webpack_require__(17);
 
 var _deleteTarget2 = _interopRequireDefault(_deleteTarget);
 
-var _selectedImage = __webpack_require__(36);
+var _selectedImage = __webpack_require__(19);
 
 var _selectedImage2 = _interopRequireDefault(_selectedImage);
 
@@ -3167,14 +3363,40 @@ exports.default = (0, _redux.combineReducers)({
 });
 
 /***/ }),
-/* 15 */,
-/* 16 */
+/* 19 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+
+var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+
+exports.default = function () {
+  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { id: '' };
+  var action = arguments[1];
+
+  switch (action.type) {
+    case "SET_SELECTED_IMAGE":
+      return _extends({}, state, { id: action.payload });
+    default:
+      return state;
+  }
+};
+
+;
+
+/***/ }),
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Symbol_js__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getRawTag_js__ = __webpack_require__(19);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objectToString_js__ = __webpack_require__(20);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Symbol_js__ = __webpack_require__(2);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__getRawTag_js__ = __webpack_require__(23);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__objectToString_js__ = __webpack_require__(24);
 
 
 
@@ -3206,7 +3428,7 @@ function baseGetTag(value) {
 
 
 /***/ }),
-/* 17 */
+/* 21 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3215,14 +3437,14 @@ var freeGlobal = typeof global == 'object' && global && global.Object === Object
 
 /* harmony default export */ __webpack_exports__["a"] = (freeGlobal);
 
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(8)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(9)))
 
 /***/ }),
-/* 18 */
+/* 22 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__overArg_js__ = __webpack_require__(21);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__overArg_js__ = __webpack_require__(25);
 
 
 /** Built-in value references. */
@@ -3232,11 +3454,11 @@ var getPrototype = __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_0__overArg_js
 
 
 /***/ }),
-/* 19 */
+/* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Symbol_js__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__Symbol_js__ = __webpack_require__(2);
 
 
 /** Used for built-in method references. */
@@ -3286,7 +3508,7 @@ function getRawTag(value) {
 
 
 /***/ }),
-/* 20 */
+/* 24 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3315,7 +3537,7 @@ function objectToString(value) {
 
 
 /***/ }),
-/* 21 */
+/* 25 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3337,11 +3559,11 @@ function overArg(func, transform) {
 
 
 /***/ }),
-/* 22 */
+/* 26 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__freeGlobal_js__ = __webpack_require__(17);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__freeGlobal_js__ = __webpack_require__(21);
 
 
 /** Detect free variable `self`. */
@@ -3354,7 +3576,7 @@ var root = __WEBPACK_IMPORTED_MODULE_0__freeGlobal_js__["a" /* default */] || fr
 
 
 /***/ }),
-/* 23 */
+/* 27 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3390,11 +3612,11 @@ function isObjectLike(value) {
 
 
 /***/ }),
-/* 24 */
+/* 28 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__compose__ = __webpack_require__(4);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__compose__ = __webpack_require__(5);
 /* harmony export (immutable) */ __webpack_exports__["a"] = applyMiddleware;
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
@@ -3446,7 +3668,7 @@ function applyMiddleware() {
 }
 
 /***/ }),
-/* 25 */
+/* 29 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -3500,13 +3722,13 @@ function bindActionCreators(actionCreators, dispatch) {
 }
 
 /***/ }),
-/* 26 */
+/* 30 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(5);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__ = __webpack_require__(2);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_warning__ = __webpack_require__(7);
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(6);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__ = __webpack_require__(3);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_warning__ = __webpack_require__(8);
 /* harmony export (immutable) */ __webpack_exports__["a"] = combineReducers;
 
 
@@ -3637,17 +3859,17 @@ function combineReducers(reducers) {
     return hasChanged ? nextState : state;
   };
 }
-/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(3)))
+/* WEBPACK VAR INJECTION */}.call(__webpack_exports__, __webpack_require__(4)))
 
 /***/ }),
-/* 27 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(28);
+module.exports = __webpack_require__(32);
 
 
 /***/ }),
-/* 28 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3657,7 +3879,7 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 
-var _ponyfill = __webpack_require__(29);
+var _ponyfill = __webpack_require__(33);
 
 var _ponyfill2 = _interopRequireDefault(_ponyfill);
 
@@ -3680,10 +3902,10 @@ if (typeof self !== 'undefined') {
 
 var result = (0, _ponyfill2['default'])(root);
 exports['default'] = result;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(8), __webpack_require__(30)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9), __webpack_require__(34)(module)))
 
 /***/ }),
-/* 29 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -3712,7 +3934,7 @@ function symbolObservablePonyfill(root) {
 };
 
 /***/ }),
-/* 30 */
+/* 34 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -3740,39 +3962,6 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 31 */,
-/* 32 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.setDeleteTarget = setDeleteTarget;
-exports.setSelectedImage = setSelectedImage;
-function setDeleteTarget(deleteTarget) {
-
-  return {
-    type: 'SET_DELETE_TARGET',
-    payload: deleteTarget
-  };
-}
-
-function setSelectedImage(id) {
-  console.log('fired');
-  console.log(id);
-
-  return {
-    type: "SET_SELECTED_IMAGE",
-    payload: id
-  };
-}
-
-/***/ }),
-/* 33 */,
-/* 34 */,
 /* 35 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -3782,22 +3971,20 @@ function setSelectedImage(id) {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.default = configureStore;
 
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
+var _redux = __webpack_require__(7);
 
-exports.default = function () {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { element: {}, id: '' };
-  var action = arguments[1];
+var _reducers = __webpack_require__(18);
 
-  switch (action.type) {
-    case "SET_DELETE_TARGET":
-      return _extends({}, state, { element: action.payload, id: action.payload.id });
-    default:
-      return state;
-  }
+var _reducers2 = _interopRequireDefault(_reducers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function configureStore() {
+  // return createStore(reducers, {}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  return (0, _redux.createStore)(_reducers2.default, {});
 };
-
-;
 
 /***/ }),
 /* 36 */
@@ -3806,250 +3993,69 @@ exports.default = function () {
 "use strict";
 
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-
-var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
-
-exports.default = function () {
-  var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : { id: '' };
-  var action = arguments[1];
-
-  switch (action.type) {
-    case "SET_SELECTED_IMAGE":
-      return _extends({}, state, { id: action.payload });
-    default:
-      return state;
-  }
-};
-
-;
-
-/***/ }),
-/* 37 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  hideDraggers: function hideDraggers() {
-    Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
-      this.hideElement(dragger);
-    }.bind(this));
-  },
-  hideOtherDraggers: function hideOtherDraggers(id) {
-    Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
-      if (dragger.id !== id) {
-        this.hideElement(dragger);
-      };
-    }.bind(this));
-  },
-  hideID: function hideID(id) {
-    document.getElementById(id).style.display = 'none';
-  },
-  hideElement: function hideElement(element) {
-    element.style.display = 'none';
-  },
-  showID: function showID(id) {
-    document.getElementById(id).style.display = 'block';
-  },
-  deletePreview: function deletePreview() {
-    var deleteTarget = window.store.getState().deleteTarget;
-
-    // show
-    document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
-    document.getElementById('delete_preview').src = deleteTarget.element.src;
-
-    // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  },
-  openTools: function openTools() {
-    // show
-    document.getElementById('tools_container').classList.add('tools_container_is_open');
-    // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-  },
-  openAccount: function openAccount() {
-    // show
-    document.getElementById('login_container').classList.add('login_container_is_open');
-    // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  },
-  openUpload: function openUpload() {
-    // show
-    document.getElementById('upload_container').classList.add('upload_container_is_open');
-    // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  },
-  uploadPreview: function uploadPreview() {
-    // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-  },
-  afterUpload: function afterUpload() {
-    // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-    // hide elements
-    document.getElementById('upload_container').classList.remove('upload_container_is_open');
-    this.hideID('upload_preview_container');
-    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-    document.getElementById('confirm_or_reject_container_info').textContent = '';
-    // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
-    // to visible after the transition effect takes place
-    setTimeout(function () {
-      this.showID('upload_preview_container');
-      document.getElementById('confirm_or_reject_container').style.display = 'flex';
-    }, 500);
-    // replace image_upload_preview image
-    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-  },
-  afterDelete: function afterDelete() {
-    // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-    // hide elements
-    document.getElementById('delete_preview_container').style.display = 'none';
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    this.hideDraggers();
-    // This setTimeout is so that the delete_preview_container disappears immediately, and then resets
-    // to visible after the transition effect takes place
-    setTimeout(function () {
-      document.getElementById('delete_preview_container').style.display = 'block';
-    }, 500);
-    // replace delete_preview
-    document.getElementById('delete_preview').src = '/icons/1x1.png';
-  },
-  rejectDelete: function rejectDelete() {
-    var deleteTarget = window.store.getState().deleteTarget;
-
-    // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
-    // hide elements
-    document.getElementById('delete_preview_container').style.display = 'none';
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    setTimeout(function () {
-      document.getElementById('delete_preview_container').style.display = 'block';
-    }, 500);
-    // reshow hidden image that wasn't deleted
-    deleteTarget.element.style.display = 'initial';
-
-    // show image on other clients
-    window.socket.emit('c-e:  show_image', deleteTarget.id);
-  },
-  closeAll: function closeAll() {
-    // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-    document.getElementById('tools_container').classList.remove('tools_container_is_open');
-    document.getElementById('login_container').classList.remove('login_container_is_open');
-    document.getElementById('upload_container').classList.remove('upload_container_is_open');
-    document.getElementById('connect_info').classList.remove('connect_info_is_open');
-    document.getElementById('explore_container').style.display = 'none';
-    document.getElementById('insta_header').style.display = 'none';
-    document.getElementById('insta_div').style.display = 'none';
-
-    // replace image_upload_preview image and delete_preview image
-    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-    document.getElementById('delete_preview').src = '/icons/1x1.png';
-    // close navigation button
-    document.body.classList.remove('button_container_is_open');
-    // animate close hamburgers
-    document.getElementById('line_one').style.top = '40%';
-    document.getElementById('line_three').style.top = '60%';
-  }
-};
-
-/***/ }),
-/* 38 */,
-/* 39 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _stateChange = __webpack_require__(37);
-
-var _stateChange2 = _interopRequireDefault(_stateChange);
-
-var _actions = __webpack_require__(32);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 module.exports = {
   init: function init() {
-    this.buttons = [];
-    this.createButton('n1', 'open-account', 'account', '/icons/person_circle_icon.png');
-    this.createButton('n2', 'open-tools', 'tools', '/icons/tools_icon.png');
-    this.createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png');
-    this.createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png');
-
-    this.addEvents();
-  },
-  createButton: function createButton(domLocation, action, text, iconPath) {
-    var targetDiv = document.getElementById(domLocation),
-        iconDiv = document.createElement('img');
-
-    targetDiv.classList.remove('button_no_show');
-    targetDiv.classList.add('button', 'navigation_button');
-    targetDiv.setAttribute('data-action', action);
-    targetDiv.innerText = text;
-    iconDiv.classList.add('icon_image');
-    iconDiv.src = iconPath;
-    targetDiv.appendChild(iconDiv);
-
-    this.buttons.push(targetDiv);
-  },
-  onClick: function onClick(e) {
-    console.log(e.currentTarget);
-    switch (e.currentTarget.getAttribute('data-action')) {
-      case 'open-tools':
-        _stateChange2.default.openTools();
-        // NOTES: this.store.dispatch(open-tools())
-        break;
-
-      case 'open-account':
-        _stateChange2.default.openAccount();
-        break;
-
-      case 'open-upload':
-        _stateChange2.default.openUpload();
-        break;
-      case 'exit-door':
-        // hide original image
-        _stateChange2.default.hideElement(selectedImage);
-        // hide draggers
-        _stateChange2.default.hideDraggers();
-        // show delete_preview_container
-        _stateChange2.default.deletePreview();
-        this.handleDelete();
-        break;
-      default:
-        break;
-    }
-  },
-  handleDelete: function handleDelete() {
-    var selectedImageID = window.store.getState().selectedImage.id,
-        selectedImage = document.getElementById(selectedImageID);
-
-    if (selectedImageID !== '') {
-      window.store.dispatch((0, _actions.setDeleteTarget)(selectedImage));
-
-      // send socket to hide on other clients
-      window.socket.emit('c-e:  hide_image', selectedImageID);
-    };
-  },
-  addEvents: function addEvents() {
     var _this = this;
 
-    this.buttons.forEach(function (button) {
-      button.addEventListener('click', _this.onClick.bind(_this));
-    });
+    this.render();
+
+    // add perspective to 3d transforms
+    var imagesDiv = document.getElementById('images');
+
+    imagesDiv.style.width = window.innerWidth + 'px';
+    imagesDiv.style.height = window.innerHeight + 'px';
+    imagesDiv.style.webkitPerspective = '500px';
+    imagesDiv.style.webkitPerspectiveOriginX = '50%';
+    imagesDiv.style.webkitPerspectiveOriginY = '50%';
+
+    // listen for resize and orientation changes and make adjustments
+    window.addEventListener('resize', function () {
+      _this.render();
+    }, false);
+  },
+
+  render: function render() {
+    var navToggleDiv = document.getElementById('navigation_toggle_button_container'),
+        closeInfoDiv = document.getElementById('close_info_container'),
+        appInfoDiv = document.getElementById('app_info'),
+        closeExploreDiv = document.getElementById('close_explore_container');
+
+    // retrieve dragger size from css
+    this.draggerWidth = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width);
+    this.draggerHeight = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).height);
+
+    // retrieve window size; calculate dragger limit box size
+    this.mainWide = window.innerWidth;
+    this.mainHigh = window.innerHeight;
+
+    this.innerWidth = this.mainWide - this.draggerWidth;
+    this.innerHeight = this.mainHigh - this.draggerHeight;
+
+    // set wrapper size; (css vh and vw were not working with mobile safari)
+    document.getElementById('wrapper').style.width = this.mainWide + 'px';
+    document.getElementById('wrapper').style.height = this.mainHigh + 'px';
+
+    // position the navigation_toggle_button_container on the bottom right
+    navToggleDiv.style.left = this.mainWide - parseFloat(window.getComputedStyle(navToggleDiv).width) + 'px';
+    navToggleDiv.style.top = this.mainHigh - parseFloat(window.getComputedStyle(navToggleDiv).height) + 'px';
+
+    // set app_info height
+    document.getElementById('app_info').style.height = this.innerHeight * 0.9 + 'px';
+
+    // set explore_container height
+    document.getElementById('explore_container').style.height = this.innerHeight * 0.9 + 'px';
+
+    // set position and size of the close_info container divs
+    closeInfoDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeInfoDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeInfoDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+
+    // set position and size of the x_icon container divs
+    closeExploreDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeExploreDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeExploreDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
   }
 };
-// import socketFile from '../socket-file';
 
 /***/ })
 /******/ ]);

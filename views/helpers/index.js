@@ -17,20 +17,19 @@ module.exports = {
     return accum;
   },
   repeat: function (times, opts) {
-    var out = "";
-    var i;
-    var data = {};
+    var out = '',
+        i,
+        data = {};
 
     if ( times ) {
-        for ( i = 1; i < times + 1; i += 1 ) {
-            data.index = i;
-            out += opts.fn(this, {
-                data: data
-            });
-        }
+      for ( i = 1; i < times + 1; i += 1 ) {
+        data.index = i;
+        out += opts.fn(this, {
+          data: data
+        });
+      }
     } else {
-
-        out = opts.inverse(this);
+      out = opts.inverse(this);
     }
 
     return out;

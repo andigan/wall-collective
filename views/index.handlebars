@@ -38,7 +38,8 @@
                       height: {{height}};
                    transform: {{transform}};
                      opacity: {{opacity}};
-              -webkit-filter: {{filter}};'
+              -webkit-filter: {{filter}};
+                    position: absolute;'
               data-scale='{{scale}}'
               data-angle='{{angle}}'
               data-rotateX='{{rotateX}}'
@@ -197,10 +198,10 @@
         </a>
 
       </div>
+      <div id='close_explore_container'>
+        <img class='x_icon icon_image' src='/icons/x_icon.png'>
+      </div>
 
-    </div>
-    <div id='close_explore_container'>
-      <img class='x_icon icon_image' src='/icons/x_icon.png'>
     </div>
 
     {{>draggers_switch_panel}}
