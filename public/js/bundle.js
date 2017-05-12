@@ -492,6 +492,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -550,11 +554,11 @@ function compose() {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ActionTypes; });
+/* harmony export (immutable) */ __webpack_exports__["a"] = createStore;
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lodash_es_isPlainObject__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable__ = __webpack_require__(31);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_symbol_observable___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_symbol_observable__);
-/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return ActionTypes; });
-/* harmony export (immutable) */ __webpack_exports__["a"] = createStore;
 
 
 
@@ -809,8 +813,8 @@ function createStore(reducer, preloadedState, enhancer) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(process) {Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(6);
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1__combineReducers__ = __webpack_require__(30);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__bindActionCreators__ = __webpack_require__(29);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__applyMiddleware__ = __webpack_require__(28);
@@ -903,6 +907,102 @@ module.exports = g;
 "use strict";
 
 
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.default = configureStore;
+
+var _redux = __webpack_require__(7);
+
+var _reducers = __webpack_require__(18);
+
+var _reducers2 = _interopRequireDefault(_reducers);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function configureStore() {
+  // return createStore(reducers, {}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
+  return (0, _redux.createStore)(_reducers2.default, {});
+};
+
+/***/ }),
+/* 11 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+module.exports = {
+  init: function init() {
+    var _this = this;
+
+    this.render();
+
+    // add perspective to 3d transforms
+    var imagesDiv = document.getElementById('images');
+
+    imagesDiv.style.width = window.innerWidth + 'px';
+    imagesDiv.style.height = window.innerHeight + 'px';
+    imagesDiv.style.webkitPerspective = '500px';
+    imagesDiv.style.webkitPerspectiveOriginX = '50%';
+    imagesDiv.style.webkitPerspectiveOriginY = '50%';
+
+    // listen for resize and orientation changes and make adjustments
+    window.addEventListener('resize', function () {
+      _this.render();
+    }, false);
+  },
+
+  render: function render() {
+    var navToggleDiv = document.getElementById('navigation_toggle_button_container'),
+        closeInfoDiv = document.getElementById('close_info_container'),
+        appInfoDiv = document.getElementById('app_info'),
+        closeExploreDiv = document.getElementById('close_explore_container');
+
+    // retrieve dragger size from css
+    this.draggerWidth = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width);
+    this.draggerHeight = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).height);
+
+    // retrieve window size; calculate dragger limit box size
+    this.mainWide = window.innerWidth;
+    this.mainHigh = window.innerHeight;
+
+    this.innerWidth = this.mainWide - this.draggerWidth;
+    this.innerHeight = this.mainHigh - this.draggerHeight;
+
+    // set wrapper size; (css vh and vw were not working with mobile safari)
+    document.getElementById('wrapper').style.width = this.mainWide + 'px';
+    document.getElementById('wrapper').style.height = this.mainHigh + 'px';
+
+    // position the navigation_toggle_button_container on the bottom right
+    navToggleDiv.style.left = this.mainWide - parseFloat(window.getComputedStyle(navToggleDiv).width) + 'px';
+    navToggleDiv.style.top = this.mainHigh - parseFloat(window.getComputedStyle(navToggleDiv).height) + 'px';
+
+    // set app_info height
+    document.getElementById('app_info').style.height = this.innerHeight * 0.9 + 'px';
+
+    // set explore_container height
+    document.getElementById('explore_container').style.height = this.innerHeight * 0.9 + 'px';
+
+    // set position and size of the close_info container divs
+    closeInfoDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeInfoDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeInfoDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+
+    // set position and size of the x_icon container divs
+    closeExploreDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeExploreDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
+    closeExploreDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+  }
+};
+
+/***/ }),
+/* 12 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
 var _stateChange = __webpack_require__(1);
 
 var _stateChange2 = _interopRequireDefault(_stateChange);
@@ -985,7 +1085,7 @@ module.exports = {
 // import socketFile from '../socket-file';
 
 /***/ }),
-/* 11 */
+/* 13 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1009,7 +1109,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 12 */
+/* 14 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1170,8 +1270,6 @@ module.exports = {
 };
 
 /***/ }),
-/* 13 */,
-/* 14 */,
 /* 15 */
 /***/ (function(module, exports, __webpack_require__) {
 
@@ -1195,15 +1293,15 @@ module.exports = {
 "use strict";
 
 
-var _config = __webpack_require__(11);
+var _config = __webpack_require__(13);
 
 var _config2 = _interopRequireDefault(_config);
 
-var _configureStore = __webpack_require__(35);
+var _configureStore = __webpack_require__(10);
 
 var _configureStore2 = _interopRequireDefault(_configureStore);
 
-var _pageSettings = __webpack_require__(36);
+var _pageSettings = __webpack_require__(11);
 
 var _pageSettings2 = _interopRequireDefault(_pageSettings);
 
@@ -1211,13 +1309,13 @@ var _stateChange = __webpack_require__(1);
 
 var _stateChange2 = _interopRequireDefault(_stateChange);
 
-var _buttons = __webpack_require__(10);
+var _buttons = __webpack_require__(12);
 
 var _buttons2 = _interopRequireDefault(_buttons);
 
 var _actions = __webpack_require__(0);
 
-var _debug = __webpack_require__(12);
+var _debug = __webpack_require__(14);
 
 var _debug2 = _interopRequireDefault(_debug);
 
@@ -3616,8 +3714,8 @@ function isObjectLike(value) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__compose__ = __webpack_require__(5);
 /* harmony export (immutable) */ __webpack_exports__["a"] = applyMiddleware;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__compose__ = __webpack_require__(5);
 var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
 
@@ -3726,10 +3824,10 @@ function bindActionCreators(actionCreators, dispatch) {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* WEBPACK VAR INJECTION */(function(process) {/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(6);
+/* WEBPACK VAR INJECTION */(function(process) {/* harmony export (immutable) */ __webpack_exports__["a"] = combineReducers;
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__createStore__ = __webpack_require__(6);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lodash_es_isPlainObject__ = __webpack_require__(3);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__utils_warning__ = __webpack_require__(8);
-/* harmony export (immutable) */ __webpack_exports__["a"] = combineReducers;
 
 
 
@@ -3960,102 +4058,6 @@ module.exports = function(module) {
 	return module;
 };
 
-
-/***/ }),
-/* 35 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.default = configureStore;
-
-var _redux = __webpack_require__(7);
-
-var _reducers = __webpack_require__(18);
-
-var _reducers2 = _interopRequireDefault(_reducers);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-function configureStore() {
-  // return createStore(reducers, {}, window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__());
-  return (0, _redux.createStore)(_reducers2.default, {});
-};
-
-/***/ }),
-/* 36 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-module.exports = {
-  init: function init() {
-    var _this = this;
-
-    this.render();
-
-    // add perspective to 3d transforms
-    var imagesDiv = document.getElementById('images');
-
-    imagesDiv.style.width = window.innerWidth + 'px';
-    imagesDiv.style.height = window.innerHeight + 'px';
-    imagesDiv.style.webkitPerspective = '500px';
-    imagesDiv.style.webkitPerspectiveOriginX = '50%';
-    imagesDiv.style.webkitPerspectiveOriginY = '50%';
-
-    // listen for resize and orientation changes and make adjustments
-    window.addEventListener('resize', function () {
-      _this.render();
-    }, false);
-  },
-
-  render: function render() {
-    var navToggleDiv = document.getElementById('navigation_toggle_button_container'),
-        closeInfoDiv = document.getElementById('close_info_container'),
-        appInfoDiv = document.getElementById('app_info'),
-        closeExploreDiv = document.getElementById('close_explore_container');
-
-    // retrieve dragger size from css
-    this.draggerWidth = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width);
-    this.draggerHeight = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).height);
-
-    // retrieve window size; calculate dragger limit box size
-    this.mainWide = window.innerWidth;
-    this.mainHigh = window.innerHeight;
-
-    this.innerWidth = this.mainWide - this.draggerWidth;
-    this.innerHeight = this.mainHigh - this.draggerHeight;
-
-    // set wrapper size; (css vh and vw were not working with mobile safari)
-    document.getElementById('wrapper').style.width = this.mainWide + 'px';
-    document.getElementById('wrapper').style.height = this.mainHigh + 'px';
-
-    // position the navigation_toggle_button_container on the bottom right
-    navToggleDiv.style.left = this.mainWide - parseFloat(window.getComputedStyle(navToggleDiv).width) + 'px';
-    navToggleDiv.style.top = this.mainHigh - parseFloat(window.getComputedStyle(navToggleDiv).height) + 'px';
-
-    // set app_info height
-    document.getElementById('app_info').style.height = this.innerHeight * 0.9 + 'px';
-
-    // set explore_container height
-    document.getElementById('explore_container').style.height = this.innerHeight * 0.9 + 'px';
-
-    // set position and size of the close_info container divs
-    closeInfoDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeInfoDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeInfoDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
-
-    // set position and size of the x_icon container divs
-    closeExploreDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeExploreDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeExploreDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
-  }
-};
 
 /***/ })
 /******/ ]);
