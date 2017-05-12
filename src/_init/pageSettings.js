@@ -6,8 +6,8 @@ module.exports = {
     // add perspective to 3d transforms
     let imagesDiv = document.getElementById('images');
 
-    imagesDiv.style.width = window.innerWidth + 'px';
-    imagesDiv.style.height = window.innerHeight + 'px';
+    // imagesDiv.style.width = window.innerWidth + 'px';
+    // imagesDiv.style.height = window.innerHeight + 'px';
     imagesDiv.style.webkitPerspective = '500px';
     imagesDiv.style.webkitPerspectiveOriginX = '50%';
     imagesDiv.style.webkitPerspectiveOriginY = '50%';
@@ -39,6 +39,38 @@ module.exports = {
     // set wrapper size; (css vh and vw were not working with mobile safari)
     document.getElementById('wrapper').style.width = this.mainWide + 'px';
     document.getElementById('wrapper').style.height = this.mainHigh + 'px';
+
+
+
+    // set images container size; maintain portrait aspect ratio
+    function setAspectRatio() {
+       let aspect = 568/320;
+
+        var outer = $('#wrapper');
+        var box = $('#images');
+
+        if (outer.height() > outer.width() * aspect) {
+            box.css({'width': '100%'});
+            box.css({'height': box.width() * aspect});
+
+        } else {
+            box.css({'height': '100%'});
+            box.css({'width': box.height() / aspect});
+        }
+    }
+
+        setAspectRatio();
+
+
+
+
+
+    // console.log(aspect);
+    //
+    // document.getElementById('images').style.width = (this.mainWide - this.draggerWidth) + 'px';
+    // document.getElementById('images').style.height = (this.mainHigh - this.draggerHeight) + 'px';
+
+
 
 
     // position the navigation_toggle_button_container on the bottom right

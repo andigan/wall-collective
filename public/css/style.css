@@ -438,11 +438,15 @@ fullscreenmaskclass: 90000;
 }
 
 #wrapper {
-  background-color:black;
+  background-color:#50a0ee;
   display:block;
   left:0;
   position:absolute;
   top:0;
+}
+
+#images {
+  background-color: black;
 }
 
 /* opacity is the primary feature of this functionality. */
