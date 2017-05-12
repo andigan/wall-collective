@@ -159,6 +159,8 @@ module.exports = {
     document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
   },
   afterUpload: function afterUpload() {
+    var _this = this;
+
     // show element
     document.getElementById('navigation_container').classList.add('navigation_container_is_open');
     // hide elements
@@ -169,7 +171,7 @@ module.exports = {
     // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
     // to visible after the transition effect takes place
     setTimeout(function () {
-      this.showID('upload_preview_container');
+      _this.showID('upload_preview_container');
       document.getElementById('confirm_or_reject_container').style.display = 'flex';
     }, 500);
     // replace image_upload_preview image
@@ -954,10 +956,10 @@ module.exports = {
   },
 
   render: function render() {
-    var navToggleDiv = document.getElementById('navigation_toggle_button_container'),
-        closeInfoDiv = document.getElementById('close_info_container'),
-        appInfoDiv = document.getElementById('app_info'),
-        closeExploreDiv = document.getElementById('close_explore_container');
+    var navToggleEl = document.getElementById('navigation_toggle_button_container'),
+        xInfoEl = document.getElementById('close_info_container'),
+        appInfoEl = document.getElementById('app_info'),
+        xExploreEl = document.getElementById('close_explore_container');
 
     // retrieve dragger size from css
     this.draggerWidth = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width);
@@ -975,8 +977,8 @@ module.exports = {
     document.getElementById('wrapper').style.height = this.mainHigh + 'px';
 
     // position the navigation_toggle_button_container on the bottom right
-    navToggleDiv.style.left = this.mainWide - parseFloat(window.getComputedStyle(navToggleDiv).width) + 'px';
-    navToggleDiv.style.top = this.mainHigh - parseFloat(window.getComputedStyle(navToggleDiv).height) + 'px';
+    navToggleEl.style.left = this.mainWide - parseFloat(window.getComputedStyle(navToggleEl).width) + 'px';
+    navToggleEl.style.top = this.mainHigh - parseFloat(window.getComputedStyle(navToggleEl).height) + 'px';
 
     // set app_info height
     document.getElementById('app_info').style.height = this.innerHeight * 0.9 + 'px';
@@ -985,14 +987,14 @@ module.exports = {
     document.getElementById('explore_container').style.height = this.innerHeight * 0.9 + 'px';
 
     // set position and size of the close_info container divs
-    closeInfoDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeInfoDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeInfoDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+    xInfoEl.style.width = parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1 + 'px';
+    xInfoEl.style.height = parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1 + 'px';
+    xInfoEl.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(xInfoEl.style.height)) + 'px';
 
     // set position and size of the x_icon container divs
-    closeExploreDiv.style.width = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeExploreDiv.style.height = parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1 + 'px';
-    closeExploreDiv.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+    xExploreEl.style.width = parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1 + 'px';
+    xExploreEl.style.height = parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1 + 'px';
+    xExploreEl.style.top = this.mainHigh * 0.05 + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(xInfoEl.style.height)) + 'px';
   }
 };
 
@@ -1095,8 +1097,8 @@ module.exports = {
   debugOn: true, // set debug div
 
   // set upload placement
-  uploadTop: '0px',
-  uploadLeft: '0px',
+  uploadTop: '0%',
+  uploadLeft: '0%',
   uploadWidth: '75px',
   uploadheight: '100px',
 
@@ -1623,8 +1625,8 @@ socket.on('bc: change_user_count', function (data) {
 
 // on another client moving an image, move target
 socket.on('bc: moving', function (data) {
-  document.getElementById(data.image_id).style.top = data.imageTop;
-  document.getElementById(data.image_id).style.left = data.imageLeft;
+  document.getElementById(data.image_id).style.top = data.posTop + '%';
+  document.getElementById(data.image_id).style.left = data.posLeft + '%';
 });
 
 // on another client resizing an image, resize target
@@ -1948,11 +1950,11 @@ socket.on('be: add_insta_image_to_other_clients', function (instaDBData) {
 // --Buttons
 
 
-document.getElementById('navigation_toggle_button').onclick = function () {
-  var button_element = document.getElementById('navigation_toggle_button');
+document.getElementById('navigation_toggle_button').onclick = function (e) {
+  var buttonEl = document.getElementById('navigation_toggle_button');
 
   // if the button is being dragged, don't use the click.  FUTURE WORK: stop event propagation
-  if (button_element.classList.contains('dragging_no_click') === false) {
+  if (buttonEl.classList.contains('dragging_no_click') === false) {
 
     // otherwise, if button containers are open
     if (document.body.classList.contains('button_container_is_open')) {
@@ -1978,15 +1980,6 @@ document.getElementById('navigation_toggle_button').onclick = function () {
     };
   };
 };
-
-//
-// <div id='exit_door' class='button navigation_button'> remove
-//   <img class='icon_image' src='/icons/door_icon.png'>
-// </div>
-
-
-//var exitDoor = require('./exit-door');
-
 
 // dragger_all_switch; used to toggle all dragger switches
 $('#dragger_all_switch').click(function () {
@@ -2317,8 +2310,12 @@ function assigndrag(id) {
       //   boolean statement ? true result : false result;
       //   if boolean statement is true, do first, else do second.
       //   so if left is not a number, make it zero, otherwise make it left
-      var left = parseInt(this.style.left),
-          top = parseInt(this.style.top);
+
+      var left = parseInt(window.getComputedStyle(this).left),
+          top = parseInt(window.getComputedStyle(this).top);
+
+      // var left = parseInt(this.style.left),
+      //   top = parseInt(this.style.top);
 
       left = isNaN(left) ? 0 : left;
       top = isNaN(top) ? 0 : top;
@@ -2360,6 +2357,9 @@ function assigndrag(id) {
       this.socketdata.imageTop = this.style.top;
       this.socketdata.imageLeft = this.style.left;
 
+      this.socketdata.posTop = (ui.position.top / _pageSettings2.default.mainHigh * 100).toFixed(2);
+      this.socketdata.posLeft = (ui.position.left / _pageSettings2.default.mainWide * 100).toFixed(2);
+
       // pass socket data to server
       socket.emit('c-e:  moving', this.socketdata);
     },
@@ -2387,8 +2387,8 @@ function assigndrag(id) {
       dropPost.filenames = [];
       dropPost.zIndexes = [];
       dropPost.dFilename = this.getAttribute('title');
-      dropPost.dLeft = this.style.left;
-      dropPost.dTop = this.style.top;
+      dropPost.dLeft = this.socketdata.posLeft + '%';
+      dropPost.dTop = this.socketdata.posTop + '%';
 
       // populate dropPost
       for (i = 0; i < drawing_elements.length; i++) {

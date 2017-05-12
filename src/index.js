@@ -326,8 +326,8 @@ assigndrag();
 
   // on another client moving an image, move target
   socket.on('bc: moving', function (data) {
-    document.getElementById(data.image_id).style.top  = data.imageTop;
-    document.getElementById(data.image_id).style.left = data.imageLeft;
+    document.getElementById(data.image_id).style.top  = data.posTop + '%';
+    document.getElementById(data.image_id).style.left = data.posLeft + '%';
   });
 
   // on another client resizing an image, resize target
@@ -663,11 +663,11 @@ assigndrag();
 // --Buttons
 
 
-  document.getElementById('navigation_toggle_button').onclick = function () {
-    var button_element = document.getElementById('navigation_toggle_button');
+  document.getElementById('navigation_toggle_button').onclick = function (e) {
+    var buttonEl = document.getElementById('navigation_toggle_button');
 
     // if the button is being dragged, don't use the click.  FUTURE WORK: stop event propagation
-    if ( button_element.classList.contains('dragging_no_click') === false ) {
+    if ( buttonEl.classList.contains('dragging_no_click') === false ) {
 
       // otherwise, if button containers are open
       if ( document.body.classList.contains('button_container_is_open') ) {
@@ -693,15 +693,6 @@ assigndrag();
       };
     };
   };
-
-
-  //
-  // <div id='exit_door' class='button navigation_button'> remove
-  //   <img class='icon_image' src='/icons/door_icon.png'>
-  // </div>
-
-
-//var exitDoor = require('./exit-door');
 
 
   // dragger_all_switch; used to toggle all dragger switches
@@ -1035,9 +1026,6 @@ assigndrag();
   });
 
 
-
-
-
 // --Main drag function
 
   // use this function to assign draggable to all '.wallPic' elements
@@ -1063,8 +1051,12 @@ assigndrag();
           //   boolean statement ? true result : false result;
           //   if boolean statement is true, do first, else do second.
           //   so if left is not a number, make it zero, otherwise make it left
-          var left = parseInt(this.style.left),
-            top = parseInt(this.style.top);
+
+          var left = parseInt(window.getComputedStyle(this).left),
+            top = parseInt(window.getComputedStyle(this).top);
+
+            // var left = parseInt(this.style.left),
+            //   top = parseInt(this.style.top);
 
           left = isNaN(left) ? 0 : left;
           top = isNaN(top) ? 0 : top;
@@ -1106,6 +1098,9 @@ assigndrag();
           this.socketdata.imageTop = this.style.top;
           this.socketdata.imageLeft = this.style.left;
 
+          this.socketdata.posTop = (ui.position.top / pageSettings.mainHigh * 100).toFixed(2);
+          this.socketdata.posLeft = (ui.position.left / pageSettings.mainWide * 100).toFixed(2);
+
           // pass socket data to server
           socket.emit('c-e:  moving', this.socketdata);
         },
@@ -1133,8 +1128,8 @@ assigndrag();
           dropPost.filenames = [];
           dropPost.zIndexes = [];
           dropPost.dFilename = this.getAttribute('title');
-          dropPost.dLeft = this.style.left;
-          dropPost.dTop = this.style.top;
+          dropPost.dLeft = this.socketdata.posLeft + '%';
+          dropPost.dTop = this.socketdata.posTop + '%';
 
           // populate dropPost
           for (i = 0; i < drawing_elements.length; i++) {

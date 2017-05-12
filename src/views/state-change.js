@@ -76,7 +76,7 @@ module.exports = {
     document.getElementById('confirm_or_reject_container_info').textContent = '';
     // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
     // to visible after the transition effect takes place
-    setTimeout(function () {
+    setTimeout(() => {
       this.showID('upload_preview_container');
       document.getElementById('confirm_or_reject_container').style.display = 'flex';
     }, 500);
