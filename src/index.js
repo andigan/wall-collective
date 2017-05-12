@@ -1097,11 +1097,16 @@ assigndrag();
           ui.position.top += this.recoupTop;
 
           // prepare socketdata to pass
-          this.socketdata.imageTop = this.style.top;
-          this.socketdata.imageLeft = this.style.left;
+          // this.socketdata.imageTop = this.style.top;
+          // this.socketdata.imageLeft = this.style.left;
 
-          this.socketdata.posTop = (ui.position.top / pageSettings.mainHigh * 100).toFixed(2);
-          this.socketdata.posLeft = (ui.position.left / pageSettings.mainWide * 100).toFixed(2);
+          console.log((ui.position.top / pageSettings.imagesHigh * 100).toFixed(2));
+
+          this.socketdata.posTop = (ui.position.top / pageSettings.imagesHigh * 100).toFixed(2);
+          this.socketdata.posLeft = (ui.position.left / pageSettings.imagesWide * 100).toFixed(2);
+
+//          console.log(this.socketdata.posLeft);
+
 
           // pass socket data to server
           socket.emit('c-e:  moving', this.socketdata);
@@ -1132,9 +1137,8 @@ assigndrag();
           dropPost.dFilename = this.getAttribute('title');
           // dropPost.dLeft = this.style.left;
           // dropPost.dTop = this.style.top;
-          dropPost.dLeft = this.socketdata.posLeft + '%';
-          dropPost.dTop = this.socketdata.posTop + '%';
-
+          dropPost.posLeft = this.socketdata.posLeft + '%';
+          dropPost.posTop = this.socketdata.posTop + '%';
 
           // populate dropPost
           for (i = 0; i < drawing_elements.length; i++) {

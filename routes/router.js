@@ -53,14 +53,16 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
   console.log('filenames : ' + dropPost.filenames);
   console.log('z_indexes : ' + dropPost.zIndexes);
   console.log('dFilename : ' + dropPost.dFilename);
+  console.log('posLeft   : ' + dropPost.posLeft);
+  console.log('posTop    : ' + dropPost.posTop);
   console.log('dLeft     : ' + dropPost.dLeft);
   console.log('dTop      : ' + dropPost.dTop + '\n');
 
   // update left/top positions for moved_file's filename
   ImageDocuments.update(
     { filename : dropPost.dFilename },
-    { $set: {   posleft  : dropPost.dLeft,
-                postop   : dropPost.dTop } },
+    { $set: {   posleft  : dropPost.posLeft,
+                postop   : dropPost.posTop } },
     { upsert: true },
     function (err) { if (err) return console.error(err); } );
 
@@ -142,8 +144,8 @@ router.get('/resetpage', function (req, res) {
               posleft   : '10%',
               postop    : '10%',
               zindex    : i,
-              width     : '75px',
-              height    : '100px',
+              width     : '20%',
+              height    : 'auto',
               transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
               opacity   : '1',
               filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
@@ -247,8 +249,8 @@ router.post('/addfile', function (req, res) {
                                       location  : config.imageDir,
                                       posleft   : '5%',
                                       postop    : '5%',
-                                      width     : '75px',
-                                      height    : '100px',
+                                      width     : '20%',
+                                      height    : 'auto',
                                       transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
                                       filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
                                       opacity   : '1',

@@ -42,8 +42,8 @@ module.exports = {
 
 
 
+
     // set images container size; maintain portrait aspect ratio
-    function setAspectRatio() {
        let aspect = 568/320;
 
         var outer = $('#wrapper');
@@ -57,9 +57,11 @@ module.exports = {
             box.css({'height': '100%'});
             box.css({'width': box.height() / aspect});
         }
-    }
 
-        setAspectRatio();
+    this.imagesHigh = parseFloat(window.getComputedStyle(document.getElementById('images')).height);
+    this.imagesWide = parseFloat(window.getComputedStyle(document.getElementById('images')).width);
+
+
 
 
 
