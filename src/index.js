@@ -332,52 +332,52 @@ assigndrag();
 
   // on another client moving an image, move target
   socket.on('bc: moving', function (data) {
-    // document.getElementById(data.image_id).style.top  = data.imageTop;
-    // document.getElementById(data.image_id).style.left = data.imageLeft;
-   document.getElementById(data.image_id).style.top  = data.posTop + '%';
-   document.getElementById(data.image_id).style.left = data.posLeft + '%';
+    // document.getElementById(data.imageID).style.top  = data.imageTop;
+    // document.getElementById(data.imageID).style.left = data.imageLeft;
+   document.getElementById(data.imageID).style.top  = data.posTop + '%';
+   document.getElementById(data.imageID).style.left = data.posLeft + '%';
   });
 
   // on another client resizing an image, resize target
   socket.on('bc: resizing', function (data) {
-    document.getElementById(data.image_id).style.transform = data.imageTransform;
-    document.getElementById(data.image_id).style.top       = data.imageTop;
-    document.getElementById(data.image_id).style.left      = data.imageLeft;
-    document.getElementById(data.image_id).style.width     = data.imageWidth;
-    document.getElementById(data.image_id).style.height    = data.imageHeight;
+    document.getElementById(data.imageID).style.transform = data.imageTransform;
+    document.getElementById(data.imageID).style.top       = data.imageTop;
+    document.getElementById(data.imageID).style.left      = data.imageLeft;
+    document.getElementById(data.imageID).style.width     = data.imageWidth;
+    document.getElementById(data.imageID).style.height    = data.imageHeight;
   });
 
   // on resize stop, resize target with new parameters
   socket.on('bc: resized', function (data) {
-    document.getElementById(data.image_id).style.transform = data.imageTransform;
-    document.getElementById(data.image_id).style.top       = data.imageTop;
-    document.getElementById(data.image_id).style.left      = data.imageLeft;
-    document.getElementById(data.image_id).style.width     = data.imageWidth;
-    document.getElementById(data.image_id).style.height    = data.imageHeight;
+    document.getElementById(data.imageID).style.transform = data.imageTransform;
+    document.getElementById(data.imageID).style.top       = data.imageTop;
+    document.getElementById(data.imageID).style.left      = data.imageLeft;
+    document.getElementById(data.imageID).style.width     = data.imageWidth;
+    document.getElementById(data.imageID).style.height    = data.imageHeight;
   });
 
   // on transforming, transform target
   socket.on('bc: transforming', function (data) {
-    document.getElementById(data.image_id).style.transform = data.imageTransform;
+    document.getElementById(data.imageID).style.transform = data.imageTransform;
   });
 
   // on transform changes, modify data attributes used by set_dragger_locations
   socket.on('bc: change_data_attributes', function (data) {
-    document.getElementById(data.image_id).setAttribute('data-scale', data.scale);
-    document.getElementById(data.image_id).setAttribute('data-angle', data.angle);
-    document.getElementById(data.image_id).setAttribute('data-rotateX', data.rotateX);
-    document.getElementById(data.image_id).setAttribute('data-rotateY', data.rotateY);
-    document.getElementById(data.image_id).setAttribute('data-rotateZ', data.rotateZ);
+    document.getElementById(data.imageID).setAttribute('data-scale', data.scale);
+    document.getElementById(data.imageID).setAttribute('data-angle', data.angle);
+    document.getElementById(data.imageID).setAttribute('data-rotateX', data.rotateX);
+    document.getElementById(data.imageID).setAttribute('data-rotateY', data.rotateY);
+    document.getElementById(data.imageID).setAttribute('data-rotateZ', data.rotateZ);
   });
 
   // on opacity changing, adjust target
   socket.on('bc: opacity_changing', function (data) {
-    document.getElementById(data.image_id).style.opacity = data.imageOpacity;
+    document.getElementById(data.imageID).style.opacity = data.imageOpacity;
   });
 
   // on filter changing, adjust target
   socket.on('bc: filter_changing', function (data) {
-    document.getElementById(data.image_id).style.WebkitFilter = data.imageFilter;
+    document.getElementById(data.imageID).style.WebkitFilter = data.imageFilter;
   });
 
   // reset page across all clients
@@ -1095,7 +1095,7 @@ assigndrag();
 
           // begin to prepare socketdata
           this.socketdata = {};
-          this.socketdata.image_id = this.imageID;
+          this.socketdata.imageID = this.imageID;
         },
         drag: function (event, ui) {
           // recoup drag position
@@ -1298,7 +1298,7 @@ assigndrag();
 
       // prepare socketdata
       this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
+      this.socketdata.imageID = this.imageID;
       this.socketdata.imageFilename = this.imageEl.getAttribute('title');
     },
     onmove: function (event) {
@@ -1313,7 +1313,7 @@ assigndrag();
 
       // send socketdata
       this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('c-e:  transforming', this.socketdata);
+      socket.emit('ce:_transforming', this.socketdata);
     },
     onend: function (event) {
       // if angle is < 0 or > 360, revise the angle to 0-360 range
@@ -1333,9 +1333,9 @@ assigndrag();
       this.socketdata.rotateY = this.imageEl.getAttribute('data-rotateY');
       this.socketdata.rotateZ = this.imageEl.getAttribute('data-rotateZ');
 
-      socket.emit('c-e:  store_data_attributes', this.socketdata);
+      socket.emit('ce:_saveDataAttributes', this.socketdata);
       this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('c-e:  store_transformed', this.socketdata);
+      socket.emit('ce:_saveTransform', this.socketdata);
 
       // pass id to c-e:  unfreeze
       socket.emit('c-e:  unfreeze', this.imageID);
@@ -1512,42 +1512,78 @@ assigndrag();
 
 // --Draggers
 
-var draggerstuff = {
+var draggerAPI = {
 
+  socketdata: {
+    imageID: '',
+    imageEl: '',
+    imageFilename: ''
+  },
+
+  init(dragger) {
+    this.dragger = dragger;
+    make_grid();
+    stateChange.hideOtherDraggers(dragger.id);
+    dragger.classList.remove('d-transition');
+
+    this.imageID = store.getState().selectedImage.id;
+    this.imageEl = document.getElementById(this.imageID);
+
+    this.socketdata.imageID = this.imageID;
+    this.socketdata.imageEl = this.imageEl;
+    this.socketdata.imageFilename = this.imageEl.getAttribute('title');
+
+    this.dInfo = document.getElementById('d-info');
+  },
+
+  updateInfo: function (message) {
+    this.dInfo.textContent = message;
+  },
+
+  drag: function () {
+
+  },
+
+  stop: function () {
+    remove_grid();
+    this.dragger.classList.add('d-transition');
+    set_dragger_locations(this.imageID);
+    store.dispatch(resetClickCount());
+  },
+
+  removeFilter: function () {
+    // put the filter in a data attribute and remove filter
+    // --sometimes necessary because dragging images with filter causes rendering lag
+    this.imageEl.setAttribute('data-filter', this.imageEl.style.WebkitFilter);
+    this.imageEl.style.WebkitFilter = '';
+    socket.emit('c-e:_removeFilter', this.imageID);
+  },
+
+  restoreFilter: function () {
+    this.imageEl.style.WebkitFilter = this.imageEl.getAttribute('data-filter');
+    this.imageEl.removeAttribute('data-filter');
+    socket.emit('c-e:_restoreFilter', this.imageID);
+  }
 
 };
+
+
+
+
+
 
 
   $('#stretch_dragger').draggable({
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(this.imageID);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
+      this.draggerAPI.removeFilter();
+
       // find image center
-      this.imageCenterX = parseFloat(this.imageEl.style.left) + (parseFloat(this.imageEl.style.width) / 2);
-      this.imageCenterY = parseFloat(this.imageEl.style.top) + (parseFloat(this.imageEl.style.height) / 2);
-
-      // show grid lines and get d-info div
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-
-      // remove transitions
-      this.classList.remove('d-transition');
-
-      // put the filter in a data attribute and remove filter
-      // --this was necessary because dragging images with filter caused too much rendering lag
-      this.imageEl.setAttribute('data-filter', this.imageEl.style.WebkitFilter);
-      this.imageEl.style.WebkitFilter = '';
-      // socket to other clients
-      socket.emit('c-e:_removeFilter', this.imageID);
+      this.imageCenterX = parseFloat(this.draggerAPI.imageEl.style.left) + (parseFloat(this.draggerAPI.imageEl.style.width) / 2);
+      this.imageCenterY = parseFloat(this.draggerAPI.imageEl.style.top) + (parseFloat(this.draggerAPI.imageEl.style.height) / 2);
     },
     drag: function (event, ui) {
       // get the desired percentage (.25) based on the dragger position in relation to the inner box
@@ -1562,84 +1598,55 @@ var draggerstuff = {
       this.newTop = this.imageCenterY - (this.newHeight / 2);
 
       // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'width:' + (this.draggerXpos * 100).toFixed(0) +  '% height: ' + (this.draggerYpos * 100).toFixed(0) + '%';
+      this.draggerAPI.updateInfo('width:' + (this.draggerXpos * 100).toFixed(0) +  '% height: ' + (this.draggerYpos * 100).toFixed(0) + '%');
 
       // set the selected image's new position
-      this.imageEl.style.width = this.newWidth + '%';
-      this.imageEl.style.height = this.newHeight + '%';
-      this.imageEl.style.left = this.newLeft + '%';
-      this.imageEl.style.top = this.newTop + '%';
+      this.draggerAPI.imageEl.style.width = this.newWidth + '%';
+      this.draggerAPI.imageEl.style.height = this.newHeight + '%';
+      this.draggerAPI.imageEl.style.left = this.newLeft + '%';
+      this.draggerAPI.imageEl.style.top = this.newTop + '%';
 
       // emit to other clients
-      this.socketdata.imageTransform = this.imageEl.style.transform;
-      this.socketdata.imageWidth     = this.imageEl.style.width;
-      this.socketdata.imageHeight    = this.imageEl.style.height;
-      this.socketdata.imageLeft      = this.imageEl.style.left;
-      this.socketdata.imageTop       = this.imageEl.style.top;
-      socket.emit('c-e:_resizeImage', this.socketdata);
+      this.draggerAPI.socketdata.imageTransform = this.draggerAPI.imageEl.style.transform;
+      this.draggerAPI.socketdata.imageWidth     = this.draggerAPI.imageEl.style.width;
+      this.draggerAPI.socketdata.imageHeight    = this.draggerAPI.imageEl.style.height;
+      this.draggerAPI.socketdata.imageLeft      = this.draggerAPI.imageEl.style.left;
+      this.draggerAPI.socketdata.imageTop       = this.draggerAPI.imageEl.style.top;
+      socket.emit('c-e:_resizing', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // add transitions
-      this.classList.add('d-transition');
-      // restore filter
-      this.imageEl.style.WebkitFilter = this.imageEl.getAttribute('data-filter');
-      this.imageEl.removeAttribute('data-filter');
-      // show draggers
-      set_dragger_locations(this.imageID);
-      // socket to other clients
-      socket.emit('c-e:_restoreFilter', this.imageID);
+      this.draggerAPI.restoreFilter();
+      this.draggerAPI.stop();
 
-      // socket to other clients
-      socket.emit('c-e:_saveResize', this.socketdata);
+      // save to database
+      socket.emit('c-e:_saveResize', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
-      store.dispatch(resetClickCount());
     }
   });
+
 
   $('#opacity_dragger').draggable({
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      // gather selected_image stats
-      this.image_original_opacity = this.imageEl.style.opacity;
-      // disallow transitions
-      this.classList.remove('d-transition');
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
     },
     drag: function (event, ui) {
-      // dynamic percentage defined by the dragger in relation to the inner window
+      // get the desired percentage (.25) based on the dragger position in relation to the inner box
       this.draggerXpos = ui.position.left / pageSettings.innerWidth;
-      // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'opacity:' + (this.draggerXpos * 100).toFixed(0) +  '%';
       // make the calculated changes
-      this.imageEl.style.opacity = this.draggerXpos;
+      this.draggerAPI.imageEl.style.opacity = this.draggerXpos;
+      // display the percentages in the d-info div
+      this.draggerAPI.updateInfo('opacity:' + (this.draggerXpos * 100).toFixed(0) +  '%');
       // socket to other clients
-      this.socketdata.imageOpacity = this.draggerXpos;
-      socket.emit('c-e:  opacity_changing', this.socketdata);
+      this.draggerAPI.socketdata.imageOpacity = this.draggerXpos;
+      socket.emit('ce:_opacityChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // show draggers
-      set_dragger_locations(this.imageID);
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      socket.emit('c-e:  store_opacity', this.socketdata);
+      this.draggerAPI.stop();
+      socket.emit('ce:_saveOpacity', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1649,66 +1656,42 @@ var draggerstuff = {
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-      // disallow transitions
-      this.classList.remove('d-transition');
-      // put the filter in a data attribute and remove filter
-      // this.imageEl.setAttribute('data-filter', this.imageEl.style.WebkitFilter);
-      // this.imageEl.style.WebkitFilter = '';
-      // socket to other clients
-      // socket.emit('c-e:_removeFilter', this.imageID);
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
     },
     drag: function (event, ui) {
-      // calculate changes: define the selected_image's new rotation in relation to the percentage of inner window size
+      // calculate the selected_image's new rotation in relation to the percentage of inner window size
       this.new_rotation = Math.round(ui.position.left / pageSettings.innerWidth * 100) * 3.6;
       this.new_rotateZ = Math.round(ui.position.top / pageSettings.innerHeight * 100) * 3.6;
 
-      // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'rotation: ' + this.new_rotation.toFixed(2) + 'deg   rotateZ: ' + this.new_rotateZ.toFixed(2) + 'deg';
       // make the calculated changes
-      this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotate\(.*?\)/      , 'rotate(' + this.new_rotation + 'deg)');
-      this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotateZ\(.*?\)/      , 'rotateZ(' + this.new_rotateZ + 'deg)');
+      this.draggerAPI.imageEl.style.transform = this.draggerAPI.imageEl.style.transform.replace(/rotate\(.*?\)/      , 'rotate(' + this.new_rotation + 'deg)');
+      this.draggerAPI.imageEl.style.transform = this.draggerAPI.imageEl.style.transform.replace(/rotateZ\(.*?\)/      , 'rotateZ(' + this.new_rotateZ + 'deg)');
+
+      // display the percentages in the d-info div
+      this.draggerAPI.updateInfo('rotation: ' + this.new_rotation.toFixed(2) + 'deg   rotateZ: ' + this.new_rotateZ.toFixed(2) + 'deg');
 
       // socket to other clients
-      this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('c-e:  transforming', this.socketdata);
+      this.draggerAPI.socketdata.imageTransform = this.draggerAPI.imageEl.style.transform;
+      socket.emit('ce:_transforming', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // restore filter
-      // this.imageEl.style.WebkitFilter = this.imageEl.getAttribute('data-filter');
-      // this.imageEl.removeAttribute('data-filter');
-      // socket.emit('c-e:_restoreFilter', this.imageID);
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      // this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('c-e:  store_transformed', this.socketdata);
       // store angle in data-angle
-      this.imageEl.setAttribute('data-angle', this.new_rotation.toFixed(2));
-      this.imageEl.setAttribute('data-rotateZ', this.new_rotateZ.toFixed(2));
-      // show draggers
-      set_dragger_locations(this.imageID);
+      this.draggerAPI.imageEl.setAttribute('data-angle', this.new_rotation.toFixed(2));
+      this.draggerAPI.imageEl.setAttribute('data-rotateZ', this.new_rotateZ.toFixed(2));
+
+      this.draggerAPI.stop();
+
+      // save to database
+      socket.emit('ce:_saveTransform', this.draggerAPI.socketdata);
+
       // send to socket
-      this.socketdata.angle = this.new_rotation.toString();
-      this.socketdata.scale = this.imageEl.getAttribute('data-scale');
-      this.socketdata.rotateX = this.imageEl.getAttribute('data-rotateX');
-      this.socketdata.rotateY = this.imageEl.getAttribute('data-rotateY');
-      this.socketdata.rotateZ = this.imageEl.getAttribute('data-rotateZ');
-      socket.emit('c-e:  store_data_attributes', this.socketdata);
+      this.draggerAPI.socketdata.angle = this.new_rotation.toString();
+      this.draggerAPI.socketdata.scale = this.draggerAPI.imageEl.getAttribute('data-scale');
+      this.draggerAPI.socketdata.rotateX = this.draggerAPI.imageEl.getAttribute('data-rotateX');
+      this.draggerAPI.socketdata.rotateY = this.draggerAPI.imageEl.getAttribute('data-rotateY');
+      this.draggerAPI.socketdata.rotateZ = this.draggerAPI.imageEl.getAttribute('data-rotateZ');
+      socket.emit('ce:_saveDataAttributes', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1718,45 +1701,25 @@ var draggerstuff = {
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      // gather selected_image stats
-      this.image_original_filter = this.imageEl.style.WebkitFilter;
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-      // disallow transitions
-      this.classList.remove('d-transition');
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
     },
     drag: function (event, ui) {
-      // dynamic percentage defined by the dragger in relation to the inner window
+      // get the desired percentage (.25) based on the dragger position in relation to the inner box
       this.draggerXpos = ui.position.left / pageSettings.innerWidth;
       this.draggerYpos = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'grayscale: ' + (this.draggerYpos * 100).toFixed(0) + '% invert:' + (this.draggerXpos * 100).toFixed(0) + '%';
+      this.draggerAPI.updateInfo('grayscale: ' + (this.draggerYpos * 100).toFixed(0) + '% invert:' + (this.draggerXpos * 100).toFixed(0) + '%');
       // make the calculated changes and use regex to replace
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/invert\(.*?\)/   , 'invert('    + this.draggerXpos + ')');
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/grayscale\(.*?\)/, 'grayscale(' + this.draggerYpos + ')');
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/invert\(.*?\)/   , 'invert('    + this.draggerXpos + ')');
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/grayscale\(.*?\)/, 'grayscale(' + this.draggerYpos + ')');
       // socket to other clients
-      this.socketdata.imageFilter = this.imageEl.style.WebkitFilter;
-      socket.emit('c-e:  filter_changing', this.socketdata);
+      this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // show draggers
-      set_dragger_locations(this.imageID);
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      socket.emit('c-e:  store_filter', this.socketdata);
+      this.draggerAPI.stop();
+      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1766,45 +1729,25 @@ var draggerstuff = {
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      // gather selected_image stats
-      this.image_original_filter = this.imageEl.style.WebkitFilter;
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-      // disallow transitions
-      this.classList.remove('d-transition');
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
     },
     drag: function (event, ui) {
-      // dynamic percentage defined by the dragger in relation to the inner window
+      // get the desired percentage (.25) based on the dragger position in relation to the inner box
       this.draggerXpos = ui.position.left / pageSettings.innerWidth;
       this.draggerYpos = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'blur:' + ((1 - this.draggerYpos) * config.blurLevel).toFixed(2) + 'px brightness: ' + (this.draggerXpos * config.brightnessLevel).toFixed(2);
+      this.draggerAPI.updateInfo('blur:' + ((1 - this.draggerYpos) * config.blurLevel).toFixed(2) + 'px brightness: ' + (this.draggerXpos * config.brightnessLevel).toFixed(2));
       // make the calculated changes
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/blur\(.*?\)/      , 'blur(' + ((1 - this.draggerYpos) * config.blurLevel) + 'px)');
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.draggerXpos * config.brightnessLevel) + ')');
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/blur\(.*?\)/      , 'blur(' + ((1 - this.draggerYpos) * config.blurLevel) + 'px)');
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.draggerXpos * config.brightnessLevel) + ')');
       // socket to other clients
-      this.socketdata.imageFilter = this.imageEl.style.WebkitFilter;
-      socket.emit('c-e:  filter_changing', this.socketdata);
+      this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // show draggers
-      set_dragger_locations(this.imageID);
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      socket.emit('c-e:  store_filter', this.socketdata);
+      this.draggerAPI.stop();
+      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1814,45 +1757,25 @@ var draggerstuff = {
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      // gather selected_image stats
-      this.image_original_filter = this.imageEl.style.WebkitFilter;
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-      // disallow transitions
-      this.classList.remove('d-transition');
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
     },
     drag: function (event, ui) {
-      // dynamic percentage defined by the dragger in relation to the inner window
+      // get the desired percentage (.25) based on the dragger position in relation to the inner box
       this.draggerXpos = ui.position.left / pageSettings.innerWidth;
       this.draggerYpos = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'contrast:' + ((1 - this.draggerYpos) * config.contrastLevel).toFixed(2) +  ' saturate: ' + (this.draggerXpos * config.saturateLevel).toFixed(2);
+      this.draggerAPI.updateInfo('contrast:' + ((1 - this.draggerYpos) * config.contrastLevel).toFixed(2) +  ' saturate: ' + (this.draggerXpos * config.saturateLevel).toFixed(2));
       // make the calculated changes
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/contrast\(.*?\)/      , 'contrast(' + ((1 - this.draggerYpos) * config.contrastLevel) + ')');
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.draggerXpos * config.saturateLevel) + ')');
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/contrast\(.*?\)/      , 'contrast(' + ((1 - this.draggerYpos) * config.contrastLevel) + ')');
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.draggerXpos * config.saturateLevel) + ')');
       // socket to other clients
-      this.socketdata.imageFilter = this.imageEl.style.WebkitFilter;
-      socket.emit('c-e:  filter_changing', this.socketdata);
+      this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // show draggers
-      set_dragger_locations(this.imageID);
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      socket.emit('c-e:  store_filter', this.socketdata);
+      this.draggerAPI.stop();
+      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1862,50 +1785,31 @@ var draggerstuff = {
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-      // disallow transitions
-      this.classList.remove('d-transition');
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
     },
     drag: function (event, ui) {
-      // dynamic percentage defined by the dragger in relation to the inner window
+      // get the desired percentage (.25) based on the dragger position in relation to the inner box
       this.draggerXpos = ui.position.left / pageSettings.innerWidth;
       this.draggerYpos = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // calculate changes
       this.new_opacity = this.draggerXpos;
       this.new_hue_rotate = Math.round(this.draggerYpos * 100) * 3.6;
       // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'opacity: ' + Math.round(this.new_opacity * 100) + '%   hue-rotation: ' + this.new_hue_rotate.toFixed(2);
+      this.draggerAPI.updateInfo('opacity: ' + Math.round(this.new_opacity * 100) + '%   hue-rotation: ' + this.new_hue_rotate.toFixed(2));
       // make the calculated changes
-      this.imageEl.style.opacity = this.new_opacity;
-      this.imageEl.style.WebkitFilter = this.imageEl.style.WebkitFilter.replace(/hue-rotate\(.*?\)/      , 'hue-rotate(' + this.new_hue_rotate + 'deg)');
+      this.draggerAPI.imageEl.style.opacity = this.new_opacity;
+      this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/hue-rotate\(.*?\)/      , 'hue-rotate(' + this.new_hue_rotate + 'deg)');
       // socket to other clients
-      this.socketdata.imageOpacity = this.draggerXpos;
-      this.socketdata.imageFilter = this.imageEl.style.WebkitFilter;
-      socket.emit('c-e:  opacity_changing', this.socketdata);
-      socket.emit('c-e:  filter_changing', this.socketdata);
+      this.draggerAPI.socketdata.imageOpacity = this.draggerXpos;
+      this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('ce:_opacityChanging', this.draggerAPI.socketdata);
+      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // show draggers
-      set_dragger_locations(this.imageID);
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      this.socketdata.image_id = this.imageID;
-      socket.emit('c-e:  store_opacity', this.socketdata);
-      socket.emit('c-e:  store_filter', this.socketdata);
+      this.draggerAPI.stop();
+      socket.emit('ce:_saveOpacity', this.draggerAPI.socketdata);
+      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1915,23 +1819,14 @@ var draggerstuff = {
     containment: 'parent',
     scroll: false,
     start: function () {
-      // hide other draggers
-      stateChange.hideOtherDraggers(this.getAttribute('id'));
-      // prepare dom elements for manipulation
-      this.imageID      = store.getState().selectedImage.id;
-      this.imageEl = document.getElementById(store.getState().selectedImage.id);
+      this.draggerAPI = draggerAPI;
+      this.draggerAPI.init(this);
 
-      // prepare the socketdata
-      this.socketdata = {};
-      this.socketdata.image_id = this.imageID;
-      // show some grid lines and d-info box
-      make_grid();
-      this.dInfoDiv = document.getElementById('d-info');
-      // disallow transitions
-      this.classList.remove('d-transition');
+      console.log(this.draggerAPI.imageID);
+
     },
     drag: function (event, ui) {
-      // dynamic percentage defined by the dragger in relation to the inner window
+      // get the desired percentage (.25) based on the dragger position in relation to the inner box
       this.draggerXpos = ui.position.left / pageSettings.innerWidth;
       this.draggerYpos = (pageSettings.innerHeight - ui.position.top) / pageSettings.innerHeight;
       // calculate changes
@@ -1939,41 +1834,40 @@ var draggerstuff = {
       this.new_rotate_y = (Math.round(this.draggerXpos * 100) * 3.6) - 180;
 
       // display the percentages in the d-info div
-      this.dInfoDiv.textContent = 'rotateX: ' + this.new_rotate_x.toFixed(2) + 'deg   rotateY: ' + this.new_rotate_y.toFixed(2) + 'deg';
+      this.draggerAPI.updateInfo('rotateX: ' + this.new_rotate_x.toFixed(2) + 'deg   rotateY: ' + this.new_rotate_y.toFixed(2) + 'deg');
       // make the calculated changes
-      this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotateX\(.*?\)/      , 'rotateX(' + this.new_rotate_x + 'deg)');
-      this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotateY\(.*?\)/      , 'rotateY(' + this.new_rotate_y + 'deg)');
+      this.draggerAPI.imageEl.style.transform = this.draggerAPI.imageEl.style.transform.replace(/rotateX\(.*?\)/      , 'rotateX(' + this.new_rotate_x + 'deg)');
+      this.draggerAPI.imageEl.style.transform = this.draggerAPI.imageEl.style.transform.replace(/rotateY\(.*?\)/      , 'rotateY(' + this.new_rotate_y + 'deg)');
 
       // socket to other clients
-      this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('c-e:  transforming', this.socketdata);
+      this.draggerAPI.socketdata.imageTransform = this.draggerAPI.imageEl.style.transform;
+      socket.emit('ce:_transforming', this.draggerAPI.socketdata);
     },
     stop: function () {
-      // remove grid and d-info box
-      remove_grid();
-      // allow transitions
-      this.classList.add('d-transition');
-      // save to database
-      this.socketdata.imageFilename  = this.imageEl.getAttribute('title');
-      this.socketdata.image_id = this.imageID;
-      socket.emit('c-e:  store_transformed', this.socketdata);
+
       // store rotate in data-rotateX,Y
-      this.imageEl.setAttribute('data-rotateX', this.new_rotate_x.toFixed(2));
-      this.imageEl.setAttribute('data-rotateY', this.new_rotate_y.toFixed(2));
-      // show draggers
-      set_dragger_locations(this.imageID);
+      this.draggerAPI.imageEl.setAttribute('data-rotateX', this.new_rotate_x.toFixed(2));
+      this.draggerAPI.imageEl.setAttribute('data-rotateY', this.new_rotate_y.toFixed(2));
+
+      this.draggerAPI.stop();
+
+      // save to database
+      socket.emit('ce:_saveTransform', this.draggerAPI.socketdata);
 
       // send to socket
-      this.socketdata.scale = this.imageEl.getAttribute('data-scale');
-      this.socketdata.angle = this.imageEl.getAttribute('data-angle');
-      this.socketdata.rotateX = this.imageEl.getAttribute('data-rotateX');
-      this.socketdata.rotateY = this.imageEl.getAttribute('data-rotateY');
-      this.socketdata.rotateZ = this.imageEl.getAttribute('data-rotateZ');
-      socket.emit('c-e:  store_data_attributes', this.socketdata);
+      this.draggerAPI.socketdata.scale = this.draggerAPI.imageEl.getAttribute('data-scale');
+      this.draggerAPI.socketdata.angle = this.draggerAPI.imageEl.getAttribute('data-angle');
+      this.draggerAPI.socketdata.rotateX = this.draggerAPI.imageEl.getAttribute('data-rotateX');
+      this.draggerAPI.socketdata.rotateY = this.draggerAPI.imageEl.getAttribute('data-rotateY');
+      this.draggerAPI.socketdata.rotateZ = this.draggerAPI.imageEl.getAttribute('data-rotateZ');
+      socket.emit('ce:_saveDataAttributes', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
   });
+
+
+
 
 // --Set dragger locations
 
@@ -2022,13 +1916,6 @@ var draggerstuff = {
         draggerLeft = selected_imageWidth_percentage * pageSettings.innerWidth,
         draggerTop = (1 - selected_imageHeight_percentage) * pageSettings.innerHeight;
 
-//        console.log('ok');
-//        console.log(selected_imageWidth);
-//        console.log(innerWidth);
-
-  //      console.log('gi');
-  //      console.log(draggerLeft);
-
     // set the dragger location
     dragger_element.style.left    = draggerLeft + 'px';
     dragger_element.style.top     = draggerTop + 'px';
@@ -2076,18 +1963,25 @@ var draggerstuff = {
   };
 
   function set_grayscale_invert_dragger_to(id) {
-    var dragger_element = document.getElementById('grayscale_invert_dragger'),
-        imageEl = document.getElementById(id),
+    var dragger_element = document.getElementById('grayscale_invert_dragger');
+    var imageEl = document.getElementById(id);
         // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-        selected_image_filter = imageEl.style.WebkitFilter,
+    var selected_image_filter = imageEl.style.WebkitFilter;
         // get the numbers within the grayscale and invert parentheses
-        grayscale_Exp = /grayscale\(([^)]+)\)/,
+
+        console.log(imageEl);
+
+
+    var grayscale_Exp = /grayscale\(([^)]+)\)/,
         invert_Exp = /invert\(([^)]+)\)/,
         grayscale_matches = grayscale_Exp.exec(selected_image_filter),
         invert_matches    = invert_Exp.exec(selected_image_filter),
         // calculate the dragger location
         draggerTop = ((1 - parseFloat(grayscale_matches[1])) * pageSettings.innerHeight),
         draggerLeft = (parseFloat(invert_matches[1]) * pageSettings.innerWidth);
+
+
+
 
     // set the dragger location
     dragger_element.style.left    = draggerLeft + 'px';

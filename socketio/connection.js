@@ -69,7 +69,7 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: moved', data);
     });
 
-    socket.on('c-e:_resizeImage', function (data) {
+    socket.on('c-e:_resizing', function (data) {
       socket.broadcast.emit('bc: resizing', data);
     });
 
@@ -92,7 +92,7 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: resized', data);
     });
 
-    socket.on('c-e:  store_data_attributes', function (data) {
+    socket.on('ce:_saveDataAttributes', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { scale   : data.scale,
@@ -106,11 +106,11 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: change_data_attributes', data);
     });
 
-    socket.on('c-e:  transforming', function (data) {
+    socket.on('ce:_transforming', function (data) {
       socket.broadcast.emit('bc: transforming', data);
     });
 
-    socket.on('c-e:  store_transformed', function (data) {
+    socket.on('ce:_saveTransform', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { transform : data.imageTransform } },
@@ -118,11 +118,11 @@ module.exports = function (io) {
         function (err) { if (err) return console.error(err); } );
     });
 
-    socket.on('c-e:  opacity_changing', function (data) {
+    socket.on('ce:_opacityChanging', function (data) {
       socket.broadcast.emit('bc: opacity_changing', data);
     });
 
-    socket.on('c-e:  store_opacity', function (data) {
+    socket.on('ce:_saveOpacity', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { opacity : data.imageOpacity } },
@@ -130,11 +130,11 @@ module.exports = function (io) {
         function (err) { if (err) return console.error(err); } );
     });
 
-    socket.on('c-e:  filter_changing', function (data) {
+    socket.on('c-e:_filterChanging', function (data) {
       socket.broadcast.emit('bc: filter_changing', data);
     });
 
-    socket.on('c-e:  store_filter', function (data) {
+    socket.on('c-e:_saveFilter', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { filter : data.imageFilter } },
