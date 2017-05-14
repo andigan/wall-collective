@@ -49,9 +49,13 @@ module.exports = {
         var outer = $('#wrapper');
         var box = $('#images');
 
-        if (outer.height() > outer.width() * aspect) {
-            box.css({'width': '100%'});
-            box.css({'height': box.width() * aspect});
+        let imagesEl = document.getElementById('images');
+
+        if (this.mainHigh > this.mainWide * aspect) {
+          imagesEl.width = '100%';
+          imagesEl.height = (parseFloat(imagesEl.width) * aspect) + '%';
+//            box.css({'width': '100%'});
+//            box.css({'height': box.width() * aspect});
 
         } else {
             box.css({'height': '100%'});

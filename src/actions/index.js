@@ -8,12 +8,16 @@ export function setDeleteTarget(deleteTarget) {
 }
 
 export function setSelectedImage(id) {
-  console.log('fired');
-  console.log(id);
-
   return {
-    type: "SET_SELECTED_IMAGE",
+    type: 'SET_SELECTED_IMAGE',
     payload: id
+  };
+
+}
+
+export function resetClickCount() {
+  return {
+    type: 'RESET_CLICK_COUNT'
   };
 
 }

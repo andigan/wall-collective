@@ -10,7 +10,7 @@ navigation_container: 50000;
 dragged image: 60000;
 
 navigation_toggle_button_container: 80000;
-dragger_info: 86000;
+d-info: 86000;
 
 
 upload_preview_container: 90000;
@@ -134,7 +134,7 @@ fullscreenmaskclass: 90000;
   z-index:90000;
 }
 
-#dragger_info {
+#d-info {
   background-color:transparent;
   color:yellow;
   position:fixed;
@@ -601,7 +601,7 @@ fullscreenmaskclass: 90000;
   -webkit-transform:scaleX(1)!important;
 }
 
-.dragger_transitions {
+.d-transition {
   -webkit-transition:left .1s, top .1s, width .1s, height .1s, background-color .1s, 0 .1s;
   transition:left .1s, top .1s, width .1s, height .1s, background-color .1s, transform .1s;
 }

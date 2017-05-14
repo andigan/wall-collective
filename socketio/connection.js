@@ -69,11 +69,11 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: moved', data);
     });
 
-    socket.on('c-e:  resizing', function (data) {
+    socket.on('c-e:_resizeImage', function (data) {
       socket.broadcast.emit('bc: resizing', data);
     });
 
-    socket.on('c-e:  store_resized', function (data) {
+    socket.on('c-e:_saveResize', function (data) {
 
       ImageDocuments.update(
         // filter
@@ -177,11 +177,11 @@ module.exports = function (io) {
       });
     });
 
-    socket.on('c-e:  remove_filter', function (data) {
+    socket.on('c-e:_removeFilter', function (data) {
       socket.broadcast.emit('bc: remove_filter', data);
     });
 
-    socket.on('c-e:  restore_filter', function (data) {
+    socket.on('c-e:_restoreFilter', function (data) {
       socket.broadcast.emit('bc: restore_filter', data);
     });
 

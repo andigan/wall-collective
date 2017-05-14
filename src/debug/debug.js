@@ -14,7 +14,7 @@ module.exports = {
     this.setListeners();
 
     // console log store
-    document.addEventListener('click touchstart', function () {
+    document.addEventListener('click', function () {
       console.log(store.getState());
 
       // uncomment to log whichever element is clicked on

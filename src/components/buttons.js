@@ -46,7 +46,9 @@ module.exports = {
         break;
       case 'exit-door':
         // hide original image
-        stateChange.hideElement(selectedImage);
+        stateChange.hideID(window.store.getState().selectedImage.id);
+        // set delete target in store
+        store.dispatch(setDeleteTarget(document.getElementById(window.store.getState().selectedImage.id)));
         // hide draggers
         stateChange.hideDraggers();
         // show delete_preview_container
@@ -74,8 +76,5 @@ module.exports = {
     this.buttons.forEach(
       button => { button.addEventListener('click', this.onClick.bind(this)); });
   }
-
-
-
 
 };
