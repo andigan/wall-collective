@@ -269,7 +269,7 @@ assigndrag();
     var clientVars = {};
 
     clientVars.sessionID = getCookie('sessionID');
-    socket.emit ('c-e:  sessionID_check', clientVars);
+    socket.emit ('ce:  sessionID_check', clientVars);
 
   });
 
@@ -378,6 +378,10 @@ assigndrag();
   // on filter changing, adjust target
   socket.on('bc: filter_changing', function (data) {
     document.getElementById(data.imageID).style.WebkitFilter = data.imageFilter;
+  });
+
+  socket.on('bc:_changeBackground', function (data) {
+    document.getElementById('images').style.backgroundColor = data;
   });
 
   // reset page across all clients
@@ -782,26 +786,6 @@ assigndrag();
     setCookie('switches_status', switches_status, 7);
   });
 
-  // dragger_switches button
-  $('#dragger_switches_button').on('click', function () {
-    // toggle dragger_switches container
-    document.getElementById('dragger_switches_container').classList.toggle('dragger_switches_container_is_open');
-    // if dragger_switches container opens, close navigation container
-    if (document.getElementById('dragger_switches_container').classList.contains('dragger_switches_container_is_open')) {
-      document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    };
-  });
-
-  // reset page button
-  // uses jquery $.get to reset the page, and sends socket to other clients to reset as well
-  $('#reset_page_button').on('click', function () {
-    $.get('/resetpage', function () {
-      socket.emit('c-e:  resetpage');
-      // reload the page
-      window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
-    });
-  });
-
   $('#info_button').on('click', function () {
     document.getElementById('app_info').style.display = 'block';
     document.getElementById('close_info_container').style.display = 'block';
@@ -887,7 +871,7 @@ assigndrag();
         stateChange.afterUpload();
         // emit to other clients
         socketdata.uploadedFilename = response.imageFilename;
-        socket.emit('c-e:  share_upload', socketdata);
+        socket.emit('ce:  share_upload', socketdata);
 
         uploadtotal = 0;
       }
@@ -899,18 +883,13 @@ assigndrag();
     stateChange.afterUpload();
   });
 
-
-  $('#n4').on('click', function () {
-
-  });
-
   // reject delete
   $('#reject_delete_button').on('click', function () {
     var deleteTargetID = store.getState().deleteTarget.id;
 
     stateChange.rejectDelete();
     // send socket to show on other clients
-    socket.emit('c-e:  show_image', deleteTargetID);
+    socket.emit('ce:  show_image', deleteTargetID);
   });
 
   // confirm delete
@@ -927,7 +906,7 @@ assigndrag();
     socketdata.filenameToDelete = deleteTarget.element.getAttribute('title');
     socketdata.id_to_delete = deleteTarget.id;
     // send data to server
-    socket.emit('c-e:  delete_image', socketdata);
+    socket.emit('ce:  delete_image', socketdata);
     clear_selected_file();
   });
 
@@ -994,9 +973,7 @@ assigndrag();
 
 
 
-  $('#explore_button').on('click', function () {
-
-
+  $('#t3').on('click', function () {
     document.getElementById('explore_container').style.display = 'block';
     document.getElementById('close_explore_container').style.display = 'block';
 
@@ -1056,18 +1033,11 @@ assigndrag();
         start:  function (event, ui) {
           // recoup for transformed objects, to keep the drag event centered on a transformed object.
           // http://stackoverflow.com/questions/3523747/webkit-and-jquery-draggable-jumping
-          // uses a ternary operator:
-          //   boolean statement ? true result : false result;
-          //   if boolean statement is true, do first, else do second.
-          //   so if left is not a number, make it zero, otherwise make it left
-          // var left = parseInt(this.style.left),
-          //   top = parseInt(this.style.top);
 
-            var left = parseInt(window.getComputedStyle(this).left),
-             top = parseInt(window.getComputedStyle(this).top);
+          // convert percentage to original pixel size
+          var left = parseInt(this.style.left) / 100 * pageSettings.imagesWide,
+              top = parseInt(this.style.top) / 100 * pageSettings.imagesHigh;
 
-          left = isNaN(left) ? 0 : left;
-          top = isNaN(top) ? 0 : top;
           this.recoupLeft = left - ui.position.left;
           this.recoupTop = top - ui.position.top;
 
@@ -1088,14 +1058,17 @@ assigndrag();
           this.style.webkitFilter = '';
 
           // send emit to remove filter from other clients
-          socket.emit('c-e:_removeFilter', this.imageID);
+          socket.emit('ce:_removeFilter', this.imageID);
 
-          // pass id to c-e:  freeze
-          socket.emit('c-e:  freeze', this.imageID);
+          // pass id to ce:  freeze
+          socket.emit('ce:  freeze', this.imageID);
 
           // begin to prepare socketdata
           this.socketdata = {};
           this.socketdata.imageID = this.imageID;
+
+
+
         },
         drag: function (event, ui) {
           // recoup drag position
@@ -1115,7 +1088,7 @@ assigndrag();
 
 
           // pass socket data to server
-          socket.emit('c-e:  moving', this.socketdata);
+          socket.emit('ce:  moving', this.socketdata);
         },
         stop: function () {
           // prepare data to send to ajax post, get all wallPic elements
@@ -1131,10 +1104,10 @@ assigndrag();
           this.removeAttribute('data-filter');
 
           // send emit to restore filter to other clients
-          socket.emit('c-e:_restoreFilter', this.imageID);
+          socket.emit('ce:_restoreFilter', this.imageID);
 
           // send emit to unfreeze in other clients
-          socket.emit('c-e:  unfreeze', this.imageID);
+          socket.emit('ce:  unfreeze', this.imageID);
 
           // prepare data to send to server
           dropPost.domIDs = [];
@@ -1293,8 +1266,8 @@ assigndrag();
       this.angle = parseFloat(this.imageEl.getAttribute('data-angle'));
       this.scale = parseFloat(this.imageEl.getAttribute('data-scale'));
 
-      // pass id to c-e:  freeze
-      socket.emit('c-e:  freeze', this.imageID);
+      // pass id to ce:  freeze
+      socket.emit('ce:  freeze', this.imageID);
 
       // prepare socketdata
       this.socketdata = {};
@@ -1337,8 +1310,8 @@ assigndrag();
       this.socketdata.imageTransform = this.imageEl.style.transform;
       socket.emit('ce:_saveTransform', this.socketdata);
 
-      // pass id to c-e:  unfreeze
-      socket.emit('c-e:  unfreeze', this.imageID);
+      // pass id to ce:  unfreeze
+      socket.emit('ce:  unfreeze', this.imageID);
 
       // put new scale and angle into data-scale and data-angle
       event.target.setAttribute('data-scale', this.scale.toFixed(2));
@@ -1386,7 +1359,7 @@ assigndrag();
       stateChange.deletePreview();
 
       // send socket to hide on other clients
-      socket.emit('c-e:  hide_image', deleteTarget.id);
+      socket.emit('ce:  hide_image', deleteTarget.id);
     }
   });
 
@@ -1556,13 +1529,13 @@ var draggerAPI = {
     // --sometimes necessary because dragging images with filter causes rendering lag
     this.imageEl.setAttribute('data-filter', this.imageEl.style.WebkitFilter);
     this.imageEl.style.WebkitFilter = '';
-    socket.emit('c-e:_removeFilter', this.imageID);
+    socket.emit('ce:_removeFilter', this.imageID);
   },
 
   restoreFilter: function () {
     this.imageEl.style.WebkitFilter = this.imageEl.getAttribute('data-filter');
     this.imageEl.removeAttribute('data-filter');
-    socket.emit('c-e:_restoreFilter', this.imageID);
+    socket.emit('ce:_restoreFilter', this.imageID);
   }
 
 };
@@ -1612,14 +1585,14 @@ var draggerAPI = {
       this.draggerAPI.socketdata.imageHeight    = this.draggerAPI.imageEl.style.height;
       this.draggerAPI.socketdata.imageLeft      = this.draggerAPI.imageEl.style.left;
       this.draggerAPI.socketdata.imageTop       = this.draggerAPI.imageEl.style.top;
-      socket.emit('c-e:_resizing', this.draggerAPI.socketdata);
+      socket.emit('ce:_resizing', this.draggerAPI.socketdata);
     },
     stop: function () {
       this.draggerAPI.restoreFilter();
       this.draggerAPI.stop();
 
       // save to database
-      socket.emit('c-e:_saveResize', this.draggerAPI.socketdata);
+      socket.emit('ce:_saveResize', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1715,11 +1688,11 @@ var draggerAPI = {
       this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/grayscale\(.*?\)/, 'grayscale(' + this.draggerYpos + ')');
       // socket to other clients
       this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
-      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
+      socket.emit('ce:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
       this.draggerAPI.stop();
-      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
+      socket.emit('ce:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1743,11 +1716,11 @@ var draggerAPI = {
       this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/brightness\(.*?\)/, 'brightness(' + (this.draggerXpos * config.brightnessLevel) + ')');
       // socket to other clients
       this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
-      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
+      socket.emit('ce:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
       this.draggerAPI.stop();
-      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
+      socket.emit('ce:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1771,11 +1744,11 @@ var draggerAPI = {
       this.draggerAPI.imageEl.style.WebkitFilter = this.draggerAPI.imageEl.style.WebkitFilter.replace(/saturate\(.*?\)/, 'saturate(' + (this.draggerXpos * config.saturateLevel) + ')');
       // socket to other clients
       this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
-      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
+      socket.emit('ce:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
       this.draggerAPI.stop();
-      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
+      socket.emit('ce:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1804,12 +1777,12 @@ var draggerAPI = {
       this.draggerAPI.socketdata.imageOpacity = this.draggerXpos;
       this.draggerAPI.socketdata.imageFilter = this.draggerAPI.imageEl.style.WebkitFilter;
       socket.emit('ce:_opacityChanging', this.draggerAPI.socketdata);
-      socket.emit('c-e:_filterChanging', this.draggerAPI.socketdata);
+      socket.emit('ce:_filterChanging', this.draggerAPI.socketdata);
     },
     stop: function () {
       this.draggerAPI.stop();
       socket.emit('ce:_saveOpacity', this.draggerAPI.socketdata);
-      socket.emit('c-e:_saveFilter', this.draggerAPI.socketdata);
+      socket.emit('ce:_saveFilter', this.draggerAPI.socketdata);
       // reset click count
       click_count = 0;
     }
@@ -1821,9 +1794,6 @@ var draggerAPI = {
     start: function () {
       this.draggerAPI = draggerAPI;
       this.draggerAPI.init(this);
-
-      console.log(this.draggerAPI.imageID);
-
     },
     drag: function (event, ui) {
       // get the desired percentage (.25) based on the dragger position in relation to the inner box

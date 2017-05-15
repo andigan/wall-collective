@@ -17,6 +17,30 @@ module.exports = {
       this.render();
     }, false);
 
+
+    // spectrum color chooser
+    $('#flat').spectrum({
+  //      flat: true,
+        showInput: false,
+        color: 'black',
+        showAlpha: true,
+        showButtons: false,
+        clickoutFiresChange: true,
+        change: function(color) {
+        },
+        move: function(color) {
+          document.getElementById('images').style.backgroundColor = color.toHexString();
+          window.socket.emit('ce:_changeBackground', color.toHexString());
+        }
+
+      });
+
+      $("#t4").click(function() {
+          $("#flat").spectrum("toggle");
+          return false;
+      });
+
+
   },
 
   render: function () {
@@ -62,8 +86,13 @@ module.exports = {
             box.css({'width': box.height() / aspect});
         }
 
+    // document.getElementById('images').style.width = "100%";
+    // document.getElementById('images').style.height = "100%";
+
     this.imagesHigh = parseFloat(window.getComputedStyle(document.getElementById('images')).height);
     this.imagesWide = parseFloat(window.getComputedStyle(document.getElementById('images')).width);
+    document.getElementById('images').style.height = this.imagesHigh + 'px';
+    document.getElementById('images').style.width = this.imagesWide + 'px';
 
 
 

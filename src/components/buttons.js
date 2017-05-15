@@ -11,6 +11,11 @@ module.exports = {
     this.createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png');
     this.createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png');
 
+    this.createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers_icon.png');
+    this.createButton('t2', 'reset-page', 'reset page', '/icons/reset_icon.png');
+//    this.createButton('t3', 'explore', 'explore', '/icons/magnifying_glass_icon.png');
+    this.createButton('t4', 'choose-color', 'bk color', '/icons/door_icon.png');
+
     this.addEvents();
   },
 
@@ -30,7 +35,6 @@ module.exports = {
   },
 
   onClick(e) {
-    console.log(e.currentTarget);
     switch (e.currentTarget.getAttribute('data-action')) {
       case 'open-tools':
         stateChange.openTools();
@@ -55,6 +59,38 @@ module.exports = {
         stateChange.deletePreview();
         this.handleDelete();
         break;
+      case 'dragger-switch':
+        document.getElementById('dragger_switches_container').classList.toggle('dragger_switches_container_is_open');
+        // if dragger_switches container opens, close navigation container
+        if (document.getElementById('dragger_switches_container').classList.contains('dragger_switches_container_is_open')) {
+          document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+        };
+        break;
+      case 'reset-page':
+        let xhr = new XMLHttpRequest ();
+        xhr.open('GET', '/resetpage');
+        xhr.send(null);
+
+        xhr.onreadystatechange = function () {
+          // readyState 4 means the request is done.
+          if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+              // send socket to reset other pages
+              window.socket.emit('ce:_resetPage');
+              // reload the page
+              window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
+            } else {
+              console.log('Error: ' + xhr.status); // An error occurred during the request.
+            };
+          }
+        };
+        break;
+        case 'choose-color':
+          // currently does nothing
+          stateChange.openColorChooser();
+          break;
+
+
       default:
         break;
     }
@@ -68,7 +104,7 @@ module.exports = {
       window.store.dispatch(setDeleteTarget(selectedImage));
 
       // send socket to hide on other clients
-      window.socket.emit('c-e:  hide_image', selectedImageID);
+      window.socket.emit('ce:  hide_image', selectedImageID);
     };
   },
 

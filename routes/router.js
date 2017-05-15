@@ -159,7 +159,7 @@ router.get('/resetpage', function (req, res) {
           temp_document.save(function (err) { if (err) return console.error(err); });
         }; // end of for loop
         console.log('\nCollection replaced.\n\n');
-        res.end();
+        res.sendStatus(200);
       }); // end of ImageDocuments.remove callback
     });
   }); // end of fs.readdir callback

@@ -38,6 +38,33 @@ fullscreenmaskclass: 90000;
   background-color: peachpuff !important;
 }
 
+
+#flat {
+  position: absolute;
+  top: 0;
+}
+
+.sp-replacer {
+  display: none !important;
+}
+
+.sp-container {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translateX(-50%) translateY(-50%) !important;
+}
+
+#choice-container {
+  align-items: center;
+  display: none;
+  justify-content: center;
+  height: 100%;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
+
 #confirm_or_reject_container {
   bottom:0;
   display:flex;
