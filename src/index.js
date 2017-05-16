@@ -25,7 +25,8 @@ const store = configureStore();
 
 import pageSettings from './_init/pageSettings';
 import stateChange from './views/state-change';
-import buttons from './components/buttons';
+import Buttons from './components/buttons';
+import Grid from './components/grid';
 
 // dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
 import { setDeleteTarget } from './actions';
@@ -34,18 +35,16 @@ import { setSelectedImage } from './actions';
 // dispatched to cycle through click count
 import { resetClickCount } from './actions';
 
-
-
-
-
 // DEBUG
 import debug from './debug/debug'; // DEBUG
 if (config.debugOn) debug.init(store);
 
-
-
-buttons.init();
+// create buttons and assign functionality
+Buttons.init(config);
+// set page sizes and resize listeners
 pageSettings.init();
+// provide methods for creating and destroying grid
+Grid.init(pageSettings);
 
 
 
@@ -85,18 +84,19 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
 
 var insta = {
   init: function () {
-    // set insta_divs height
-    document.getElementById('insta_div').style.height = (window.innerHeight) + 'px';
-    document.getElementById('insta_image_container').style.height = (window.innerHeight * 0.8) + 'px';
-    document.getElementById('insta_image_container').style.top = (window.innerHeight * 0.1) + 'px';
-    document.getElementById('insta_header').style.height = (window.innerHeight * 0.07) + 'px';
-    document.getElementById('background_opacity_trick').style.height = (window.innerHeight * 0.8) + 'px';
-    document.getElementById('background_opacity_trick').style.top = (window.innerHeight * 0.1) + 'px';
+    // set insta-container's height
+    document.getElementById('insta-container').style.height = (window.innerHeight) + 'px';
+    document.getElementById('insta-images-container').style.height = (window.innerHeight * 0.8) + 'px';
+    document.getElementById('insta-images-container').style.top = (window.innerHeight * 0.1) + 'px';
+    document.getElementById('insta-header').style.height = (window.innerHeight * 0.07) + 'px';
+    document.getElementById('background-opacity').style.height = (window.innerHeight * 0.8) + 'px';
+    document.getElementById('background-opacity').style.top = (window.innerHeight * 0.1) + 'px';
   }
 
 
 };
 
+// initialize instagram options
 insta.init();
 
 
@@ -110,18 +110,17 @@ insta.init();
 // assign draggable to all .wallPic elements
 assigndrag();
 
-
   // insta_step 6: Open the instagram_div and fetch instagram data
   if (openInstagramDiv === true) {
     socket.emit('ce: get_instagram_data');
 
-    document.getElementById('insta_header').style.display = 'flex';
-    document.getElementById('insta_div').style.display = 'block';
+    document.getElementById('insta-header').style.display = 'flex';
+    document.getElementById('insta-container').style.display = 'block';
     document.body.classList.add('button_container_is_open');
 
     // animate open hamburgers
-    document.getElementById('line_one').style.top = '35%';
-    document.getElementById('line_three').style.top = '65%';
+    document.getElementById('ham-line1').style.top = '35%';
+    document.getElementById('ham-line3').style.top = '65%';
   };
 
 
@@ -196,67 +195,11 @@ assigndrag();
 
 
   // remove
-  // if (document.getElementById('insta_div').style.display === 'block') {
+  // if (document.getElementById('insta-container').style.display === 'block') {
   //   history.replaceState({}, 'wall-collective', '/');
-  //   document.getElementById('insta_header').style.display = 'none';
-  //   document.getElementById('insta_div').style.display = 'none';
+  //   document.getElementById('insta-header').style.display = 'none';
+  //   document.getElementById('insta-container').style.display = 'none';
   // };
-
-
-// --Create grid line divs
-//    use left/top parameter with unit
-//    id is optional
-
-  function vline(left, color, id) {
-    var wrapper_element = document.getElementById('wrapper'),
-      line_element = document.createElement('div');
-
-    if (id) line_element.setAttribute('id', id);
-    line_element.classList.add('vline');
-    line_element.style.backgroundColor = color;
-    line_element.style.left = left;
-    // add 'line_element' to 'wrapper'
-    wrapper_element.appendChild(line_element);
-  } // end of vline
-
-  function hline(top, color, id) {
-    var wrapper_element = document.getElementById('wrapper'),
-      line_element = document.createElement('div');
-
-    if (id) line_element.setAttribute('id', id);
-    line_element.classList.add('hline');
-    line_element.style.backgroundColor = color;
-    line_element.style.top = top;
-    // add 'line_element' to 'wrapper'
-    wrapper_element.appendChild(line_element);
-  } // end of hline
-
-  // create a grid and d-info box.  used when draggers are dragging.
-  function make_grid() {
-    var wrapper_element = document.getElementById('wrapper'),
-      info_element = document.createElement('div');
-
-    info_element.setAttribute('id', 'd-info');
-    info_element.style.left = ((pageSettings.draggerWidth / 2) + 1) + 'px';
-    info_element.style.height = (pageSettings.draggerHeight / 2) + 'px';
-    info_element.style.width = (pageSettings.mainWide - pageSettings.draggerWidth - 2) + 'px';
-    // add 'info_element' to 'wrapper'
-    wrapper_element.appendChild(info_element);
-    // show grid lines
-    vline((pageSettings.mainWide - (pageSettings.draggerWidth / 2))  + 'px', 'red'   , 'inner_right');
-    vline((pageSettings.draggerWidth / 2)               + 'px', 'blue'  , 'inner_left');
-    hline((pageSettings.mainHigh - (pageSettings.draggerHeight / 2)) + 'px', 'purple', 'inner_bottom');
-    hline((pageSettings.draggerHeight / 2)              + 'px', 'yellow', 'inner_top');
-  }; // end of make_grid
-
-  function remove_grid() {
-    // remove the elements created by make_grid
-    document.getElementById('inner_top').remove();
-    document.getElementById('inner_bottom').remove();
-    document.getElementById('inner_left').remove();
-    document.getElementById('inner_right').remove();
-    document.getElementById('d-info').remove();
-  }; // end of remove_grid
 
 // --Socket.io
 
@@ -318,15 +261,15 @@ assigndrag();
   socket.on('bc: change_user_count', function (data) {
     var i = 0,
       content = '',
-      connect_info_element = document.getElementById('connect_info');
+      connectInfoEl = document.getElementById('connect-info');
 
-    // for each connected_client, add an icon to connect_info element
+    // for each connected_client, add an icon to connect-info element
     for ( i = 0; i < data.length; i++ ) {
-      content = content + "<img src='icons/person_icon.png' class='person_icon' />";
+      content = content + "<img src='icons/person_icon.png' class='icon-person' />";
       // debug: report sessionID rather than image. underline connected sessionID
       // if (data[i] === sessionID) content = content + '<u>'; content = content + '  ' + data[i]; if (data[i] === sessionID) content = content + '</u>';
     };
-    connect_info_element.innerHTML = content;
+    connectInfoEl.innerHTML = content;
   });
 
   // on another client moving an image, move target
@@ -460,22 +403,22 @@ assigndrag();
   socket.on('bc: chunk_sent', function (uploaddata) {
     if (uploaddata.sessionID === sessionID) {
       uploadtotal += uploaddata.chunkSize;
-      document.getElementById('confirm_or_reject_container_info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
+      document.getElementById('upload-confirm-info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
     };
   });
 
-  // insta_step 10: Add content to insta_div
+  // insta_step 10: Add content to insta-container
   socket.on('se: add_content_to_insta_div', function (insta_fetch_data) {
     var i = 0,
-      insta_image_container = document.getElementById('insta_image_container');
+      instaImagesEl = document.getElementById('insta-images-container');
 
-    // set content in insta_header
-    document.getElementById('insta_username').textContent = insta_fetch_data.username;
-    document.getElementById('insta_profile_pic').src = insta_fetch_data.profile_picture;
-    document.getElementById('insta_profile_link').setAttribute('href', 'https://www.instagram.com/' + insta_fetch_data.username + '/?hl=en');
+    // set content in insta-header
+    document.getElementById('insta-info-username').textContent = insta_fetch_data.username;
+    document.getElementById('insta-image-profile').src = insta_fetch_data.profile_picture;
+    document.getElementById('insta-profile-link').setAttribute('href', 'https://www.instagram.com/' + insta_fetch_data.username + '/?hl=en');
 
-    // destroy current images in insta_image_container
-    insta_image_container.innerHTML = '';
+    // destroy current images in insta-images-container
+    instaImagesEl.innerHTML = '';
 
     // use insta_images_src to display fetched Instagram images
     for (i = 0; i < insta_fetch_data.insta_images_src.length; i++ ) {
@@ -498,13 +441,13 @@ assigndrag();
       spacer_bottom.classList.add('spacer_top_bottom');
 
       temp_div.appendChild(temp_img);
-      insta_image_container.appendChild(temp_div);
+      instaImagesEl.appendChild(temp_div);
 
       // add spacers for scrolling
       if (i < insta_fetch_data.insta_images_src.length - 1) {
-        insta_image_container.appendChild(spacer_top);
-        insta_image_container.appendChild(spacer_middle);
-        insta_image_container.appendChild(spacer_bottom);
+        instaImagesEl.appendChild(spacer_top);
+        instaImagesEl.appendChild(spacer_middle);
+        instaImagesEl.appendChild(spacer_bottom);
       };
 
       // insta_step 11: Make the imported Instagram images draggable
@@ -518,7 +461,7 @@ assigndrag();
           start:  function () {
 
             // insta_step 12: When dragging starts, save dragged image to server storage, using id as an index
-            console.log(this);
+//            console.log(this);
 
             socket.emit('ce: save_insta_image', { src: this.getAttribute('src'), id: parseInt(this.getAttribute('id').replace('insta', '')) });
 
@@ -555,9 +498,14 @@ assigndrag();
 
         // clone is a jQuery method.  false specifies that event handlers should not be copied.
         // create a clone of the ui.draggable within the images div
+        instaDropData.posLeft = ((ui.offset.left - (pageSettings.mainWide - pageSettings.imagesWide) / 2) / pageSettings.imagesWide * 100).toFixed(2) + '%';
+        instaDropData.posTop = ((ui.offset.top - (pageSettings.mainHigh - pageSettings.imagesHigh) / 2) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+
+
+
       clone = ui.draggable.clone(false);
-      clone.css('left', ui.offset.left)
-           .css('top', ui.offset.top)
+      clone.css('left', instaDropData.posLeft)
+           .css('top', instaDropData.posTop)
            .css('position', 'absolute')
            // consider changing id so that id is not duplicated in dom
            // .attr('id', 'i' + clone.attr('id')),
@@ -587,10 +535,18 @@ assigndrag();
         // insta_step 17: Send instaDropData to server
         instaDropData.iID = ui.draggable[0].getAttribute('id');
         instaDropData.iFilename =  insta_download_ready_filename[ui.draggable[0].getAttribute('id')];
-        instaDropData.posleft = ui.offset.left;
-        instaDropData.postop = ui.offset.top;
-        instaDropData.iWidth = window.getComputedStyle(ui.draggable[0]).width;
-        instaDropData.iHeight = window.getComputedStyle(ui.draggable[0]).height;
+        // instaDropData.posleft = ui.offset.left;
+        // instaDropData.postop = ui.offset.top;
+
+        instaDropData.posLeft = ((ui.offset.left - (pageSettings.mainWide - pageSettings.imagesWide) / 2) / pageSettings.imagesWide * 100).toFixed(2) + '%';
+        instaDropData.posTop = ((ui.offset.top - (pageSettings.mainHigh - pageSettings.imagesHigh) / 2) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+
+        instaDropData.iWidth = window.getComputedStyle(ui.draggable[0]).width + '%';
+        instaDropData.iHeight = window.getComputedStyle(ui.draggable[0]).height + '%';
+
+        instaDropData.iwide = (parseFloat(window.getComputedStyle(ui.draggable[0]).width) / pageSettings.imagesWide * 100).toFixed(2) + '%';
+        instaDropData.ihigh = (parseFloat(window.getComputedStyle(ui.draggable[0]).height) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+
         instaDropData.iLink = ui.draggable[0].getAttribute('data-link');
 
         socket.emit('ce: insta_drop', instaDropData);
@@ -616,8 +572,12 @@ assigndrag();
     imageEl.setAttribute('id', instaDBData.dom_id);
     imageEl.src = instaDBData.location + instaDBData.iFilename;
     imageEl.classList.add('wallPic');
+
+    imageEl.style.left = instaDBData.posleft;
+    imageEl.style.top = instaDBData.postop;
     imageEl.style.width = instaDBData.width;
     imageEl.style.height = instaDBData.height;
+
     imageEl.classList.remove('insta_image');
     imageEl.setAttribute('title', instaDBData.iFilename);
     imageEl.setAttribute('data-link', instaDBData.insta_link);
@@ -672,11 +632,11 @@ assigndrag();
 
 
 // --Buttons
-  document.getElementById('navigation_toggle_button').onclick = function () {
-    var button_element = document.getElementById('navigation_toggle_button');
+  document.getElementById('nav-tog-button').onclick = function () {
+    var button_element = document.getElementById('nav-tog-button');
 
     // if the button is being dragged, don't use the click.  FUTURE WORK: stop event propagation
-    if ( button_element.classList.contains('dragging_no_click') === false ) {
+    if ( button_element.classList.contains('nav-tog-dragging') === false ) {
 
       // otherwise, if button containers are open
       if ( document.body.classList.contains('button_container_is_open') ) {
@@ -690,13 +650,13 @@ assigndrag();
       // else when no containers are open
       } else {
         // open the navigation container
-        document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+        document.getElementById('nav-main-container').classList.add('nav-is-open');
         document.body.classList.add('button_container_is_open');
-        document.getElementById('connect_info').classList.add('connect_info_is_open');
+        document.getElementById('connect-info').classList.add('connect-info-is-open');
 
         // animate open hamburgers
-        document.getElementById('line_one').style.top = '35%';
-        document.getElementById('line_three').style.top = '65%';
+        document.getElementById('ham-line1').style.top = '35%';
+        document.getElementById('ham-line3').style.top = '65%';
 
         stateChange.hideDraggers();
       };
@@ -785,11 +745,6 @@ assigndrag();
     setCookie('switches_status', switches_status, 7);
   });
 
-  $('#info_button').on('click', function () {
-    document.getElementById('app_info').style.display = 'block';
-    document.getElementById('close_info_container').style.display = 'block';
-  });
-
   $('#close_info_container').on('click', function () {
     document.getElementById('app_info').style.display = 'none';
     document.getElementById('close_info_container').style.display = 'none';
@@ -800,7 +755,7 @@ assigndrag();
 
   // on file_select element change, load up the image preview
   $('#fileselect').on('change', function () {
-    // open upload_preview_container
+    // open upload-preview-container
     stateChange.uploadPreview();
     readURL(this);
   });
@@ -815,24 +770,24 @@ assigndrag();
       reader = new FileReader();
       reader.onload = function (event) {
         // wait until the image is ready to upload_preview container
-        document.getElementById('upload_preview_container').classList.add('upload_preview_container_is_open');
-        document.getElementById('image_upload_preview').src = event.target.result;
+        document.getElementById('upload-preview-container').classList.add('upload-preview-container_is_open');
+        document.getElementById('image-upload-preview').src = event.target.result;
       };
       reader.readAsDataURL(input.files[0]);
     };
   }
 
   // confirm upload button
-  // on click, send a submit to the html form with id='upload_image_button'
-  // the html form with id='upload_image_button' posts to '/addfile'
-  $('#confirm_upload_button').on('click', function () {
-    document.getElementById('confirm_or_reject_container').style.display = 'none';
+  // on click, send a submit to the html form with id='upload-form-button'
+  // the html form with id='upload-form-button' posts to '/addfile'
+  $('#button-confirm-upload').on('click', function () {
+    document.getElementById('upload-confirm-container').style.display = 'none';
 
-    $('#upload_image_button').ajaxSubmit({
+    $('#upload-form-button').ajaxSubmit({
       // method from jquery.form
       error: function (xhr) {
         console.log('Error:' + xhr.status);
-        // change navigation_container and remove upload_preview
+        // change nav-main-container and remove upload_preview
         stateChange.afterUpload();
         uploadtotal = 0;
       },
@@ -878,12 +833,12 @@ assigndrag();
   });
 
   // reject upload
-  $('#reject_upload_button').on('click', function () {
+  $('#button-reject-upload').on('click', function () {
     stateChange.afterUpload();
   });
 
   // reject delete
-  $('#reject_delete_button').on('click', function () {
+  $('#button-reject-delete').on('click', function () {
     var deleteTargetID = store.getState().deleteTarget.id;
 
     stateChange.rejectDelete();
@@ -892,7 +847,7 @@ assigndrag();
   });
 
   // confirm delete
-  $('#confirm_delete_button').on('click', function () {
+  $('#button-confirm-delete').on('click', function () {
     var socketdata = {},
         deleteTarget = store.getState().deleteTarget;
 
@@ -910,7 +865,7 @@ assigndrag();
   });
 
 
-  $('#instagram_login').on('click', function () {
+  $('#u3').on('click', function () {
     var redirect_url = [location.protocol, '//', location.host, location.pathname].join('');
 
     // redirect_url: http://www.example.com?myclient_id=johndoe
@@ -923,14 +878,14 @@ assigndrag();
 
       socket.emit('ce: get_instagram_data');
 
-      document.getElementById('insta_header').style.display = 'flex';
-      document.getElementById('insta_div').style.display = 'block';
-      document.getElementById('upload_container').classList.remove('upload_container_is_open');
+      document.getElementById('insta-header').style.display = 'flex';
+      document.getElementById('insta-container').style.display = 'block';
+      document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
       document.body.classList.add('button_container_is_open');
 
       // animate open hamburgers
-      document.getElementById('line_one').style.top = '35%';
-      document.getElementById('line_three').style.top = '65%';
+      document.getElementById('ham-line1').style.top = '35%';
+      document.getElementById('ham-line3').style.top = '65%';
 
     } else {
 
@@ -947,7 +902,7 @@ assigndrag();
 
   // insta_step 25: Use the instagram logout link in an image tag to log out.
   // http://stackoverflow.com/questions/10991753/instagram-api-user-logout
-  $('#instagram_logout_button').on('click', function () {
+  $('#a2').on('click', function () {
     var logout_imageEl = document.createElement('img');
 
     logout_imageEl.src = 'http://instagram.com/accounts/logout/';
@@ -973,11 +928,11 @@ assigndrag();
 
 
   $('#t4').on('click', function () {
-    document.getElementById('explore_container').style.display = 'block';
-    document.getElementById('close_explore_container').style.display = 'block';
+    document.getElementById('explore-container').style.display = 'block';
+    document.getElementById('x-explore-container').style.display = 'block';
 
 
-    document.getElementById('explore_image').src = document.getElementById(store.getState().selectedImage.id).src;
+    document.getElementById('image-explore').src = document.getElementById(store.getState().selectedImage.id).src;
 
 
     if (document.getElementById(store.getState().selectedImage.id).getAttribute('data-link').length > 1) {
@@ -1002,9 +957,9 @@ assigndrag();
     };
   });
 
-  $('#close_explore_container').on('click', function () {
-    document.getElementById('explore_container').style.display = 'none';
-    document.getElementById('close_explore_container').style.display = 'none';
+  $('#x-explore-container').on('click', function () {
+    document.getElementById('explore-container').style.display = 'none';
+    document.getElementById('x-explore-container').style.display = 'none';
   });
 
 
@@ -1078,13 +1033,8 @@ assigndrag();
           // this.socketdata.imageTop = this.style.top;
           // this.socketdata.imageLeft = this.style.left;
 
-//          console.log((ui.position.top / pageSettings.imagesHigh * 100).toFixed(2));
-
           this.socketdata.posTop = (ui.position.top / pageSettings.imagesHigh * 100).toFixed(2);
           this.socketdata.posLeft = (ui.position.left / pageSettings.imagesWide * 100).toFixed(2);
-
-//          console.log(this.socketdata.posLeft);
-
 
           // pass socket data to server
           socket.emit('ce:  moving', this.socketdata);
@@ -1354,25 +1304,25 @@ assigndrag();
       // hide draggers
       stateChange.hideDraggers();
 
-      // show delete_preview_container
+      // show delete-preview-container
       stateChange.deletePreview();
 
       // send socket to hide on other clients
-      socket.emit('ce:  hide_image', deleteTarget.id);
+      socket.emit('ce:_hideImage', deleteTarget.id);
     }
   });
 
 
-// --Navigation_toggle_button.draggable, for dragging the navigation_toggle_button around the sides
+// --nav-tog-button.draggable, for dragging the nav-tog-button around the sides
 
-  $('#navigation_toggle_button_container').draggable({
+  $('#nav-toggle-button-container').draggable({
     cancel: true,
     containment: 'parent',
     scroll: false,
     start: function () {
 
       // used to prevent click from registering
-      document.getElementById('navigation_toggle_button').classList.add('dragging_no_click');
+      document.getElementById('nav-tog-button').classList.add('nav-tog-dragging');
 
       debug.clearDebugInfo();
 
@@ -1475,8 +1425,8 @@ assigndrag();
     stop: function () {
       // this causes the class to be removed before the next click event begins
       setTimeout( function () {
-        document.getElementById('navigation_toggle_button').classList.remove('dragging_no_click');
-//        navigation_toggle_button_is_stationary = true;
+        document.getElementById('nav-tog-button').classList.remove('nav-tog-dragging');
+//        nav-tog-button_is_stationary = true;
       }, 200);
     }
   });
@@ -1494,7 +1444,7 @@ var draggerAPI = {
 
   init(dragger) {
     this.dragger = dragger;
-    make_grid();
+    Grid.make_grid();
     stateChange.hideOtherDraggers(dragger.id);
     dragger.classList.remove('d-transition');
 
@@ -1517,7 +1467,7 @@ var draggerAPI = {
   },
 
   stop: function () {
-    remove_grid();
+    Grid.remove_grid();
     this.dragger.classList.add('d-transition');
     set_dragger_locations(this.imageID);
     store.dispatch(resetClickCount());
@@ -1938,7 +1888,7 @@ var draggerAPI = {
     var selected_image_filter = imageEl.style.WebkitFilter;
         // get the numbers within the grayscale and invert parentheses
 
-        console.log(imageEl);
+//        console.log(imageEl);
 
 
     var grayscale_Exp = /grayscale\(([^)]+)\)/,

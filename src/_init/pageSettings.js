@@ -19,10 +19,10 @@ module.exports = {
 
 
   render: function () {
-    let navToggleEl = document.getElementById('navigation_toggle_button_container'),
+    let navToggleEl = document.getElementById('nav-toggle-button-container'),
         closeInfoEl = document.getElementById('close_info_container'),
         appInfoEl = document.getElementById('app_info'),
-        closeExploreEl = document.getElementById('close_explore_container'),
+        closeExploreEl = document.getElementById('x-explore-container'),
         imagesEl = document.getElementById('images'),
         wrapperEl = document.getElementById('wrapper'),
         aspectFit = {};
@@ -50,22 +50,25 @@ module.exports = {
     imagesEl.style.height = this.imagesHigh + 'px';
     imagesEl.style.width = this.imagesWide + 'px';
 
-    // position the navigation_toggle_button_container on the bottom right
+    // center images div vertically
+    imagesEl.style.top = ((this.mainHigh - this.imagesHigh) / 2) + 'px';
+
+    // position the nav-toggle-button-container on the bottom right
     navToggleEl.style.left = (this.mainWide - parseFloat(window.getComputedStyle(navToggleEl).width) + 'px');
     navToggleEl.style.top = (this.mainHigh - parseFloat(window.getComputedStyle(navToggleEl).height) + 'px');
 
     // set app_info height
     document.getElementById('app_info').style.height = (this.innerHeight * 0.9) + 'px';
 
-    // set explore_container height
-    document.getElementById('explore_container').style.height = (this.innerHeight * 0.9) + 'px';
+    // set explore-container height
+    document.getElementById('explore-container').style.height = (this.innerHeight * 0.9) + 'px';
 
     // set position and size of the close_info container divs
     closeInfoEl.style.width = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
     closeInfoEl.style.height = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
     closeInfoEl.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(closeInfoEl.style.height)) + 'px';
 
-    // set position and size of the x_icon container divs
+    // set position and size of the icon-x container divs
     closeExploreEl.style.width = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
     closeExploreEl.style.height = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
     closeExploreEl.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(closeInfoEl.style.height)) + 'px';

@@ -203,7 +203,7 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: unfreeze', data);
     });
 
-    socket.on('ce:  hide_image', function (data) {
+    socket.on('ce:_hideImage', function (data) {
       socket.broadcast.emit('bc: hide_image', data);
     });
 
