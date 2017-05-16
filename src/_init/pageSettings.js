@@ -1,29 +1,31 @@
+
+
 module.exports = {
   init: function () {
 
     this.render();
 
-    // add perspective to 3d transforms
-    let imagesDiv = document.getElementById('images');
-
-    imagesDiv.style.width = window.innerWidth + 'px';
-    imagesDiv.style.height = window.innerHeight + 'px';
-    imagesDiv.style.webkitPerspective = '500px';
-    imagesDiv.style.webkitPerspectiveOriginX = '50%';
-    imagesDiv.style.webkitPerspectiveOriginY = '50%';
-
     // listen for resize and orientation changes and make adjustments
     window.addEventListener('resize', () => {
       this.render();
     }, false);
-
   },
 
+  calculateAspectRatioFit: function (srcWidth, srcHeight, maxWidth, maxHeight) {
+    var ratio = Math.min(maxWidth / srcWidth, maxHeight / srcHeight);
+
+    return { width: srcWidth * ratio, height: srcHeight * ratio };
+  },
+
+
   render: function () {
-    let navToggleDiv = document.getElementById('navigation_toggle_button_container'),
-        closeInfoDiv = document.getElementById('close_info_container'),
-        appInfoDiv = document.getElementById('app_info'),
-        closeExploreDiv = document.getElementById('close_explore_container');
+    let navToggleEl = document.getElementById('navigation_toggle_button_container'),
+        closeInfoEl = document.getElementById('close_info_container'),
+        appInfoEl = document.getElementById('app_info'),
+        closeExploreEl = document.getElementById('close_explore_container'),
+        imagesEl = document.getElementById('images'),
+        wrapperEl = document.getElementById('wrapper'),
+        aspectFit = {};
 
     // retrieve dragger size from css
     this.draggerWidth = parseFloat(window.getComputedStyle(document.getElementsByClassName('dragger')[0]).width);
@@ -37,13 +39,20 @@ module.exports = {
     this.innerHeight = this.mainHigh - this.draggerHeight;
 
     // set wrapper size; (css vh and vw were not working with mobile safari)
-    document.getElementById('wrapper').style.width = this.mainWide + 'px';
-    document.getElementById('wrapper').style.height = this.mainHigh + 'px';
+    wrapperEl.style.width = this.mainWide + 'px';
+    wrapperEl.style.height = this.mainHigh + 'px';
 
+    // set images container size; maintain portrait aspect ratio
+    aspectFit = this.calculateAspectRatioFit(320, 460, this.mainWide, this.mainHigh);
+
+    this.imagesHigh = aspectFit.height;
+    this.imagesWide = aspectFit.width;
+    imagesEl.style.height = this.imagesHigh + 'px';
+    imagesEl.style.width = this.imagesWide + 'px';
 
     // position the navigation_toggle_button_container on the bottom right
-    navToggleDiv.style.left = (this.mainWide - parseFloat(window.getComputedStyle(navToggleDiv).width) + 'px');
-    navToggleDiv.style.top = (this.mainHigh - parseFloat(window.getComputedStyle(navToggleDiv).height) + 'px');
+    navToggleEl.style.left = (this.mainWide - parseFloat(window.getComputedStyle(navToggleEl).width) + 'px');
+    navToggleEl.style.top = (this.mainHigh - parseFloat(window.getComputedStyle(navToggleEl).height) + 'px');
 
     // set app_info height
     document.getElementById('app_info').style.height = (this.innerHeight * 0.9) + 'px';
@@ -52,13 +61,18 @@ module.exports = {
     document.getElementById('explore_container').style.height = (this.innerHeight * 0.9) + 'px';
 
     // set position and size of the close_info container divs
-    closeInfoDiv.style.width = (parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1) + 'px';
-    closeInfoDiv.style.height = (parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1) + 'px';
-    closeInfoDiv.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+    closeInfoEl.style.width = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
+    closeInfoEl.style.height = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
+    closeInfoEl.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(closeInfoEl.style.height)) + 'px';
 
     // set position and size of the x_icon container divs
-    closeExploreDiv.style.width = (parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1) + 'px';
-    closeExploreDiv.style.height = (parseFloat(window.getComputedStyle(appInfoDiv).height) * 0.1) + 'px';
-    closeExploreDiv.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoDiv).height) - parseInt(closeInfoDiv.style.height)) + 'px';
+    closeExploreEl.style.width = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
+    closeExploreEl.style.height = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
+    closeExploreEl.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(closeInfoEl.style.height)) + 'px';
+
+    // add perspective to 3d transforms
+    imagesEl.style.webkitPerspective = '500px';
+    imagesEl.style.webkitPerspectiveOriginX = '50%';
+    imagesEl.style.webkitPerspectiveOriginY = '50%';
   }
 };

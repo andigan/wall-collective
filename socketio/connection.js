@@ -17,11 +17,14 @@ module.exports = function (io) {
     var sessionID = '';
 
     // check to see if the client is new or revisiting with a cookie
-    socket.on('c-e:  sessionID_check', function (clientVars) {
+    socket.on('ce:  sessionID_check', function (clientVars) {
       sessionID = clientVars.sessionID;
 
       // add the instagram_app_id
       clientVars.instaAppID = secrets.instaAppID;
+
+      // add backgroundColor
+      clientVars.backgroundColor = config.backgroundColor;
 
       // if the client is revisiting, send original sessionID to client
       if (sessionID !== '' && sessionID !== 'null' && sessionID !== '[object Object]') {
@@ -61,19 +64,19 @@ module.exports = function (io) {
     });
 
     // sockets to share image transformations
-    socket.on('c-e:  moving', function (data) {
+    socket.on('ce:  moving', function (data) {
       socket.broadcast.emit('bc: moving', data);
     });
 
-    socket.on('c-e:  store_moved', function (data) {
+    socket.on('ce:  store_moved', function (data) {
       socket.broadcast.emit('bc: moved', data);
     });
 
-    socket.on('c-e:  resizing', function (data) {
+    socket.on('ce:_resizing', function (data) {
       socket.broadcast.emit('bc: resizing', data);
     });
 
-    socket.on('c-e:  store_resized', function (data) {
+    socket.on('ce:_saveResize', function (data) {
 
       ImageDocuments.update(
         // filter
@@ -92,7 +95,7 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: resized', data);
     });
 
-    socket.on('c-e:  store_data_attributes', function (data) {
+    socket.on('ce:_saveDataAttributes', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { scale   : data.scale,
@@ -106,11 +109,11 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: change_data_attributes', data);
     });
 
-    socket.on('c-e:  transforming', function (data) {
+    socket.on('ce:_transforming', function (data) {
       socket.broadcast.emit('bc: transforming', data);
     });
 
-    socket.on('c-e:  store_transformed', function (data) {
+    socket.on('ce:_saveTransform', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { transform : data.imageTransform } },
@@ -118,11 +121,11 @@ module.exports = function (io) {
         function (err) { if (err) return console.error(err); } );
     });
 
-    socket.on('c-e:  opacity_changing', function (data) {
+    socket.on('ce:_opacityChanging', function (data) {
       socket.broadcast.emit('bc: opacity_changing', data);
     });
 
-    socket.on('c-e:  store_opacity', function (data) {
+    socket.on('ce:_saveOpacity', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { opacity : data.imageOpacity } },
@@ -130,11 +133,11 @@ module.exports = function (io) {
         function (err) { if (err) return console.error(err); } );
     });
 
-    socket.on('c-e:  filter_changing', function (data) {
+    socket.on('ce:_filterChanging', function (data) {
       socket.broadcast.emit('bc: filter_changing', data);
     });
 
-    socket.on('c-e:  store_filter', function (data) {
+    socket.on('ce:_saveFilter', function (data) {
       ImageDocuments.update(
         { filename : data.imageFilename },
         { $set: { filter : data.imageFilter } },
@@ -142,11 +145,19 @@ module.exports = function (io) {
         function (err) { if (err) return console.error(err); } );
     });
 
-    socket.on('c-e:  resetpage', function () {
+    socket.on('ce:_changeBackground', function (data) {
+      socket.broadcast.emit('bc:_changeBackground', data);
+    });
+
+    socket.on('ce:_saveBackground', function (data) {
+      config.backgroundColor = data;
+    });
+
+    socket.on('ce:_resetPage', function () {
       socket.broadcast.emit('bc: resetpage');
     });
 
-    socket.on('c-e:  share_upload', function (data) {
+    socket.on('ce:  share_upload', function (data) {
       var dbImageData = {};
 
       // find matching data.uploadedFilename, return 'result' object
@@ -162,7 +173,7 @@ module.exports = function (io) {
       });
     });
 
-    socket.on('c-e:  delete_image', function (data) {
+    socket.on('ce:  delete_image', function (data) {
       socket.broadcast.emit('bc: delete_image', data);
       console.log('----------- delete image socket -------------');
       console.log(data.filenameToDelete);
@@ -177,26 +188,26 @@ module.exports = function (io) {
       });
     });
 
-    socket.on('c-e:  remove_filter', function (data) {
+    socket.on('ce:_removeFilter', function (data) {
       socket.broadcast.emit('bc: remove_filter', data);
     });
 
-    socket.on('c-e:  restore_filter', function (data) {
+    socket.on('ce:_restoreFilter', function (data) {
       socket.broadcast.emit('bc: restore_filter', data);
     });
 
-    socket.on('c-e:  freeze', function (data) {
+    socket.on('ce:  freeze', function (data) {
       socket.broadcast.emit('bc: freeze', data);
     });
-    socket.on('c-e:  unfreeze', function (data) {
+    socket.on('ce:  unfreeze', function (data) {
       socket.broadcast.emit('bc: unfreeze', data);
     });
 
-    socket.on('c-e:  hide_image', function (data) {
+    socket.on('ce:  hide_image', function (data) {
       socket.broadcast.emit('bc: hide_image', data);
     });
 
-    socket.on('c-e:  show_image', function (data) {
+    socket.on('ce:  show_image', function (data) {
       socket.broadcast.emit('bc: show_image', data);
     });
 

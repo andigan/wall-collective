@@ -3,18 +3,19 @@ import helpers from '../helpers';
 module.exports = {
 
   init: function (store) {
-    helpers.clickme('navigation_toggle_button', 50);
-    // helpers.clickme('debug-button', 0);
-    // helpers.clickme('dragger_switches_button', 1000);
-    // helpers.clickme('explore_button', 0);
-    // helpers.clickme('upload_container_button', 1000);
-
     this.createDebugButton();
     this.createDebugDiv();
     this.setListeners();
 
+    // helpers.clickme('navigation_toggle_button', 50);
+    // helpers.clickme('t2', 50);
+    // helpers.clickme('dragger_switches_button', 1000);
+    // helpers.clickme('explore_button', 0);
+    // helpers.clickme('upload_container_button', 1000);
+    // helpers.clickme('debug-button', 1000);
+
     // console log store
-    document.addEventListener('click touchstart', function () {
+    document.addEventListener('click', function () {
       console.log(store.getState());
 
       // uncomment to log whichever element is clicked on
@@ -30,7 +31,7 @@ module.exports = {
   },
 
   createDebugButton: function () {
-    var debugButton = document.getElementById('debug-holder'),
+    var debugButton = document.getElementById('t5'),
         debugIcon = document.createElement('img'),
         debugText = document.createElement('span');
 

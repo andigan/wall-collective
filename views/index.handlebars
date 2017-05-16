@@ -134,18 +134,10 @@
     </div>
 
     <div id='tools_container'>
-      <div id='dragger_switches_button' class='button tools_button'> draggers
-        <img class='icon_image' src='/icons/draggers_icon.png'>
+      {{#repeat 5}}
+      <div id='t{{@index}}' class='button_no_show'>
       </div>
-      <div id='reset_page_button' class='button tools_button'> reset page
-        <img class='icon_image' src='/icons/reset_icon.png'>
-      </div>
-      <div id='explore_button' class='button tools_button'> explore
-        <img class='icon_image' src='/icons/magnifying_glass_icon.png'>
-      </div>
-      <div class='button_no_show'>
-      </div>
-      <div id='debug-holder' class='button_no_show'></div>
+      {{/repeat}}
     </div>
 
     <div id='upload_preview_container' class='rainbow_border'>

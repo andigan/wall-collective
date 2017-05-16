@@ -115,9 +115,8 @@ module.exports = {
     deleteTarget.element.style.display = 'initial';
 
     // show image on other clients
-    window.socket.emit('c-e:  show_image', deleteTarget.id);
+    window.socket.emit('ce:  show_image', deleteTarget.id);
   },
-
 
   closeAll() {
     // hide

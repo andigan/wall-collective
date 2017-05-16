@@ -53,14 +53,16 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
   console.log('filenames : ' + dropPost.filenames);
   console.log('z_indexes : ' + dropPost.zIndexes);
   console.log('dFilename : ' + dropPost.dFilename);
+  console.log('posLeft   : ' + dropPost.posLeft);
+  console.log('posTop    : ' + dropPost.posTop);
   console.log('dLeft     : ' + dropPost.dLeft);
   console.log('dTop      : ' + dropPost.dTop + '\n');
 
   // update left/top positions for moved_file's filename
   ImageDocuments.update(
     { filename : dropPost.dFilename },
-    { $set: {   posleft  : dropPost.dLeft,
-                postop   : dropPost.dTop } },
+    { $set: {   posleft  : dropPost.posLeft,
+                postop   : dropPost.posTop } },
     { upsert: true },
     function (err) { if (err) return console.error(err); } );
 
@@ -139,11 +141,11 @@ router.get('/resetpage', function (req, res) {
               dom_id    : i,
               filename  : sortedIdsFilenames[i][1],
               location  : config.imageDir,
-              posleft   : '10px',
-              postop    : '10px',
+              posleft   : '10%',
+              postop    : '10%',
               zindex    : i,
-              width     : '75px',
-              height    : '100px',
+              width     : '20%',
+              height    : 'auto',
               transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
               opacity   : '1',
               filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
@@ -157,7 +159,7 @@ router.get('/resetpage', function (req, res) {
           temp_document.save(function (err) { if (err) return console.error(err); });
         }; // end of for loop
         console.log('\nCollection replaced.\n\n');
-        res.end();
+        res.sendStatus(200);
       }); // end of ImageDocuments.remove callback
     });
   }); // end of fs.readdir callback
@@ -245,10 +247,10 @@ router.post('/addfile', function (req, res) {
                           { $set: {   dom_id    : uploadResponse.dom_id,
                                       filename  : uploadResponse.imageFilename,
                                       location  : config.imageDir,
-                                      posleft   : '0px',
-                                      postop    : '0px',
-                                      width     : '75px',
-                                      height    : '100px',
+                                      posleft   : '5%',
+                                      postop    : '5%',
+                                      width     : '20%',
+                                      height    : 'auto',
                                       transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
                                       filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
                                       opacity   : '1',

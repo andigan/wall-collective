@@ -9,6 +9,9 @@ module.exports = {
   // set directories
   imageDir: '/images/',
   staticImageDir: 'public/images',
-  logDir: 'logs'
+  logDir: 'logs',
+
+  // temporary holding spot for database
+  backgroundColor: '#000000'
 
 };

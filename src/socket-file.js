@@ -3,7 +3,7 @@
 module.exports = {
 
   hideImage(id) {
-    window.socket.emit('c-e:  hide_image', id);
+    window.socket.emit('ce:  hide_image', id);
   }
 
 };

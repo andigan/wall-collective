@@ -2,8 +2,8 @@ module.exports = {
   debugOn: true, // set debug div
 
   // set upload placement
-  uploadTop: '0px',
-  uploadLeft: '0px',
+  uploadTop: '2%',
+  uploadLeft: '2%',
   uploadWidth: '75px',
   uploadheight: '100px',
 
