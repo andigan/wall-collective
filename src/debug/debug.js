@@ -3,15 +3,16 @@ import helpers from '../helpers';
 module.exports = {
 
   init: function (store) {
+    this.createDebugButton();
+    this.createDebugDiv();
+    this.setListeners();
+
     // helpers.clickme('navigation_toggle_button', 50);
+    // helpers.clickme('t2', 50);
     // helpers.clickme('dragger_switches_button', 1000);
     // helpers.clickme('explore_button', 0);
     // helpers.clickme('upload_container_button', 1000);
-
-    this.createDebugButton();
-    this.createDebugDiv();
-    helpers.clickme('debug-button', 1000);
-//    this.setListeners();
+    // helpers.clickme('debug-button', 1000);
 
     // console log store
     document.addEventListener('click', function () {

@@ -137,6 +137,8 @@ assigndrag();
   $('#wrapper').on('click touchstart', function (event) {
     var dragger_elements = {};
 
+    document.getElementById('color-chooser').style.display = 'none';
+
     // if the images div alone is clicked...
     if (event.target.getAttribute('id') === 'images') {
       dragger_elements = document.getElementsByClassName('dragger');
@@ -144,8 +146,9 @@ assigndrag();
       stateChange.hideDraggers();
       // close button containers and remove d-transition
       document.body.classList.remove('d-transition');
-    }; // end of if
-  }); // end of document.on.click
+
+    };
+  });
 
 
   // used by delete image button
@@ -256,13 +259,6 @@ assigndrag();
   }; // end of remove_grid
 
 // --Socket.io
-//     These functions receive an emit from the server,
-//     recognize its name, receive its data, and do something with the data.
-//
-//     socket.on('bc: name', function(data) {
-//       use data
-//     });
-
 
   // on initial connect, retrieve sessionID cookie and send results to server
   socket.on('connect', function () {
@@ -294,6 +290,9 @@ assigndrag();
     sessionID = clientVars.sessionID;
 
     instaAppID = clientVars.instaAppID;
+
+    // set background color
+    document.getElementById('wrapper').style.backgroundColor = clientVars.backgroundColor;
 
 //    instaAccessReady = clientVars.clients_instaAccessReady;
 
@@ -973,7 +972,7 @@ assigndrag();
 
 
 
-  $('#t3').on('click', function () {
+  $('#t4').on('click', function () {
     document.getElementById('explore_container').style.display = 'block';
     document.getElementById('close_explore_container').style.display = 'block';
 

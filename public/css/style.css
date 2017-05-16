@@ -208,6 +208,12 @@ fullscreenmaskclass: 90000;
   max-width:90%;
 }
 
+#images {
+  border-left: 1px rgba(41, 40, 40, 0.2) solid;
+  border-right: 1px rgba(41, 40, 40, 0.2) solid;
+  margin: auto;
+}
+
 #line_one {
   top:40%;
 }
@@ -465,15 +471,11 @@ fullscreenmaskclass: 90000;
 }
 
 #wrapper {
-  background-color:#50a0ee;
+  background-color:black;
   display:block;
   left:0;
   position:absolute;
   top:0;
-}
-
-#images {
-  background-color: black;
 }
 
 /* opacity is the primary feature of this functionality. */
@@ -721,6 +723,10 @@ fullscreenmaskclass: 90000;
   position:absolute;
   top:0;
   width:1px;
+}
+
+.wallPic {
+  /*-webkit-backface-visibility: hidden; */
 }
 
 body {

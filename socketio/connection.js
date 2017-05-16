@@ -23,6 +23,9 @@ module.exports = function (io) {
       // add the instagram_app_id
       clientVars.instaAppID = secrets.instaAppID;
 
+      // add backgroundColor
+      clientVars.backgroundColor = config.backgroundColor;
+
       // if the client is revisiting, send original sessionID to client
       if (sessionID !== '' && sessionID !== 'null' && sessionID !== '[object Object]') {
         console.log(sessionID + ' reconnected.');
@@ -144,9 +147,11 @@ module.exports = function (io) {
 
     socket.on('ce:_changeBackground', function (data) {
       socket.broadcast.emit('bc:_changeBackground', data);
-
     });
 
+    socket.on('ce:_saveBackground', function (data) {
+      config.backgroundColor = data;
+    });
 
     socket.on('ce:_resetPage', function () {
       socket.broadcast.emit('bc: resetpage');

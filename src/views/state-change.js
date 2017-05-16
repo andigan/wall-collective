@@ -118,23 +118,6 @@ module.exports = {
     window.socket.emit('ce:  show_image', deleteTarget.id);
   },
 
-
-  openColorChooser() {
-
-    // //    $("#flat").spectrum("toggle");
-    //
-    // console.log('clicked');
-    //
-    //
-    //
-    //
-    //
-    //
-    // document.getElementById('choice-container').style.display = 'flex';
-
-  },
-
-
   closeAll() {
     // hide
     document.getElementById('navigation_container').classList.remove('navigation_container_is_open');

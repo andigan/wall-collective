@@ -12,9 +12,11 @@ module.exports = {
     this.createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png');
 
     this.createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers_icon.png');
-    this.createButton('t2', 'reset-page', 'reset page', '/icons/reset_icon.png');
-//    this.createButton('t3', 'explore', 'explore', '/icons/magnifying_glass_icon.png');
-    this.createButton('t4', 'choose-color', 'bk color', '/icons/door_icon.png');
+    this.createButton('t2', 'choose-color', 'color', '/icons/palette_icon.png');
+    this.createButton('t3', 'reset-page', 'reset page', '/icons/reset_icon.png');
+    // this.createButton('t3', 'explore', 'explore', '/icons/magnifying_glass_icon.png');
+
+    this.createjsColor();
 
     this.addEvents();
   },
@@ -68,8 +70,11 @@ module.exports = {
         break;
       case 'reset-page':
         let xhr = new XMLHttpRequest ();
+
         xhr.open('GET', '/resetpage');
         xhr.send(null);
+
+        window.socket.emit('ce:_saveBackground', '#000000');
 
         xhr.onreadystatechange = function () {
           // readyState 4 means the request is done.
@@ -85,11 +90,18 @@ module.exports = {
           }
         };
         break;
-        case 'choose-color':
-          // currently does nothing
-          stateChange.openColorChooser();
-          break;
+      case 'choose-color':
 
+        document.getElementById('color-chooser').style.display = 'block';
+        // set the initial location for the color
+        document.getElementById('color-chooser').jscolor.fromString(document.getElementById('wrapper').style.backgroundColor);
+
+        // position the input element; the palette box appears above and left-justified
+        document.getElementById('color-chooser').style.left = ((parseInt(document.getElementById('wrapper').style.width) / 2) - 90) + 'px' ;
+        document.getElementById('color-chooser').style.top = ((parseInt(document.getElementById('wrapper').style.height) / 2) + 50) + 'px' ;
+
+        document.getElementById('color-chooser').jscolor.show();
+        break;
 
       default:
         break;
@@ -111,6 +123,34 @@ module.exports = {
   addEvents() {
     this.buttons.forEach(
       button => { button.addEventListener('click', this.onClick.bind(this)); });
-  }
+  },
 
+  createjsColor() {
+    var jscolorEl = {};
+
+    // fires rapidly when dragging on palette box
+    window.jScOlOrUpdate = function (jscolor) {
+      document.getElementById('wrapper').style.backgroundColor = '#' + jscolor;
+      window.socket.emit('ce:_changeBackground', '#' + jscolor);
+    };
+
+    // fires on mouseup
+    window.jScOlOrChoice = function (jscolor) {
+      window.socket.emit('ce:_saveBackground', '#' + jscolor);
+    };
+
+    jscolorEl = document.createElement('input');
+    jscolorEl.classList.add('jscolor');
+    jscolorEl.id = 'color-chooser';
+    jscolorEl.setAttribute('data-jscolor', `{position: 'top', mode:'HVS', width:180, height:100, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000', onFineChange: 'window.jScOlOrUpdate(this)'}` );
+    jscolorEl.setAttribute('onchange', 'window.jScOlOrChoice(this.jscolor)');
+
+    jscolorEl.style.position = 'fixed';
+    jscolorEl.style.width = '1px';
+    jscolorEl.style.height = '1px';
+    jscolorEl.style.display = 'none';
+    jscolorEl.style.opacity = '0';
+
+    document.getElementById('wrapper').appendChild(jscolorEl);
+  }
 };
