@@ -11,7 +11,7 @@ InstaSessions = mongoose.model('insta_sessions');
 
 // insta_step 2: Use authorization code from Instagram's API to get an access token
 
-// If a user clicks on #instagram_login and authenticates their account,
+// If a user clicks on #insta-login-button and authenticates their account,
 // instagram redirects to "callback uri"
 // with an authorization code in the form of a query parameter
 // (e.g. http://www.wall-collective.com/?myclient_id=johndoe&code=xyzxyzxyz)

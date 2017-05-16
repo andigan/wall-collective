@@ -7,11 +7,11 @@ module.exports = {
     this.createDebugDiv();
     this.setListeners();
 
-    // helpers.clickme('navigation_toggle_button', 50);
+    // helpers.clickme('nav-tog-button', 50);
     // helpers.clickme('t2', 50);
     // helpers.clickme('dragger_switches_button', 1000);
     // helpers.clickme('explore_button', 0);
-    // helpers.clickme('upload_container_button', 1000);
+    // helpers.clickme('nav-upload-container_button', 1000);
     // helpers.clickme('debug-button', 1000);
 
     // console log store
@@ -37,13 +37,13 @@ module.exports = {
 
     // create debug button
     debugButton.setAttribute('id', 'debug-button');
-    debugButton.classList.add('button', 'tools_button');
-    debugButton.classList.remove('button_no_show');
+    debugButton.classList.add('button', 'button-tools');
+    debugButton.classList.remove('button-no-show');
 
     debugText.textContent = 'report is off';
     debugText.setAttribute('id', 'debug-text');
 
-    debugIcon.classList.add('icon_image');
+    debugIcon.classList.add('button-icon');
     debugIcon.src = '/icons/debug_icon.png';
     debugButton.appendChild(debugText);
     debugButton.appendChild(debugIcon);

@@ -32,84 +32,84 @@ module.exports = {
     var deleteTarget = window.store.getState().deleteTarget;
 
     // show
-    document.getElementById('delete_preview_container').classList.add('delete_preview_container_is_open');
-    document.getElementById('delete_preview').src = deleteTarget.element.src;
+    document.getElementById('delete-preview-container').classList.add('delete-preview-container-is-open');
+    document.getElementById('image-delete-preview').src = deleteTarget.element.src;
 
     // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.remove('nav-is-open');
   },
 
   openTools() {
     // show
-    document.getElementById('tools_container').classList.add('tools_container_is_open');
+    document.getElementById('nav-tools-container').classList.add('nav-tools-container-is-open');
     // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
+    document.getElementById('nav-main-container').classList.remove('nav-is-open');
+    document.getElementById('d-switches-container').classList.remove('d-switches-is-open');
   },
 
   openAccount() {
     // show
-    document.getElementById('login_container').classList.add('login_container_is_open');
+    document.getElementById('nav-account-container').classList.add('nav-account-container-is-open');
     // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.remove('nav-is-open');
   },
 
   openUpload() {
     // show
-    document.getElementById('upload_container').classList.add('upload_container_is_open');
+    document.getElementById('nav-upload-container').classList.add('upload-container-is-open');
     // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.remove('nav-is-open');
   },
 
   uploadPreview() {
     // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.remove('nav-is-open');
   },
 
   afterUpload() {
     // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
-    document.getElementById('upload_container').classList.remove('upload_container_is_open');
-    this.hideID('upload_preview_container');
-    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-    document.getElementById('confirm_or_reject_container_info').textContent = '';
-    // This setTimeout is so that the upload_preview_container disappears immediately, and then resets
+    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
+    this.hideID('upload-preview-container');
+    document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
+    document.getElementById('upload-confirm-info').textContent = '';
+    // This setTimeout is so that the upload-preview-container disappears immediately, and then resets
     // to visible after the transition effect takes place
-    setTimeout(function () {
-      this.showID('upload_preview_container');
-      document.getElementById('confirm_or_reject_container').style.display = 'flex';
+    setTimeout(() => {
+      this.showID('upload-preview-container');
+      document.getElementById('upload-confirm-container').style.display = 'flex';
     }, 500);
-    // replace image_upload_preview image
-    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
+    // replace image-upload-preview image
+    document.getElementById('image-upload-preview').src = '/icons/1x1.png';
   },
 
   afterDelete() {
     // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
-    document.getElementById('delete_preview_container').style.display = 'none';
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    document.getElementById('delete-preview-container').style.display = 'none';
+    document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
     this.hideDraggers();
-    // This setTimeout is so that the delete_preview_container disappears immediately, and then resets
+    // This setTimeout is so that the delete-preview-container disappears immediately, and then resets
     // to visible after the transition effect takes place
     setTimeout(function () {
-      document.getElementById('delete_preview_container').style.display = 'block';
+      document.getElementById('delete-preview-container').style.display = 'block';
     }, 500);
-    // replace delete_preview
-    document.getElementById('delete_preview').src = '/icons/1x1.png';
+    // replace image-delete-preview
+    document.getElementById('image-delete-preview').src = '/icons/1x1.png';
   },
 
   rejectDelete() {
     var deleteTarget = window.store.getState().deleteTarget;
 
     // show element
-    document.getElementById('navigation_container').classList.add('navigation_container_is_open');
+    document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
-    document.getElementById('delete_preview_container').style.display = 'none';
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
+    document.getElementById('delete-preview-container').style.display = 'none';
+    document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
     setTimeout(function () {
-      document.getElementById('delete_preview_container').style.display = 'block';
+      document.getElementById('delete-preview-container').style.display = 'block';
     }, 500);
     // reshow hidden image that wasn't deleted
     deleteTarget.element.style.display = 'initial';
@@ -120,26 +120,26 @@ module.exports = {
 
   closeAll() {
     // hide
-    document.getElementById('navigation_container').classList.remove('navigation_container_is_open');
-    document.getElementById('upload_preview_container').classList.remove('upload_preview_container_is_open');
-    document.getElementById('delete_preview_container').classList.remove('delete_preview_container_is_open');
-    document.getElementById('dragger_switches_container').classList.remove('dragger_switches_container_is_open');
-    document.getElementById('tools_container').classList.remove('tools_container_is_open');
-    document.getElementById('login_container').classList.remove('login_container_is_open');
-    document.getElementById('upload_container').classList.remove('upload_container_is_open');
-    document.getElementById('connect_info').classList.remove('connect_info_is_open');
-    document.getElementById('explore_container').style.display = 'none';
-    document.getElementById('insta_header').style.display = 'none';
-    document.getElementById('insta_div').style.display = 'none';
+    document.getElementById('nav-main-container').classList.remove('nav-is-open');
+    document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
+    document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
+    document.getElementById('d-switches-container').classList.remove('d-switches-is-open');
+    document.getElementById('nav-tools-container').classList.remove('nav-tools-container-is-open');
+    document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
+    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
+    document.getElementById('connect-info').classList.remove('connect-info-is-open');
+    document.getElementById('explore-container').style.display = 'none';
+    document.getElementById('insta-header').style.display = 'none';
+    document.getElementById('insta-container').style.display = 'none';
 
-    // replace image_upload_preview image and delete_preview image
-    document.getElementById('image_upload_preview').src = '/icons/1x1.png';
-    document.getElementById('delete_preview').src = '/icons/1x1.png';
+    // replace image-upload-preview image and image-delete-preview image
+    document.getElementById('image-upload-preview').src = '/icons/1x1.png';
+    document.getElementById('image-delete-preview').src = '/icons/1x1.png';
     // close navigation button
     document.body.classList.remove('button_container_is_open');
     // animate close hamburgers
-    document.getElementById('line_one').style.top = '40%';
-    document.getElementById('line_three').style.top = '60%';
+    document.getElementById('ham-line1').style.top = '40%';
+    document.getElementById('ham-line3').style.top = '60%';
   }
 
 

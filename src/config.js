@@ -1,5 +1,5 @@
 module.exports = {
-  debugOn: true, // set debug div
+  debugOn: false, // set debug div
 
   // set upload placement
   uploadTop: '2%',
@@ -11,6 +11,11 @@ module.exports = {
   blurLevel: 7,
   brightnessLevel: 8,
   contrastLevel: 10,
-  saturateLevel: 10
+  saturateLevel: 10,
+
+  // color chooser size in pixels
+  chooserPos: { width: 180,
+                height: 100 }
+
 
 };
