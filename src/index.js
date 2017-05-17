@@ -29,7 +29,7 @@ import Buttons from './components/buttons';
 import Grid from './components/grid';
 
 // dispatched when an image is dragged onto the exit_door icon or exit_door is clicked
-import { setDeleteTarget } from './actions';
+import { setDeleteID } from './actions';
 // dispatched when an image is clicked or dragged; used by draggers
 import { setSelectedImage } from './actions';
 // dispatched to cycle through click count
@@ -116,7 +116,7 @@ assigndrag();
 
     document.getElementById('insta-header').style.display = 'flex';
     document.getElementById('insta-container').style.display = 'block';
-    document.body.classList.add('button_container_is_open');
+    document.body.classList.add('a-nav-container-is-open');
 
     // animate open hamburgers
     document.getElementById('ham-line1').style.top = '35%';
@@ -148,19 +148,6 @@ assigndrag();
 
     };
   });
-
-
-  // used by delete image button
-  function clear_selected_file() {
-    store.getState().selectedImage.id = '';
-    // selected_file.imageFilename  = '';
-    // selected_file.src             = '';
-    // selected_file.width           = '';
-    // selected_file.height          = '';
-    // selected_file.transform       = '';
-    // selected_file.zindex          = '';
-    store.dispatch(setSelectedImage(''));
-  };
 
   // cookie setter
   function setCookie(cookie_name, cookie_value, days_til_expire) {
@@ -360,10 +347,10 @@ assigndrag();
   });
 
   // remove deleted image
-  socket.on('bc: delete_image', function (data) {
-    document.getElementById(data.id_to_delete).remove();
-    if (data.id_to_delete === store.getState().selectedImage.id) {
-      clear_selected_file();
+  socket.on('bc:_deleteImage', function (data) {
+    document.getElementById(data.deleteID).remove();
+    if (data.deleteID === store.getState().selectedImage.id) {
+      store.dispatch(setSelectedImage(''));
       stateChange.hideDraggers();
     };
   });
@@ -632,38 +619,6 @@ assigndrag();
 
 
 // --Buttons
-  document.getElementById('nav-tog-button').onclick = function () {
-    var button_element = document.getElementById('nav-tog-button');
-
-    // if the button is being dragged, don't use the click.  FUTURE WORK: stop event propagation
-    if ( button_element.classList.contains('nav-tog-dragging') === false ) {
-
-      // otherwise, if button containers are open
-      if ( document.body.classList.contains('button_container_is_open') ) {
-        // close all containers
-        stateChange.closeAll();
-        // show selected_file in case it was removed by being dragged onto the exit door
-        // except when no file is selected: store.getState().selectedImage.id is undefined or ''
-        if ( store.getState().selectedImage.id !== '' ) {
-          document.getElementById(store.getState().selectedImage.id).style.display = 'initial';
-        };
-      // else when no containers are open
-      } else {
-        // open the navigation container
-        document.getElementById('nav-main-container').classList.add('nav-is-open');
-        document.body.classList.add('button_container_is_open');
-        document.getElementById('connect-info').classList.add('connect-info-is-open');
-
-        // animate open hamburgers
-        document.getElementById('ham-line1').style.top = '35%';
-        document.getElementById('ham-line3').style.top = '65%';
-
-        stateChange.hideDraggers();
-      };
-    };
-  };
-
-
   // dragger_all_switch; used to toggle all dragger switches
   $('#dragger_all_switch').click(function () {
     var i = 0,
@@ -745,10 +700,6 @@ assigndrag();
     setCookie('switches_status', switches_status, 7);
   });
 
-  $('#close_info_container').on('click', function () {
-    document.getElementById('app_info').style.display = 'none';
-    document.getElementById('close_info_container').style.display = 'none';
-  });
 
 
 
@@ -832,39 +783,7 @@ assigndrag();
     });
   });
 
-  // reject upload
-  $('#button-reject-upload').on('click', function () {
-    stateChange.afterUpload();
-  });
-
-  // reject delete
-  $('#button-reject-delete').on('click', function () {
-    var deleteTargetID = store.getState().deleteTarget.id;
-
-    stateChange.rejectDelete();
-    // send socket to show on other clients
-    socket.emit('ce:  show_image', deleteTargetID);
-  });
-
-  // confirm delete
-  $('#button-confirm-delete').on('click', function () {
-    var socketdata = {},
-        deleteTarget = store.getState().deleteTarget;
-
-
-    // remove image
-    deleteTarget.element.remove();
-    // change navigation container
-    stateChange.afterDelete();
-    // prepare data to send
-    socketdata.filenameToDelete = deleteTarget.element.getAttribute('title');
-    socketdata.id_to_delete = deleteTarget.id;
-    // send data to server
-    socket.emit('ce:  delete_image', socketdata);
-    clear_selected_file();
-  });
-
-
+  // instagram
   $('#u3').on('click', function () {
     var redirect_url = [location.protocol, '//', location.host, location.pathname].join('');
 
@@ -881,7 +800,7 @@ assigndrag();
       document.getElementById('insta-header').style.display = 'flex';
       document.getElementById('insta-container').style.display = 'block';
       document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
-      document.body.classList.add('button_container_is_open');
+      document.body.classList.add('a-nav-container-is-open');
 
       // animate open hamburgers
       document.getElementById('ham-line1').style.top = '35%';
@@ -926,41 +845,6 @@ assigndrag();
 
 
 
-
-  $('#t4').on('click', function () {
-    document.getElementById('explore-container').style.display = 'block';
-    document.getElementById('x-explore-container').style.display = 'block';
-
-
-    document.getElementById('image-explore').src = document.getElementById(store.getState().selectedImage.id).src;
-
-
-    if (document.getElementById(store.getState().selectedImage.id).getAttribute('data-link').length > 1) {
-
-      document.getElementById('insta_link').setAttribute('href', document.getElementById(store.getState().selectedImage.id).getAttribute('data-link'));
-    };
-
-
-    if ( (typeof store.getState().selectedImage.id !== 'undefined') && (store.getState().selectedImage.id.length > 0 ) ) {
-
-      // if selected file is empty, fill it.
-
-
-
-
-    } else {
-
-
-
-
-
-    };
-  });
-
-  $('#x-explore-container').on('click', function () {
-    document.getElementById('explore-container').style.display = 'none';
-    document.getElementById('x-explore-container').style.display = 'none';
-  });
 
 
 
@@ -1021,6 +905,8 @@ assigndrag();
           this.socketdata = {};
           this.socketdata.imageID = this.imageID;
 
+          // set selectedImage
+          store.dispatch(setSelectedImage(this.getAttribute('id')));
 
 
         },
@@ -1069,15 +955,12 @@ assigndrag();
           dropPost.posTop = this.socketdata.posTop + '%';
 
           // change width and height back to percentage
-          document.getElementById(this.imageID).style.width = (this.width / pageSettings.imagesWide * 100).toFixed(2) + '%';
-          document.getElementById(this.imageID).style.height = (this.height / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+          document.getElementById(this.imageID).style.width = (parseFloat(this.style.width) / pageSettings.imagesWide * 100).toFixed(2) + '%';
+          document.getElementById(this.imageID).style.height = (parseFloat(this.style.height) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
 
           // and left, right
           document.getElementById(this.imageID).style.left = this.socketdata.posLeft + '%';
           document.getElementById(this.imageID).style.top = this.socketdata.posTop + '%';
-
-
-
 
           // populate dropPost
           for (i = 0; i < drawing_elements.length; i++) {
@@ -1094,11 +977,6 @@ assigndrag();
             contentType: 'application/json'
           }).done(function () {
           });
-
-          // for set dragger locations
-          store.getState().selectedImage.id = this.getAttribute('id');
-          store.dispatch(setSelectedImage(this.getAttribute('id')));
-
 
           // reset click count
           click_count = 0;
@@ -1276,41 +1154,6 @@ assigndrag();
   });
 
 
-// --Exit door.droppable, for preparing a dropped image to delete
-
-  $('#n4').droppable({
-    accept: '.wallPic',
-    // activeClass: 'exit_active_class',
-    hoverClass: 'exit_door_hover',
-    tolerance: 'pointer',
-
-    over: function () {
-//       console.log('over exit door');
-    },
-    out: function () {
-//       console.log('back out over exit door ');
-    },
-    drop: function (event, ui) {
-//       console.log('Draggable wallPic dropped on exit door.');
-      var deleteTarget = ui.draggable[0];
-
-
-      store.dispatch(setDeleteTarget(deleteTarget));
-
-
-      // hide original image
-      deleteTarget.style.display = 'none';
-
-      // hide draggers
-      stateChange.hideDraggers();
-
-      // show delete-preview-container
-      stateChange.deletePreview();
-
-      // send socket to hide on other clients
-      socket.emit('ce:_hideImage', deleteTarget.id);
-    }
-  });
 
 
 // --nav-tog-button.draggable, for dragging the nav-tog-button around the sides

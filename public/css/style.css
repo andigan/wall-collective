@@ -811,7 +811,7 @@ position: absolute;
 
 
 
-#app_info {
+#info-page {
   background-color: white;
   display: none;
   left: 5vw;
@@ -823,7 +823,7 @@ position: absolute;
   z-index: 90000;
 }
 
-.info_title {
+.info-page-title {
   font-size: 5vh;
   font-family:‘Arial Narrow’, sans-serif;
   font-family:"Open Sans", sans-serif;
@@ -840,13 +840,13 @@ position: absolute;
   text-align: left;
 }
 
-.info_paragraph {
+.info-paragraph {
   display: block;
   text-align: justify;
   postion: static;
 }
 
-.info_line_center {
+.info-line-center {
   background-color: black;
   height: 2px;
   left: 25%;
@@ -854,7 +854,7 @@ position: absolute;
   width: 50%;
 }
 
-#close_info_container {
+#x-info-container {
   display: none;
   position: fixed;
   right: 5vw;
@@ -866,14 +866,14 @@ position: absolute;
   width: 100%;
 }
 
-#inner_info {
+#info-inner-container {
   height: 100%;
   left:15%;
   position: absolute;
   width: 70%;
 }
 
-.inline_icon {
+.icon-inline {
   height: 2vh;
 }
 

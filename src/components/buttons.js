@@ -1,6 +1,8 @@
 import stateChange from '../views/state-change';
 // import socketFile from '../socket-file';
-import { setDeleteTarget } from '../actions';
+import { setDeleteID } from '../actions';
+import { setSelectedImage } from '../actions';
+
 
 module.exports = {
 
@@ -18,7 +20,7 @@ module.exports = {
     this.createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers_icon.png', 'button-tools');
     this.createButton('t2', 'choose-color', 'color', '/icons/palette_icon.png', 'button-tools');
     this.createButton('t3', 'reset-page', 'reset page', '/icons/reset_icon.png', 'button-tools');
-    // this.createButton('t3', 'explore', 'explore', '/icons/magnifying_glass_icon.png', 'button-tools');
+//    this.createButton('t4', 'open-explore', 'explore', '/icons/magnifying_glass_icon.png', 'button-tools');
 
     this.createButton('a1', 'app-info', 'info', '/icons/info_icon.png', 'button-tools');
     this.createButton('a2', 'insta-logout', 'instagram logout', '/icons/debug_icon.png', 'button-tools');
@@ -28,7 +30,16 @@ module.exports = {
 
     this.createjsColor();
 
+    this.buttons.push(document.getElementById('nav-tog-button'));
+    this.buttons.push(document.getElementById('button-reject-delete'));
+    this.buttons.push(document.getElementById('button-confirm-delete'));
+    this.buttons.push(document.getElementById('x-info-container'));
+    this.buttons.push(document.getElementById('button-reject-upload'));
+    this.buttons.push(document.getElementById('x-explore-container'));
+
     this.addEvents();
+    this.exitDoorDrop();
+
   },
 
   createButton(targetID, action, text, iconPath, buttonClass) {
@@ -48,6 +59,38 @@ module.exports = {
 
   onClick(e) {
     switch (e.currentTarget.getAttribute('data-action')) {
+      case 'main-nav-click':
+        let navMainEl = document.getElementById('nav-tog-button');
+
+        // if the main button is not being dragged, process the click.
+        if ( navMainEl.classList.contains('nav-tog-dragging') === false ) {
+
+          // if any containers are open
+          if ( document.body.classList.contains('a-nav-container-is-open') ) {
+            // close all containers
+            stateChange.closeAll();
+
+            // if an image is selected
+            if ( store.getState().selectedImage.id !== '' ) {
+              // restore selected image in case it was removed by being dragged onto the exit door
+              document.getElementById(store.getState().selectedImage.id).style.display = 'initial';
+            };
+          // else when no containers are open
+          } else {
+            // open the navigation container
+            document.getElementById('nav-main-container').classList.add('nav-is-open');
+            document.body.classList.add('a-nav-container-is-open');
+            document.getElementById('connect-info').classList.add('connect-info-is-open');
+
+            // animate open hamburgers
+            document.getElementById('ham-line1').style.top = '35%';
+            document.getElementById('ham-line3').style.top = '65%';
+
+            stateChange.hideDraggers();
+          };
+        };
+        break;
+
       case 'open-tools':
         stateChange.openTools();
         // NOTES: this.store.dispatch(open-tools())
@@ -62,19 +105,22 @@ module.exports = {
         break;
 
       case 'app-info':
-        document.getElementById('app_info').style.display = 'block';
-        document.getElementById('close_info_container').style.display = 'block';
+        document.getElementById('info-page').style.display = 'block';
+        document.getElementById('x-info-container').style.display = 'block';
         break;
 
       case 'exit-door':
         // hide original image
-        stateChange.hideID(window.store.getState().selectedImage.id);
-        // set delete target in store
-        store.dispatch(setDeleteTarget(document.getElementById(window.store.getState().selectedImage.id)));
+        if (window.store.getState().selectedImage.id !== '') {
+          let deleteID = window.store.getState().selectedImage.id;
 
-        stateChange.hideDraggers();
-        stateChange.deletePreview();
-        this.handleDelete();
+          window.store.dispatch(setDeleteID(deleteID));
+
+          stateChange.hideID(deleteID);
+          stateChange.hideDraggers();
+          stateChange.deletePreview(deleteID);
+          window.socket.emit('ce:_hideImage', deleteID);
+        };
         break;
 
       case 'dragger-switch':
@@ -124,21 +170,71 @@ module.exports = {
         chooserEl.jscolor.show();
         break;
 
+      case 'delete-reject':
+        stateChange.rejectDelete();
+        window.socket.emit('ce:_showImage', window.store.getState().pageConfig.deleteID);
+        break;
+
+      case 'delete-confirm':
+        let socketdata = {},
+            deleteID = window.store.getState().pageConfig.deleteID;
+
+        // prepare socket data
+        socketdata.filenameToDelete = document.getElementById(deleteID).getAttribute('title');
+        socketdata.deleteID = deleteID;
+
+        // remove element
+        document.getElementById(deleteID).remove();
+
+        stateChange.afterDelete();
+
+        // reset store
+        store.dispatch(setSelectedImage(''));
+        store.dispatch(setDeleteID(''));
+
+        // send data to server to delete image
+        socket.emit('ce:_deleteImage', socketdata);
+        break;
+
+      case 'upload-reject':
+        stateChange.afterUpload();
+        break;
+
+      case 'close-info-page':
+        stateChange.hideID('info-page');
+        stateChange.hideID('x-info-container');
+        break;
+
+
+      // explore to fix
+      case 'open-explore':
+        document.getElementById('explore-container').style.display = 'block';
+        document.getElementById('x-explore-container').style.display = 'block';
+
+        document.getElementById('image-explore').src = document.getElementById(store.getState().selectedImage.id).src;
+
+        if (document.getElementById(store.getState().selectedImage.id).getAttribute('data-link').length > 1) {
+
+          document.getElementById('insta_link').setAttribute('href', document.getElementById(store.getState().selectedImage.id).getAttribute('data-link'));
+        };
+
+
+        if ( (typeof store.getState().selectedImage.id !== 'undefined') && (store.getState().selectedImage.id.length > 0 ) ) {
+
+          // if selected file is empty, fill it.
+
+        } else {
+        };
+        break;
+
+      case 'close-explore':
+        stateChange.hideID('explore-container');
+        stateChange.hideID('x-explore-container');
+        break;
+
       default:
         break;
     }
-  },
-
-  handleDelete() {
-    var selectedImageID = window.store.getState().selectedImage.id,
-        selectedImage = document.getElementById(selectedImageID);
-
-    if (selectedImageID !== '') {
-      window.store.dispatch(setDeleteTarget(selectedImage));
-
-      // send socket to hide on other clients
-      window.socket.emit('ce:_hideImage', selectedImageID);
-    };
   },
 
   addEvents() {
@@ -174,5 +270,29 @@ module.exports = {
     jscolorEl.setAttribute('onchange', 'window.jScOlOrChoice(this.jscolor)');
 
     this.wrapperEl.appendChild(jscolorEl);
+  },
+
+  exitDoorDrop() {
+
+    $('#n4').droppable({
+      accept: '.wallPic',
+      // activeClass: 'exit_active_class',
+      hoverClass: 'exit_door_hover',
+      tolerance: 'pointer',
+
+      over: function () { /* console.log('over exit door'); */ },
+      out: function () { /* console.log('back out over exit door '); */ },
+      drop: function (event, ui) {
+        let deleteID = ui.draggable[0].id;
+
+        window.store.dispatch(setDeleteID(deleteID));
+
+        stateChange.hideID(deleteID);
+        stateChange.hideDraggers();
+        stateChange.deletePreview(deleteID);
+        window.socket.emit('ce:_hideImage', deleteID);
+      }
+    });
   }
+
 };

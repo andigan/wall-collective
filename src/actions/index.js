@@ -1,8 +1,8 @@
-export function setDeleteTarget(deleteTarget) {
+export function setDeleteID(id) {
 
   return {
-    type: 'SET_DELETE_TARGET',
-    payload: deleteTarget
+    type: 'SET_DELETE_ID',
+    payload: id
   };
 
 }

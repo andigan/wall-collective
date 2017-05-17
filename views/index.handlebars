@@ -44,7 +44,7 @@
 
     {{! main button }}
     <div id='nav-toggle-button-container'>
-      <button id='nav-tog-button'>
+      <button id='nav-tog-button' data-action='main-nav-click'>
         <div id='ham-line1'>
         </div>
         <div id='ham-line2'>
@@ -95,8 +95,8 @@
     <div id='upload-preview-container' class='rainbow-border'>
       <img id='image-upload-preview' src='/icons/1x1.png'/>
       <div id='upload-confirm-container'>
-        <div id='button-confirm-upload' class='button-confirmer confirm-yes'> Confirm Upload </div>
-        <div id='button-reject-upload' class='button-confirmer confirm-no'> Cancel </div>
+        <div id='button-confirm-upload' class='button-confirmer confirm-yes' data-action='upload-confirm'> Confirm Upload </div>
+        <div id='button-reject-upload' class='button-confirmer confirm-no' data-action='upload-reject'> Cancel </div>
       </div>
       <div id='upload-confirm-info'> </div>
     </div>
@@ -104,8 +104,8 @@
     <div id='delete-preview-container' class='rainbow-border'>
       <img id='image-delete-preview' src='/icons/1x1.png'/>
       <div id='delete-confirm-container'>
-        <div id='button-confirm-delete' class='button-confirmer confirm-yes'> Confirm Delete </div>
-        <div id='button-reject-delete' class='button-confirmer confirm-no'> Cancel </div>
+        <div id='button-confirm-delete' class='button-confirmer confirm-yes' data-action='delete-confirm'> Confirm Delete </div>
+        <div id='button-reject-delete' class='button-confirmer confirm-no' data-action='delete-reject'> Cancel </div>
       </div>
       <div id='delete-confirm-info'></div>
     </div>
@@ -124,7 +124,7 @@
         <a id='insta_link'> <div id='insta-link-text'> instagram link </div>
         </a>
       </div>
-      <div id='x-explore-container'>
+      <div id='x-explore-container' data-action='close-explore'>
         <img class='icon-x button-icon' src='/icons/x_icon.png'>
       </div>
     </div>

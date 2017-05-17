@@ -173,8 +173,8 @@ module.exports = function (io) {
       });
     });
 
-    socket.on('ce:  delete_image', function (data) {
-      socket.broadcast.emit('bc: delete_image', data);
+    socket.on('ce:_deleteImage', function (data) {
+      socket.broadcast.emit('bc:_deleteImage', data);
       console.log('----------- delete image socket -------------');
       console.log(data.filenameToDelete);
 
@@ -207,7 +207,7 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: hide_image', data);
     });
 
-    socket.on('ce:  show_image', function (data) {
+    socket.on('ce:_showImage', function (data) {
       socket.broadcast.emit('bc: show_image', data);
     });
 
