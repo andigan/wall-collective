@@ -157,7 +157,7 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: resetpage');
     });
 
-    socket.on('ce:  share_upload', function (data) {
+    socket.on('ce:_share_upload', function (data) {
       var dbImageData = {};
 
       // find matching data.uploadedFilename, return 'result' object

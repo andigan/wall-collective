@@ -2,8 +2,6 @@
 // add button to reset image
 // clean dragger.js
 
-
-
 // wall-collective
 //
 // Version: 0.7.0
@@ -28,13 +26,12 @@ import stateChange from './views/state-change';
 // components
 import { buttonsInit } from './components/buttons';
 import  { navToggleInit } from './components/ui-elements/nav-toggle-button';
+import { uploadInit } from './components/upload';
 
 // actions
 import { setSelectedImage } from './actions';
 import { setSessionID } from './actions';
 import { setInstaAvailable } from './actions';
-import { setSwitchesStatus } from './actions';
-
 
 // helpers
 import { getCookie } from './helpers';
@@ -49,57 +46,9 @@ import { assignImageInteract } from './components/ui-elements/main-image-interac
 // draggers
 import { draggersInit } from './components/draggers';
 import { dSwitchsInit } from './components/d-switchs';
-import { setDraggerLocations } from './components/draggers';
-
 
 // DEBUG
 import debug from './debug/debug'; // DEBUG
-if (config.debugOn) debug.init(store);
-
-// instagram switch; arriving from server response
-config.useIGram = useIGram;
-
-window.store = store;
-
-
-
-
-
-// switches_status cookie stores which draggers are activated when the page loads; capital letters denote an activated dragger
-if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgtp', 7);
-
-switches_status = getCookie('switches_status');
-window.store.dispatch(setSwitchesStatus(getCookie('switches_status')));
-
-let switchesStatus = getCookie('switches_status');
-let switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
-
-
-// if the switches_status character is uppercase, switch on the corresponding dragger_switch
-for ( let i = 0; i < switches.length; i++ ) {
-  if (switchesStatus[i] === switchesStatus[i].toUpperCase()) document.getElementById('switch-' + switches[i]).classList.add('switchon');
-};
-
-
-
-
-
-
-buttonsInit(); // create buttons and assign functionality
-pageSettings.init(); // set page sizes and resize listeners
-navToggleInit(); // make nav-toggle-button draggable
-draggersInit(); // set up draggers functionality
-dSwitchsInit(); // set up dragger switches
-
-
-
-// temporary fix: change auto height to percentage
-Array.from(document.getElementsByClassName('wallPic')).forEach(function (element) {
-  if (element.style.height === 'auto') {
-    element.style.height = ((parseInt(window.getComputedStyle(element).height) / pageSettings.imagesHigh * 100).toFixed(2)) + '%';
-  };
-});
-
 
 // set socket location : io.connect('http://localhost:8000'); || io.connect('http://www.domain_name.com');
 var socket = io.connect([location.protocol, '//', location.host, location.pathname].join('')),
@@ -107,16 +56,75 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     // assigned by initial socket; used by upload counter
     sessionID = String,
 
-    // used with a cookie to store which draggers are active for individual persistence
-    switches_status = String,
-
-    // used by the upload counter
-    uploadtotal = 0,
-
     // used when an image is dragged from the instagram div; assigned by socket when download is complete
     insta_download_ready_filename = {};
 
+
+if (config.debugOn) debug.init(store);
+
+config.useIGram = useIGram; // instagram switch; arriving from server response
+
 window.socket = socket;
+window.store = store;
+
+
+
+
+
+
+function init() {
+  // temporary fix: change auto height to percentage
+  Array.from(document.getElementsByClassName('wallPic')).forEach(function (element) {
+    if (element.style.height === 'auto') {
+      element.style.height = ((parseInt(window.getComputedStyle(element).height) / pageSettings.imagesHigh * 100).toFixed(2)) + '%';
+    };
+  });
+
+
+  // // prevent default behavior to prevent iphone dragging and bouncing
+  // // http://www.quirksmode.org/mobile/default.html
+  // document.ontouchmove = function (event) {
+  //   event.preventDefault();
+  // };
+
+    // process any click on the wrapper
+    $('#wrapper').on('click touchstart', function (event) {
+      var dragger_elements = {};
+
+      document.getElementById('color-chooser').style.display = 'none';
+
+      // if the images div alone is clicked...
+      if (event.target.getAttribute('id') === 'images') {
+        dragger_elements = document.getElementsByClassName('dragger');
+        // remove all draggers
+        stateChange.hideDraggers();
+        // close button containers and remove d-transition
+        document.body.classList.remove('d-transition');
+
+      };
+    });
+
+
+    // possible fix: remove query string from url
+    // if (document.getElementById('insta-container').style.display === 'block') {
+    //   history.replaceState({}, 'wall-collective', '/');
+    // };
+
+
+
+}
+init();
+
+
+buttonsInit(); // create buttons and assign functionality
+pageSettings.init(); // set page sizes and resize listeners
+navToggleInit(); // make nav-toggle-button draggable
+draggersInit(); // set up draggers functionality
+dSwitchsInit(); // set up dragger switches
+uploadInit();
+
+assignImageDrag(); // assign draggable to all .wallPic elements
+assignImageInteract(); // assign Interact.js to .wallPic elements
 
 
 
@@ -133,7 +141,7 @@ var insta = {
     // insta_step 5, 6: on initial load, if query includes ?open_igram (added after i-gram auth),
     // fetch igram data and open the divs
     if (window.location.href.includes('open_igram')) {
-      socket.emit('ce:_fetchIgramData');
+      window.socket.emit('ce:_fetchIgramData');
 
       document.getElementById('insta-header').style.display = 'flex';
       document.getElementById('insta-container').style.display = 'block';
@@ -149,40 +157,7 @@ var insta = {
 // initialize instagram options
 insta.init();
 
-// assign draggable to all .wallPic elements
-assignImageDrag();
-assignImageInteract();
 
-// // prevent default behavior to prevent iphone dragging and bouncing
-// // http://www.quirksmode.org/mobile/default.html
-// document.ontouchmove = function (event) {
-//   event.preventDefault();
-// };
-
-  // process any click on the wrapper
-  $('#wrapper').on('click touchstart', function (event) {
-    var dragger_elements = {};
-
-    document.getElementById('color-chooser').style.display = 'none';
-
-    // if the images div alone is clicked...
-    if (event.target.getAttribute('id') === 'images') {
-      dragger_elements = document.getElementsByClassName('dragger');
-      // remove all draggers
-      stateChange.hideDraggers();
-      // close button containers and remove d-transition
-      document.body.classList.remove('d-transition');
-
-    };
-  });
-
-
-  // remove
-  // if (document.getElementById('insta-container').style.display === 'block') {
-  //   history.replaceState({}, 'wall-collective', '/');
-  //   document.getElementById('insta-header').style.display = 'none';
-  //   document.getElementById('insta-container').style.display = 'none';
-  // };
 
 // --Socket.io
 
@@ -375,8 +350,8 @@ assignImageInteract();
   // if this client is the uploader, show upload statistics from busboy
   socket.on('bc: chunk_sent', function (uploaddata) {
     if (uploaddata.sessionID === sessionID) {
-      uploadtotal += uploaddata.chunkSize;
-      document.getElementById('upload-confirm-info').textContent = 'Uploaded ' + uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
+      config.uploadtotal += uploaddata.chunkSize;
+      document.getElementById('upload-confirm-info').textContent = 'Uploaded ' + config.uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
     };
   });
 
@@ -598,101 +573,4 @@ assignImageInteract();
 
     // assign drag to added element
     assignImageDrag(instaDBData.dom_id);
-  });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// **************
-// replace with different form of upload
-
-  // on file_select element change, load up the image preview
-  $('#fileselect').on('change', function () {
-    // open upload-preview-container
-    stateChange.uploadPreview();
-    readURL(this);
-  });
-
-  // this function puts the image selected by the browser into the upload_preview container.
-  // http://stackoverflow.com/questions/18934738/select-and-display-images-using-filereader
-  // https://developer.mozilla.org/en-US/docs/Web/API/FileReader/readAsDataURL
-  function readURL(input) {
-    var reader;
-
-    if (input.files && input.files[0]) {
-      reader = new FileReader();
-      reader.onload = function (event) {
-        // wait until the image is ready to upload_preview container
-        document.getElementById('upload-preview-container').classList.add('upload-preview-container_is_open');
-        document.getElementById('image-upload-preview').src = event.target.result;
-      };
-      reader.readAsDataURL(input.files[0]);
-    };
-  }
-
-  // confirm upload button
-  // on click, send a submit to the html form with id='upload-form-button'
-  // the html form with id='upload-form-button' posts to '/addfile'
-  $('#button-confirm-upload').on('click', function () {
-    document.getElementById('upload-confirm-container').style.display = 'none';
-
-    $('#upload-form-button').ajaxSubmit({
-      // method from jquery.form
-      error: function (xhr) {
-        console.log('Error:' + xhr.status);
-        // change nav-main-container and remove upload_preview
-        stateChange.afterUpload();
-        uploadtotal = 0;
-      },
-      success: function (response) {
-        // response variable from server is the uploaded file information
-        var socketdata = {},
-          images_element = document.getElementById('images'),
-          imageEl = document.createElement('img');
-
-        // create new image
-        imageEl.setAttribute('id', response.dom_id);
-        imageEl.setAttribute('title', response.imageFilename);
-        imageEl.classList.add('wallPic');
-        imageEl.src = response.location + response.imageFilename;
-        imageEl.setAttribute('data-scale', '1');
-        imageEl.setAttribute('data-angle', '0');
-        imageEl.setAttribute('data-rotateX', '0');
-        imageEl.setAttribute('data-rotateY', '0');
-        imageEl.setAttribute('data-rotateZ', '0');
-        imageEl.setAttribute('data-persective', '0');
-        imageEl.style.width = config.uploadWidth;
-        imageEl.style.height = config.uploadheight;
-        imageEl.style.zIndex = response.z_index;
-        imageEl.style.top = config.uploadTop;
-        imageEl.style.left = config.uploadLeft;
-        imageEl.style.opacity = 1;
-        imageEl.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
-        imageEl.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
-
-        // Add <div id='dom_id'> to <div id='images'>
-        images_element.appendChild(imageEl);
-        // assign drag to added element
-        assignImageDrag(response.dom_id);
-        // change navigation container and remove upload_preview
-        stateChange.afterUpload();
-        // emit to other clients
-        socketdata.uploadedFilename = response.imageFilename;
-        socket.emit('ce:  share_upload', socketdata);
-
-        uploadtotal = 0;
-      }
-    });
   });

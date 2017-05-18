@@ -1,9 +1,29 @@
 import { setDraggerLocations } from './draggers';
 import { setSwitchesStatus } from '../actions';
+import { getCookie } from '../helpers';
 import { setCookie } from '../helpers';
 
 export function dSwitchsInit() {
+  getSetSwitchStatus();
+  switchFunction();
+  switchAllFunction();
+}
 
+function getSetSwitchStatus() {
+  let statusStr = getCookie('switches_status'),
+      switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
+
+  // if the statusStr character is uppercase, turn on the corresponding switch
+  statusStr.split('').forEach(function (switchLetter, index) {
+    if (switchLetter === switchLetter.toUpperCase()) {
+      document.getElementById('switch-' + switches[index]).classList.add('switchon');
+    };
+  });
+}
+
+function switchFunction() {
+
+  // for each switchEl
   Array.from(document.getElementsByClassName('dragger-switch')).forEach(function (switchEl) {
 
     switchEl.onclick = function () {
@@ -13,14 +33,13 @@ export function dSwitchsInit() {
           switchesStats = window.store.getState().pageConfig.switchesStatus.split(''),
           switchStr;
 
-      // toggle switch.switchon
       this.classList.toggle('switchon');
 
       if (this.classList.contains('switchon')) {
-        // set dragger locations
+
         setDraggerLocations(window.store.getState().selectedImage.id);
 
-        // show dragger if an image is selected
+        // if an image is selected, show dragger
         if (window.store.getState().selectedImage.id !== '') {
           draggerEl.style.display = 'block';
         };
@@ -30,10 +49,8 @@ export function dSwitchsInit() {
         switchesStats[switchesStats.indexOf(dLetter)] = dLetter.toUpperCase();
       } else {
 
-        // hide dragger
         draggerEl.style.display = 'none';
-        // use d-letter to find corresponding character in the array
-        // and replace it with lowercase character to indicate switch is off
+        // replace corresponding letter with lowercase character to indicate switch is off
         switchesStats[switchesStats.indexOf(dLetter.toUpperCase())] = dLetter.toLowerCase();
       };
 
@@ -41,11 +58,12 @@ export function dSwitchsInit() {
 
       setCookie('switches_status', switchStr, 7);
       window.store.dispatch(setSwitchesStatus(switchStr));
-
     };
   });
+}
 
-  // dragger-switch-all; used to toggle all dragger switches
+function switchAllFunction() {
+  // dragger-switch-all functionality
   document.getElementById('dragger-switch-all').onclick = function () {
     let switchEls = document.getElementsByClassName('dragger-switch'),
         draggerEls = document.getElementsByClassName('dragger'),
@@ -61,7 +79,6 @@ export function dSwitchsInit() {
       isOn ? switchEl.classList.add('switchon') : switchEl.classList.remove('switchon');
     });
 
-    // set dragger element locations
     setDraggerLocations(window.store.getState().selectedImage.id);
 
     // show dragger elements if an image is selected
