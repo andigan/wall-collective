@@ -19,6 +19,14 @@ export function setSessionID(id) {
   };
 }
 
+export function setSwitchesStatus(statusStr) {
+  return {
+    type: 'SET_SWITCHES_STATUS',
+    payload: statusStr
+  };
+}
+
+
 export function resetClickCount() {
   return {
     type: 'RESET_CLICK_COUNT'

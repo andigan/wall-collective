@@ -6,10 +6,11 @@ import { resetClickCount } from '../actions';
 
 
 function set_stretch_dragger_to(id) {
-  var dragger_element = document.getElementById('stretch_dragger'),
-      imageEl     = document.getElementById(id),
+  var dragger_element = document.getElementById('dragger-stretch'),
+      imageEl = document.getElementById(id),
+
       // get the width and height
-      selected_imageWidth  = parseFloat(imageEl.style.width),
+      selected_imageWidth = parseFloat(imageEl.style.width),
       selected_imageHeight = parseFloat(imageEl.style.height),
 
       // calculate the dragger location
@@ -31,7 +32,7 @@ function set_stretch_dragger_to(id) {
 };
 
 function set_opacity_dragger_to(id) {
-  var dragger_element = document.getElementById('opacity_dragger'),
+  var dragger_element = document.getElementById('dragger-opacity'),
       imageEl = document.getElementById(id),
       // get the opacity percentage: 0-1
       selected_image_opacity = parseInt( imageEl.style.opacity * 100) / 100,
@@ -49,7 +50,7 @@ function set_opacity_dragger_to(id) {
 };
 
 function set_rotation_dragger_to(id) {
-  var dragger_element = document.getElementById('rotation_dragger'),
+  var dragger_element = document.getElementById('dragger-rotation'),
     imageEl = document.getElementById(id),
     // calculate the dragger location
     draggerLeft = parseFloat(imageEl.getAttribute('data-angle') / 360 * pageSettings.innerWidth),
@@ -66,7 +67,7 @@ function set_rotation_dragger_to(id) {
 };
 
 function set_grayscale_invert_dragger_to(id) {
-  var dragger_element = document.getElementById('grayscale_invert_dragger');
+  var dragger_element = document.getElementById('dragger-grayscale_invert');
   var imageEl = document.getElementById(id);
       // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
   var selected_image_filter = imageEl.style.WebkitFilter;
@@ -97,7 +98,7 @@ function set_grayscale_invert_dragger_to(id) {
 };
 
 function set_blur_brightness_dragger_to(id) {
-  var dragger_element = document.getElementById('blur_brightness_dragger'),
+  var dragger_element = document.getElementById('dragger-blur_brightness'),
       imageEl = document.getElementById(id),
       // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
       selected_image_filter = imageEl.style.WebkitFilter,
@@ -121,7 +122,7 @@ function set_blur_brightness_dragger_to(id) {
 };
 
 function set_contrast_saturate_dragger_to(id) {
-  var dragger_element = document.getElementById('contrast_saturate_dragger'),
+  var dragger_element = document.getElementById('dragger-contrast_saturate'),
       imageEl = document.getElementById(id),
       // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
       selected_image_filter = imageEl.style.WebkitFilter,
@@ -145,7 +146,7 @@ function set_contrast_saturate_dragger_to(id) {
 };
 
 function set_party_dragger_to(id) {
-  var dragger_element = document.getElementById('party_dragger'),
+  var dragger_element = document.getElementById('dragger-party'),
       imageEl = document.getElementById(id),
       // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
       // and opacity percentage: (0-1)
@@ -169,7 +170,7 @@ function set_party_dragger_to(id) {
 };
 
 function set_threeD_dragger_to(id) {
-  var dragger_element = document.getElementById('threeD_dragger'),
+  var dragger_element = document.getElementById('dragger-threeD'),
     imageEl = document.getElementById(id),
     // calculate the dragger location
     draggerTop = pageSettings.innerHeight - ((( 180 + parseFloat(imageEl.getAttribute('data-rotateX')) ) / 360) * pageSettings.innerHeight),
@@ -275,7 +276,7 @@ export function draggersInit() {
 
 
 
-    $('#stretch_dragger').draggable({
+    $('#dragger-stretch').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -314,7 +315,7 @@ export function draggersInit() {
     });
 
 
-    $('#opacity_dragger').draggable({
+    $('#dragger-opacity').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -336,7 +337,7 @@ export function draggersInit() {
       }
     });
 
-    $('#rotation_dragger').draggable({
+    $('#dragger-rotation').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -375,7 +376,7 @@ export function draggersInit() {
       }
     });
 
-    $('#grayscale_invert_dragger').draggable({
+    $('#dragger-grayscale_invert').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -397,7 +398,7 @@ export function draggersInit() {
       }
     });
 
-    $('#blur_brightness_dragger').draggable({
+    $('#dragger-blur_brightness').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -421,7 +422,7 @@ export function draggersInit() {
       }
     });
 
-    $('#contrast_saturate_dragger').draggable({
+    $('#dragger-contrast_saturate').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -445,7 +446,7 @@ export function draggersInit() {
       }
     });
 
-    $('#party_dragger').draggable({
+    $('#dragger-party').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -473,7 +474,7 @@ export function draggersInit() {
       }
     });
 
-    $('#threeD_dragger').draggable({
+    $('#dragger-threeD').draggable({
       containment: 'parent',
       scroll: false,
       start: function () {
@@ -527,30 +528,30 @@ export function draggersInit() {
 
 export function setDraggerLocations(id) {
 
-//  if (id) {
-    if (document.getElementById('stretch_dragger_switch').classList.contains('switchon')) {
+  if (id) {
+    if (document.getElementById('switch-stretch').classList.contains('switchon')) {
       set_stretch_dragger_to(id);
     };
-    if (document.getElementById('opacity_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-opacity').classList.contains('switchon')) {
       set_opacity_dragger_to(id);
     };
-    if (document.getElementById('rotation_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-rotation').classList.contains('switchon')) {
       set_rotation_dragger_to(id);
     };
-    if (document.getElementById('grayscale_invert_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-grayscale_invert').classList.contains('switchon')) {
       set_grayscale_invert_dragger_to(id);
     };
-    if (document.getElementById('blur_brightness_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-blur_brightness').classList.contains('switchon')) {
       set_blur_brightness_dragger_to(id);
     };
-    if (document.getElementById('contrast_saturate_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-contrast_saturate').classList.contains('switchon')) {
       set_contrast_saturate_dragger_to(id);
     };
-    if (document.getElementById('threeD_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-threeD').classList.contains('switchon')) {
       set_threeD_dragger_to(id);
     };
-    if (document.getElementById('party_dragger_switch').classList.contains('switchon')) {
+    if (document.getElementById('switch-party').classList.contains('switchon')) {
       set_party_dragger_to(id);
     };
-//  };
+  };
 }

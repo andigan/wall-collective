@@ -3,7 +3,7 @@ import pageSettings from '../../_init/pageSettings';
 
 module.exports = {
 
-  init() {
+  navToggleInit() {
     $('#nav-toggle-button-container').draggable({
       cancel: true,
       containment: 'parent',

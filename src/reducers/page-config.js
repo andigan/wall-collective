@@ -3,6 +3,7 @@ export default function(
     clickCount: 0,
     deleteID: '',
     sessionID: '',
+    switchesStatus: '',
     clickedIDs: '',
     instaAvailable: false },
   action) {
@@ -11,6 +12,8 @@ export default function(
       return {...state, deleteID: action.payload};
     case 'SET_SESSION_ID':
       return {...state, sessionID: action.payload};
+      case 'SET_SWITCHES_STATUS':
+        return {...state, switchesStatus: action.payload};
     case 'RESET_CLICK_COUNT':
       return {...state, clickCount: 0};
     case 'INCREMENT_CLICK_COUNT':

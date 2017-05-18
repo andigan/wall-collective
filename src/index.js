@@ -1,4 +1,8 @@
-// replace assignDrag with assignImageDrag
+// change party dragger to be opacity 100% in center
+// add button to reset image
+// clean dragger.js
+
+
 
 // wall-collective
 //
@@ -18,20 +22,19 @@ import config from './_config/config';
 import configureStore from './_init/configureStore';
 const store = configureStore();
 
-
 import pageSettings from './_init/pageSettings';
 import stateChange from './views/state-change';
 
 // components
 import { buttonsInit } from './components/buttons';
-import Grid from './components/grid';
-import NavToggleButton from './components/ui-elements/nav-toggle-button';
+import  { navToggleInit } from './components/ui-elements/nav-toggle-button';
 
 // actions
 import { setSelectedImage } from './actions';
-import { resetClickCount } from './actions';
 import { setSessionID } from './actions';
 import { setInstaAvailable } from './actions';
+import { setSwitchesStatus } from './actions';
+
 
 // helpers
 import { getCookie } from './helpers';
@@ -40,38 +43,61 @@ import { setCookie } from './helpers';
 // main drag
 import { assignImageDrag } from './components/ui-elements/main-image-drag';
 
+// Interact.js
+import { assignImageInteract } from './components/ui-elements/main-image-interact';
+
 // draggers
 import { draggersInit } from './components/draggers';
+import { dSwitchsInit } from './components/d-switchs';
 import { setDraggerLocations } from './components/draggers';
+
 
 // DEBUG
 import debug from './debug/debug'; // DEBUG
 if (config.debugOn) debug.init(store);
 
-// instagram switch
+// instagram switch; arriving from server response
 config.useIGram = useIGram;
 
-// create buttons and assign functionality
-buttonsInit();
+window.store = store;
 
-// set page sizes and resize listeners
-// only import the init
-pageSettings.init();
-// provide methods for creating and destroying grid
-// only import the init
-Grid.init(pageSettings);
-// make nav-toggle-button draggable
-NavToggleButton.init();
 
-draggersInit();
 
-// temporary height to percentage conversion
+
+
+// switches_status cookie stores which draggers are activated when the page loads; capital letters denote an activated dragger
+if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgtp', 7);
+
+switches_status = getCookie('switches_status');
+window.store.dispatch(setSwitchesStatus(getCookie('switches_status')));
+
+let switchesStatus = getCookie('switches_status');
+let switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
+
+
+// if the switches_status character is uppercase, switch on the corresponding dragger_switch
+for ( let i = 0; i < switches.length; i++ ) {
+  if (switchesStatus[i] === switchesStatus[i].toUpperCase()) document.getElementById('switch-' + switches[i]).classList.add('switchon');
+};
+
+
+
+
+
+
+buttonsInit(); // create buttons and assign functionality
+pageSettings.init(); // set page sizes and resize listeners
+navToggleInit(); // make nav-toggle-button draggable
+draggersInit(); // set up draggers functionality
+dSwitchsInit(); // set up dragger switches
+
+
+
+// temporary fix: change auto height to percentage
 Array.from(document.getElementsByClassName('wallPic')).forEach(function (element) {
   if (element.style.height === 'auto') {
     element.style.height = ((parseInt(window.getComputedStyle(element).height) / pageSettings.imagesHigh * 100).toFixed(2)) + '%';
   };
-
-
 });
 
 
@@ -90,7 +116,6 @@ var socket = io.connect([location.protocol, '//', location.host, location.pathna
     // used when an image is dragged from the instagram div; assigned by socket when download is complete
     insta_download_ready_filename = {};
 
-window.store = store;
 window.socket = socket;
 
 
@@ -126,6 +151,7 @@ insta.init();
 
 // assign draggable to all .wallPic elements
 assignImageDrag();
+assignImageInteract();
 
 // // prevent default behavior to prevent iphone dragging and bouncing
 // // http://www.quirksmode.org/mobile/default.html
@@ -182,8 +208,7 @@ assignImageDrag();
 
   // initial set up for all visits.
   socket.on('connect_set_clientVars', function (clientVars) {
-    var i = 0,
-      switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
+    var i = 0;
 
     // assign sessionID.  used by upload_counter and user_count
     // the server sends a unique id or the previous id from the cookie
@@ -205,16 +230,6 @@ assignImageDrag();
     // hack: Problem:  busboy stream received the file stream before the sessionID, which was passed as a data value in the ajax submit
     //       Solution: change the HTML 'name' attribute of the form's input to the sessionID, which always arrives concurrently
     document.getElementById('fileselect').setAttribute('name', sessionID);
-
-    // switches_status cookie stores which draggers are activated when the page loads; capital letters denote an activated dragger
-    if (getCookie('switches_status') === '') setCookie('switches_status', 'SRObcgtp', 7);
-
-    switches_status = getCookie('switches_status');
-
-    // if the switches_status character is uppercase, switch on the corresponding dragger_switch
-    for ( i = 0; i < switches.length; i++ ) {
-      if (switches_status[i] === switches_status[i].toUpperCase()) document.getElementById(switches[i] + '_dragger_switch').classList.add('switchon');
-    };
   });
 
   // display the number of connected clients
@@ -589,51 +604,6 @@ assignImageDrag();
 
 
 
-// --Buttons
-  // dragger_all_switch; used to toggle all dragger switches
-  $('#dragger_all_switch').click(function () {
-    var i = 0,
-      switch_elements = {},
-      dragger_elements = {};
-
-    // add or remove 'switchon' class in dragger_all_switch
-    this.classList.toggle('switchon');
-    // if dragger_all_switch has been switched on
-    if (document.getElementById('dragger_all_switch').classList.contains('switchon')) {
-      // add 'switchon' class to all dragger_switch elements
-      switch_elements = document.getElementsByClassName('dragger_switch');
-      for (i = 0; i < switch_elements.length; i++) {
-        switch_elements[i].classList.add('switchon');
-      };
-      // set dragger element locations
-      setDraggerLocations(window.store.getState().selectedImage.id);
-      // show dragger elements if an image is selected
-      if (window.store.getState().selectedImage.id) {
-        dragger_elements = document.getElementsByClassName('dragger');
-        for (i = 0; i < dragger_elements.length; i++) {
-          dragger_elements[i].style.display = 'block';
-        };
-      };
-      // set cookie to all uppercase
-      setCookie('switches_status', 'SROBCGTP', 7);
-      switches_status = 'SROBCGTP';
-    // else when dragger_all_switch has been switched off
-    } else {
-      // remove 'switchon' class from dragger_status elements
-      switch_elements = document.getElementsByClassName('dragger_switch');
-      for (i = 0; i < switch_elements.length; i++) {
-        switch_elements[i].classList.remove('switchon');
-      };
-      // hide all draggers
-      dragger_elements = document.getElementsByClassName('dragger');
-      for (i = 0; i < dragger_elements.length; i++) {
-        dragger_elements[i].style.display = 'none';
-      };
-      // set cookie to all lowercase
-      setCookie('switches_status', 'srobcgtp', 7);
-      switches_status = 'srobcgtp';
-    };
-  });
 
 
 
@@ -645,45 +615,8 @@ assignImageDrag();
 
 
 
-  // set up dragger_switch functionalities
-  $('.dragger_switch').click(function () {
-    var switch_status_array = [],
-    // use id='stretch_dragger_switch' to get 'stretch_dragger'
-      dragger_name = this.getAttribute('id').replace('_switch', '');
-
-    // toggle dragger_switch
-    this.classList.toggle('switchon');
-
-    // convert d_status string to array
-    switch_status_array = switches_status.split('');
-
-    // if switched on
-    if (this.classList.contains('switchon')) {
-      // set dragger locations
-      setDraggerLocations(window.store.getState().selectedImage.id);
-      // show dragger if an image is selected
-      if (window.store.getState().selectedImage.id) {
-        document.getElementById(dragger_name).style.display = 'block';
-      };
-      // use first letter of dragger_name to find corresponding character in array and replace it
-      // with uppercase character to indicate dragger_switch is on
-      switch_status_array[switch_status_array.indexOf(dragger_name[0])] = dragger_name[0].toUpperCase();
-    // else when switched off
-    } else {
-      // hide dragger
-      document.getElementById(dragger_name).style.display = 'none';
-      // use first letter of dragger_name to find corresponding character in array and replace it
-      // with lowercase character to indicate dragger_switch is off
-      switch_status_array[switch_status_array.indexOf(dragger_name[0].toUpperCase())] = dragger_name[0].toLowerCase();
-    };
-    // convert switch_status_array back to string and set cookie
-    switches_status = switch_status_array.join('');
-    setCookie('switches_status', switches_status, 7);
-  });
-
-
-
-
+// **************
+// replace with different form of upload
 
   // on file_select element change, load up the image preview
   $('#fileselect').on('change', function () {
@@ -763,317 +696,3 @@ assignImageDrag();
       }
     });
   });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// --Interact('.wallPic').gesturable, for touchscreen rotating and scaling
-
-  interact('.wallPic').gesturable({
-    onstart: function (event) {
-
-      this.imageID = event.target.getAttribute('id');
-      this.imageEl = event.target;
-
-      stateChange.hideDraggers();
-
-      // retrieve original angle and scale
-      this.angle = parseFloat(this.imageEl.getAttribute('data-angle'));
-      this.scale = parseFloat(this.imageEl.getAttribute('data-scale'));
-
-      // pass id to ce:_lockID
-      socket.emit('ce:_lockID', this.imageID);
-
-      // prepare socketdata
-      this.socketdata = {};
-      this.socketdata.imageID = this.imageID;
-      this.socketdata.imageFilename = this.imageEl.getAttribute('title');
-    },
-    onmove: function (event) {
-      // retrieve scale and angle from event object
-      // event.ds is scale difference; event.da is the angle difference
-      this.scale = this.scale * (1 + event.ds);
-      this.angle += event.da;
-
-      // modify element with new transform
-      this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotate\(.*?\)/, 'rotate(' + this.angle + 'deg)');
-      this.imageEl.style.transform = this.imageEl.style.transform.replace(/scale\(.*?\)/ , 'scale(' + this.scale + ')');
-
-      // send socketdata
-      this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('ce:_transforming', this.socketdata);
-    },
-    onend: function (event) {
-      // if angle is < 0 or > 360, revise the angle to 0-360 range
-      if (this.angle < 0) {
-        this.angle = (360 + this.angle);
-        this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotate\(.*?\)/, 'rotate(' + this.angle + 'deg)');
-      };
-      if (this.angle > 360) {
-        this.angle = (this.angle - 360);
-        this.imageEl.style.transform = this.imageEl.style.transform.replace(/rotate\(.*?\)/, 'rotate(' + this.angle + 'deg)');
-      };
-
-      // send socketdata
-      this.socketdata.scale = this.scale.toFixed(2);
-      this.socketdata.angle = this.angle.toFixed(2);
-      this.socketdata.rotateX = this.imageEl.getAttribute('data-rotateX');
-      this.socketdata.rotateY = this.imageEl.getAttribute('data-rotateY');
-      this.socketdata.rotateZ = this.imageEl.getAttribute('data-rotateZ');
-
-      socket.emit('ce:_saveDataAttributes', this.socketdata);
-      this.socketdata.imageTransform = this.imageEl.style.transform;
-      socket.emit('ce:_saveTransform', this.socketdata);
-
-      // pass id to ce:_unlockID
-      socket.emit('ce:_unlockID', this.imageID);
-
-      // put new scale and angle into data-scale and data-angle
-      event.target.setAttribute('data-scale', this.scale.toFixed(2));
-      event.target.setAttribute('data-angle', this.angle.toFixed(2));
-
-      // reset draggers
-//      setDraggerLocations(this.imageID);
-
-      // reset click count
-      click_count = 0;
-
-    }
-  });
-
-
-
-
-
-
-// --Draggers
-
-
-
-
-// // --Set dragger locations
-//
-// function setDraggerLocations(id) {
-//
-//     if (id) {
-//       if (document.getElementById('stretch_dragger_switch').classList.contains('switchon')) {
-//         set_stretch_dragger_to(id);
-//       };
-//       if (document.getElementById('opacity_dragger_switch').classList.contains('switchon')) {
-//         set_opacity_dragger_to(id);
-//       };
-//       if (document.getElementById('rotation_dragger_switch').classList.contains('switchon')) {
-//         set_rotation_dragger_to(id);
-//       };
-//       if (document.getElementById('grayscale_invert_dragger_switch').classList.contains('switchon')) {
-//         set_grayscale_invert_dragger_to(id);
-//       };
-//       if (document.getElementById('blur_brightness_dragger_switch').classList.contains('switchon')) {
-//         set_blur_brightness_dragger_to(id);
-//       };
-//       if (document.getElementById('contrast_saturate_dragger_switch').classList.contains('switchon')) {
-//         set_contrast_saturate_dragger_to(id);
-//       };
-//       if (document.getElementById('threeD_dragger_switch').classList.contains('switchon')) {
-//         set_threeD_dragger_to(id);
-//       };
-//       if (document.getElementById('party_dragger_switch').classList.contains('switchon')) {
-//         set_party_dragger_to(id);
-//       };
-//     };
-//   };
-
-//   function set_stretch_dragger_to(id) {
-//     var dragger_element = document.getElementById('stretch_dragger'),
-//         imageEl     = document.getElementById(id),
-//         // get the width and height
-//         selected_imageWidth  = parseFloat(imageEl.style.width),
-//         selected_imageHeight = parseFloat(imageEl.style.height),
-//
-//         // calculate the dragger location
-//         selected_imageWidth_percentage  = selected_imageWidth / 100,
-//         selected_imageHeight_percentage = selected_imageHeight / 100,
-//         draggerLeft = selected_imageWidth_percentage * pageSettings.innerWidth,
-//         draggerTop = (1 - selected_imageHeight_percentage) * pageSettings.innerHeight;
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//
-//     // allow transitions
-//     // setTimeout is needed because the dragger will otherwise transition from no selection to selection
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_opacity_dragger_to(id) {
-//     var dragger_element = document.getElementById('opacity_dragger'),
-//         imageEl = document.getElementById(id),
-//         // get the opacity percentage: 0-1
-//         selected_image_opacity = parseInt( imageEl.style.opacity * 100) / 100,
-//         // calculate the dragger location
-//         draggerLeft = (selected_image_opacity * pageSettings.innerWidth);
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-// //    dragger_element.style.top     = (pageSettings.innerHeight / 3 * 2) + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_rotation_dragger_to(id) {
-//     var dragger_element = document.getElementById('rotation_dragger'),
-//       imageEl = document.getElementById(id),
-//       // calculate the dragger location
-//       draggerLeft = parseFloat(imageEl.getAttribute('data-angle') / 360 * pageSettings.innerWidth),
-//       draggerTop = parseFloat(imageEl.getAttribute('data-rotateZ') / 360 * pageSettings.innerHeight);
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_grayscale_invert_dragger_to(id) {
-//     var dragger_element = document.getElementById('grayscale_invert_dragger');
-//     var imageEl = document.getElementById(id);
-//         // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-//     var selected_image_filter = imageEl.style.WebkitFilter;
-//         // get the numbers within the grayscale and invert parentheses
-//
-// //        console.log(imageEl);
-//
-//
-//     var grayscale_Exp = /grayscale\(([^)]+)\)/,
-//         invert_Exp = /invert\(([^)]+)\)/,
-//         grayscale_matches = grayscale_Exp.exec(selected_image_filter),
-//         invert_matches    = invert_Exp.exec(selected_image_filter),
-//         // calculate the dragger location
-//         draggerTop = ((1 - parseFloat(grayscale_matches[1])) * pageSettings.innerHeight),
-//         draggerLeft = (parseFloat(invert_matches[1]) * pageSettings.innerWidth);
-//
-//
-//
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_blur_brightness_dragger_to(id) {
-//     var dragger_element = document.getElementById('blur_brightness_dragger'),
-//         imageEl = document.getElementById(id),
-//         // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-//         selected_image_filter = imageEl.style.WebkitFilter,
-//         // get the numbers within the blur and brightness parentheses
-//         blur_Exp = /blur\(([^)]+)\)/,
-//         brightness_Exp = /brightness\(([^)]+)\)/,
-//         blur_matches = blur_Exp.exec(selected_image_filter),
-//         brightness_matches    = brightness_Exp.exec(selected_image_filter),
-//         // calculate the dragger location
-//         draggerTop = (parseFloat(blur_matches[1]) * pageSettings.innerHeight / config.blurLevel),
-//         draggerLeft = (parseFloat(brightness_matches[1]) * pageSettings.innerWidth / config.brightnessLevel);
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_contrast_saturate_dragger_to(id) {
-//     var dragger_element = document.getElementById('contrast_saturate_dragger'),
-//         imageEl = document.getElementById(id),
-//         // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-//         selected_image_filter = imageEl.style.WebkitFilter,
-//         // get the numbers within the contrast and saturate parentheses
-//         contrast_Exp = /contrast\(([^)]+)\)/,
-//         saturate_Exp = /saturate\(([^)]+)\)/,
-//         contrast_matches = contrast_Exp.exec(selected_image_filter),
-//         saturate_matches = saturate_Exp.exec(selected_image_filter),
-//         // calculate the dragger location
-//         draggerTop = (parseFloat(contrast_matches[1]) * pageSettings.innerHeight / config.contrastLevel),
-//         draggerLeft = (parseFloat(saturate_matches[1]) * pageSettings.innerWidth / config.saturateLevel);
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_party_dragger_to(id) {
-//     var dragger_element = document.getElementById('party_dragger'),
-//         imageEl = document.getElementById(id),
-//         // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-//         // and opacity percentage: (0-1)
-//         selected_image_filter = imageEl.style.WebkitFilter,
-//         selected_image_opacity = parseInt( imageEl.style.opacity * 100) / 100,
-//         // get the number within the hue-rotation parentheses
-//         hue_rotate_Exp = /hue-rotate\(([^)]+)\)/,
-//         hue_rotate_matches = hue_rotate_Exp.exec(selected_image_filter),
-//         // calculate the dragger location
-//         draggerLeft = (selected_image_opacity * pageSettings.innerWidth),
-//         draggerTop = (pageSettings.innerHeight - (parseFloat(hue_rotate_matches[1]) / 360 * pageSettings.innerHeight));
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };
-//
-//   function set_threeD_dragger_to(id) {
-//     var dragger_element = document.getElementById('threeD_dragger'),
-//       imageEl = document.getElementById(id),
-//       // calculate the dragger location
-//       draggerTop = pageSettings.innerHeight - ((( 180 + parseFloat(imageEl.getAttribute('data-rotateX')) ) / 360) * pageSettings.innerHeight),
-//       draggerLeft = (( 180 + parseFloat(imageEl.getAttribute('data-rotateY')) ) / 360) * pageSettings.innerWidth;
-//
-//     // set the dragger location
-//     dragger_element.style.left    = draggerLeft + 'px';
-//     dragger_element.style.top     = draggerTop + 'px';
-//     dragger_element.style.display = 'block';
-//     // allow transitions
-//     setTimeout(function () {
-//       dragger_element.classList.add('d-transition');
-//     }, 0);
-//   };

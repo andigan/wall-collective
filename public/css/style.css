@@ -24,17 +24,17 @@ fullscreenmaskclass: 90000;
   padding:0;
 }
 
-#blur_brightness_dragger {
+#dragger-blur_brightness {
   box-shadow: 0 0 3px 3px darkorange;
   color: darkorange;
 }
 
-#blur_brightness_dragger_switch::first-letter {
+#switch-blur_brightness::first-letter {
   font-size: 150%;
   color: darkorange;
 }
 
-#blur_brightness_dragger_switch.switchon {
+#switch-blur_brightness.switchon {
   background-color: peachpuff !important;
 }
 
@@ -68,16 +68,16 @@ fullscreenmaskclass: 90000;
   z-index:60000;
 }
 
-#contrast_saturate_dragger {
+#dragger-contrast_saturate {
   box-shadow:0 0 3px 3px crimson;
   color:crimson;
 }
 
-#contrast_saturate_dragger_switch.switchon {
+#switch-contrast_saturate.switchon {
   background-color:lightcoral!important;
 }
 
-#contrast_saturate_dragger_switch::first-letter {
+#switch-contrast_saturate::first-letter {
   color:crimson;
   font-size:150%;
 }
@@ -160,16 +160,16 @@ fullscreenmaskclass: 90000;
   transition:transform 150ms ease-in-out;
 }
 
-#grayscale_invert_dragger {
+#dragger-grayscale_invert {
   box-shadow:0 0 3px 3px silver;
   color:silver;
 }
 
-#grayscale_invert_dragger_switch.switchon {
+#switch-grayscale_invert.switchon {
   background-color:#F3E13E!important;
 }
 
-#grayscale_invert_dragger_switch::first-letter {
+#switch-grayscale_invert::first-letter {
   color:silver;
   font-size:150%;
 }
@@ -293,16 +293,16 @@ fullscreenmaskclass: 90000;
   opacity:1;
 }
 
-#opacity_dragger {
+#dragger-opacity {
   box-shadow:0 0 3px 3px white;
   color:white;
 }
 
-#opacity_dragger_switch.switchon {
+#switch-opacity.switchon {
   background-color:silver!important;
 }
 
-#opacity_dragger_switch::first-letter {
+#switch-opacity::first-letter {
   color:white;
   font-size:150%;
 }
@@ -322,30 +322,30 @@ fullscreenmaskclass: 90000;
   z-index:50000;
 }
 
-#party_dragger {
+#dragger-party {
   box-shadow:0 0 3px 3px purple;
   color:purple;
 }
 
-#party_dragger_switch.switchon {
+#switch-party.switchon {
   background-color:plum!important;
 }
 
-#party_dragger_switch::first-letter {
+#switch-party::first-letter {
   color:purple;
   font-size:150%;
 }
 
-#rotation_dragger {
+#dragger-rotation {
   box-shadow:0 0 3px 3px green;
   color:green;
 }
 
-#rotation_dragger_switch.switchon {
+#switch-rotation.switchon {
   background-color:lightgreen!important;
 }
 
-#rotation_dragger_switch::first-letter {
+#switch-rotation::first-letter {
   color:green;
   font-size:150%;
 }
@@ -374,31 +374,31 @@ fullscreenmaskclass: 90000;
   text-align:center;
 }
 
-#stretch_dragger {
+#dragger-stretch {
   box-shadow:0 0 3px 3px blue;
   color:blue;
 }
 
-#stretch_dragger_switch.switchon {
+#switch-stretch.switchon {
   background-color:lightblue!important;
 }
 
-#stretch_dragger_switch::first-letter {
+#switch-stretch::first-letter {
   color:blue;
   font-size:150%;
 }
 
-#threeD_dragger {
+#dragger-threeD {
   box-shadow: 0 0 3px 3px deeppink;
   color: deeppink;
 }
 
-#threeD_dragger_switch::first-letter {
+#switch-threeD::first-letter {
   font-size: 150%;
   color: deeppink;
 }
 
-#threeD_dragger_switch.switchon {
+#switch-threeD.switchon {
   background-color: lightpink !important;
 }
 
@@ -590,7 +590,7 @@ fullscreenmaskclass: 90000;
   z-index:40000;
 }
 
-.dragger_switch,.dragger_all_switch {
+.dragger-switch,.dragger-switch-all {
   background-color:#736E6E;
   border-bottom-right-radius:15px;
   border-top-right-radius:15px;
