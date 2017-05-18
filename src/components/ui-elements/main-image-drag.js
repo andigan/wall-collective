@@ -100,9 +100,11 @@
           dropPost.posTop = this.socketdata.posTop + '%';
 
           // change width and height back to percentage
-          document.getElementById(this.imageID).style.width = (parseFloat(this.style.width) / pageSettings.imagesWide * 100).toFixed(2) + '%';
-          document.getElementById(this.imageID).style.height = (parseFloat(this.style.height) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
-
+          // (in safari, draggable width is percentage; in chrome, width is px)
+          if (this.style.width.includes('px')) {
+            document.getElementById(this.imageID).style.width = (parseFloat(this.style.width) / pageSettings.imagesWide * 100).toFixed(2) + '%';
+            document.getElementById(this.imageID).style.height = (parseFloat(this.style.height) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+          }
           // and left, right
           document.getElementById(this.imageID).style.left = this.socketdata.posLeft + '%';
           document.getElementById(this.imageID).style.top = this.socketdata.posTop + '%';

@@ -23,7 +23,7 @@ import pageSettings from './_init/pageSettings';
 import stateChange from './views/state-change';
 
 // components
-import Buttons from './components/buttons';
+import { buttonsInit } from './components/buttons';
 import Grid from './components/grid';
 import NavToggleButton from './components/ui-elements/nav-toggle-button';
 
@@ -52,9 +52,7 @@ if (config.debugOn) debug.init(store);
 config.useIGram = useIGram;
 
 // create buttons and assign functionality
-
-// only import the init
-Buttons.init();
+buttonsInit();
 
 // set page sizes and resize listeners
 // only import the init
