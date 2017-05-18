@@ -64,8 +64,8 @@ module.exports = function (io) {
     });
 
     // sockets to share image transformations
-    socket.on('ce:  moving', function (data) {
-      socket.broadcast.emit('bc: moving', data);
+    socket.on('ce:_moving', function (data) {
+      socket.broadcast.emit('bc:_moving', data);
     });
 
     socket.on('ce:  store_moved', function (data) {
@@ -196,10 +196,10 @@ module.exports = function (io) {
       socket.broadcast.emit('bc: restore_filter', data);
     });
 
-    socket.on('ce:  freeze', function (data) {
+    socket.on('ce:_lockID', function (data) {
       socket.broadcast.emit('bc: freeze', data);
     });
-    socket.on('ce:  unfreeze', function (data) {
+    socket.on('ce:_unlockID', function (data) {
       socket.broadcast.emit('bc: unfreeze', data);
     });
 

@@ -732,21 +732,21 @@ body {
     z-index: 90000;  }
 }
 
-.selected_file_animation {
+.animation-selected-image {
   outline: 1px solid transparent;
   -webkit-animation: blink 2s ease-out 0s 1;
   animation: blink 2s ease-out 0s 1;
 }
 
-@-webkit-keyframes temp_fade {
+@-webkit-keyframes animation-temp-fade {
   0%   { opacity: .50; }
   33%  { opacity: .50; }
   100% { opacity: .50; }
 }
 
-.temp_fade {
-  -webkit-animation: temp_fade 2s ease-out 0s 1;
-  animation: temp_fade 2s ease-out 0s 1;
+.animation-temp-fade {
+  -webkit-animation: animation-temp-fade 2s ease-out 0s 1;
+  animation: animation-temp-fade 2s ease-out 0s 1;
 }
 
 #explore-container {

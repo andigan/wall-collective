@@ -56,10 +56,8 @@ module.exports = function (req, res, next) {
             { upsert: true },
             function (err) { if (err) return console.error(err); } );
 
-          // Perhaps use javascript to read ?open_instagram_div instead of passing variable to index?
-
-          // insta_step 4: Reload the page with the open_instagram_div query parameter
-          res.redirect(url.parse(req.url).pathname + '?open_instagram_div');
+          // insta_step 4: Reload the page with the open_igram query parameter
+          res.redirect(url.parse(req.url).pathname + '?open_igram');
         }; // end of if else response for access token
       }; // end of if(err) for post
     }); // end of post callback

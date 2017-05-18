@@ -28,11 +28,6 @@ router.get('/', function (req, res) {
       databaseResult      : databaseResult,
       useCDN              : config.useCDN,
       useIGram            : config.useIGram,
-
-      // insta_step 5: Load the page with the instagram div open.
-      // if the request contains the query parameter ?open_instagram_div (from i-gram auth)
-      // set the open_instagram_div to true to pass to index.html
-      openInstagramDiv  : ('open_instagram_div' in req.query)
     });
   });
 });
@@ -41,7 +36,7 @@ router.get('/', function (req, res) {
 // --Drag post
 // accept the ajax post from the stop function of the jQuery draggable event in main.js
 router.post('/dragstop', bodyParser.json(), function (req, res) {
-  var i = 0,
+  let i = 0,
       dropPost = req.body.dropPost,
       ImageDocuments = mongoose.model('images');
 
@@ -54,9 +49,7 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
   console.log('z_indexes : ' + dropPost.zIndexes);
   console.log('dFilename : ' + dropPost.dFilename);
   console.log('posLeft   : ' + dropPost.posLeft);
-  console.log('posTop    : ' + dropPost.posTop);
-  console.log('dLeft     : ' + dropPost.dLeft);
-  console.log('dTop      : ' + dropPost.dTop + '\n');
+  console.log('posTop    : ' + dropPost.posTop + '\n');
 
   // update left/top positions for moved_file's filename
   ImageDocuments.update(
@@ -72,7 +65,7 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
     ImageDocuments.update(
       { filename : dropPost.filenames[i] },
       { $set: { dom_id : dropPost.domIDs[i],
-                zindex   : dropPost.zIndexes[i]} },
+                zindex : dropPost.zIndexes[i]} },
       { upsert: true },
       function (err) { if (err) return console.error(err); } );
   };

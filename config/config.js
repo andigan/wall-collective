@@ -1,5 +1,5 @@
 module.exports = {
-  port: 8000,
+  port: 80,
   mainDir: __dirname.replace('/config', ''),
 
   // server-side settings

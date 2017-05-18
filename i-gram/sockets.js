@@ -29,7 +29,7 @@ module.exports = function (socket, sessionID, download, adapters) {
 
 
   // insta_step 7: Fetch Instagram data
-  socket.on('ce: get_instagram_data', function () {
+  socket.on('ce:_fetchIgramData', function () {
 
     // retrieve access token for current session from database
     InstaSessions.findOne({ 'session_id': sessionID }, 'inst_access_token', function (err, session) {

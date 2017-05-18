@@ -1,4 +1,4 @@
-import helpers from '../helpers';
+import { clickme } from '../helpers';
 
 module.exports = {
 
@@ -7,12 +7,12 @@ module.exports = {
     this.createDebugDiv();
     this.setListeners();
 
-    // helpers.clickme('nav-tog-button', 50);
-    // helpers.clickme('t2', 50);
-    // helpers.clickme('dragger_switches_button', 1000);
-    // helpers.clickme('explore_button', 0);
-    // helpers.clickme('nav-upload-container_button', 1000);
-    // helpers.clickme('debug-button', 1000);
+//    clickme('nav-tog-button', 50);
+//    clickme('t2', 50);
+//    clickme('dragger_switches_button', 1000);
+//    clickme('explore_button', 0);
+//    clickme('nav-upload-container_button', 1000);
+//    clickme('debug-button', 1000);
 
     // console log store
     document.addEventListener('click', function () {
