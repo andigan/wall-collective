@@ -907,7 +907,7 @@ margin-left: 5%;
   z-index: 50000;
 }
 
-.insta_image_div {
+.insta-image-div {
   margin: auto;
   width: 100%;
   text-align: center;
@@ -929,14 +929,14 @@ position: absolute;
   z-index: 1;
 }
 
-.spacer_top_bottom {
+.spacer-top-bottom {
     background-color: gray;
     height: 1px;
     margin: auto;
     width: 15vw;
   }
 
-.spacer_middle {
+.spacer-middle {
   background-color: gray;
   height: 1px;
   margin: auto;

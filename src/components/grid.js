@@ -1,4 +1,4 @@
-import pageSettings from '../_init/pageSettings.js';
+import pageSettings from '../_init/page-settings.js';
 
 module.exports = {
 

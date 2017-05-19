@@ -193,7 +193,7 @@ router.post('/addfile', function (req, res) {
         uploaddata.chunkSize = data.length;
 
         console.log('File [' + filename + '] got ' + data.length + ' bytes');
-        res.io.emit('bc: chunk_sent', uploaddata);
+        res.io.emit('bc:_uploadChunkSent', uploaddata);
       });
 
       file.on('end', function () {

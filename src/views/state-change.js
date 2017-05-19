@@ -26,8 +26,6 @@ module.exports = {
     document.getElementById(id).style.display = 'block';
   },
 
-
-
   deletePreview(deleteID) {
     // show
     document.getElementById('delete-preview-container').classList.add('delete-preview-container-is-open');
@@ -143,6 +141,4 @@ module.exports = {
     document.getElementById('ham-line1').style.top = '40%';
     document.getElementById('ham-line3').style.top = '60%';
   }
-
-
 };

@@ -1,4 +1,4 @@
-  import pageSettings from '../../_init/pageSettings';
+  import pageSettings from '../../_init/page-settings';
   import stateChange from '../../views/state-change';
   import { setSelectedImage } from '../../actions';
   import { resetClickCount } from '../../actions';

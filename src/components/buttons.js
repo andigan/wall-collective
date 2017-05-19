@@ -1,48 +1,34 @@
 import config from '../_config/config';
 import stateChange from '../views/state-change';
-// import socketFile from '../socket-file';
 import { setDeleteID } from '../actions';
 import { setSelectedImage } from '../actions';
-// IGRAM-OPTION
-import { setInstaAvailable} from '../actions';
 
-module.exports = {
+export function buttonsInit() {
 
-  buttonsInit() {
+  createButton('n1', 'open-account', 'account', '/icons/person_circle_icon.png', 'button-nav');
+  createButton('n2', 'open-tools', 'tools', '/icons/tools_icon.png', 'button-nav');
+  createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png', 'button-nav');
+  createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png', 'button-nav');
 
-    createButton('n1', 'open-account', 'account', '/icons/person_circle_icon.png', 'button-nav');
-    createButton('n2', 'open-tools', 'tools', '/icons/tools_icon.png', 'button-nav');
-    createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png', 'button-nav');
-    createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png', 'button-nav');
+  createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers_icon.png', 'button-tools');
+  createButton('t2', 'choose-color', 'color', '/icons/palette_icon.png', 'button-tools');
+  createButton('t3', 'reset-page', 'reset page', '/icons/reset_icon.png', 'button-tools');
 
-    createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers_icon.png', 'button-tools');
-    createButton('t2', 'choose-color', 'color', '/icons/palette_icon.png', 'button-tools');
-    createButton('t3', 'reset-page', 'reset page', '/icons/reset_icon.png', 'button-tools');
-//    this.createButton('t4', 'open-explore', 'explore', '/icons/magnifying_glass_icon.png', 'button-tools');
+  createButton('a1', 'app-info', 'info', '/icons/info_icon.png', 'button-tools');
+  document.getElementById('u2').appendChild(document.getElementById('upload-form-button'));
 
-    createButton('a1', 'app-info', 'info', '/icons/info_icon.png', 'button-tools');
-    document.getElementById('u2').appendChild(document.getElementById('upload-form-button'));
+  createjsColor();
 
-    // IGRAM-OPTION
-    if (config.useIGram) {
-      createButton('a2', 'insta-logout', 'instagram logout', '/icons/debug_icon.png', 'button-tools');
-      createButton('u3', 'insta-upload', 'Instagram', '/icons/glyph-logo_May2016.png', 'button-tools');
-    };
-
-    createjsColor();
-
-    addEvents([
-      document.getElementById('nav-tog-button'),
-      document.getElementById('button-reject-delete'),
-      document.getElementById('button-confirm-delete'),
-      document.getElementById('x-info-container'),
-      document.getElementById('button-reject-upload'),
-      document.getElementById('x-explore-container')
-    ]);
-    exitDoorDrop();
-
-  }
-};
+  addEvents([
+    document.getElementById('nav-tog-button'),
+    document.getElementById('button-reject-delete'),
+    document.getElementById('button-confirm-delete'),
+    document.getElementById('x-info-container'),
+    document.getElementById('button-reject-upload'),
+    document.getElementById('x-explore-container')
+  ]);
+  exitDoorDrop();
+}
 
 
 function createButton(targetID, action, text, iconPath, buttonClass) {
@@ -242,67 +228,6 @@ function onClick(e) {
     default:
       break;
   }
-
-  // IGRAM-OPTION
-  if (config.useIGram) {
-    switch (e.currentTarget.getAttribute('data-action')) {
-      case 'insta-upload':
-
-        // instaAvailable is set to true via socket when an access token is granted.
-        if (!window.store.getState().pageConfig.instaAvailable) {
-          // redirectURL: http://www.example.com?myclient_id=johndoe
-          let redirectURL = [location.protocol, '//', location.host, location.pathname].join('') + '?myclient_id=' + window.store.getState().pageConfig.sessionID;
-
-          // insta_step 1: Redirect to Igram to prompt user to authenticate
-          // instaAppID, provided to Instagram developers, is stored on the server
-          // and fetched with the initial socket connection
-          // Successful authentication will redirect the browser back to the server's
-          // app.get('/') with 'myclient_id' and 'code' query parameter to be parsed by the server
-          window.location = 'https://api.instagram.com/oauth/authorize/?client_id=' + config.instaAppID + '&redirect_uri=' + redirectURL + '&response_type=code';
-        } else {
-          // insta_step 24: If an access token was granted, open Igram divs and skip to insta_step 7.
-          window.socket.emit('ce:_fetchIgramData');
-
-          document.getElementById('insta-header').style.display = 'flex';
-          document.getElementById('insta-container').style.display = 'block';
-          document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
-          document.body.classList.add('a-nav-container-is-open');
-
-          // animate open hamburgers
-          document.getElementById('ham-line1').style.top = '35%';
-          document.getElementById('ham-line3').style.top = '65%';
-        };
-        break;
-
-      // insta_step 25: Use the instagram logout link in an image tag to log out.
-      // http://stackoverflow.com/questions/10991753/instagram-api-user-logout
-      case 'insta-logout':
-        let tempImgEl = document.createElement('img');
-
-        tempImgEl.src = 'http://instagram.com/accounts/logout/';
-        tempImgEl.style.display = 'none';
-        tempImgEl.style.height = '0';
-        tempImgEl.style.width = '0';
-
-        // create the logout 'image' briefly in the dom.
-        document.getElementById('wrapper').appendChild(tempImgEl);
-        tempImgEl.remove();
-
-        alert('logged out');
-
-        // insta_step 26: Remove client's access token from server
-        socket.emit('ce: remove_client_from_clients_access', window.store.getState().pageConfig.sessionID);
-
-        window.store.dispatch(setInstaAvailable(false));
-
-        break;
-      default:
-        break;
-    };
-  };
-
-
-
 }
 
 function addEvents(buttons) {
@@ -342,8 +267,6 @@ function createjsColor() {
 
   wrapperEl.appendChild(jscolorEl);
 }
-
-
 
 function exitDoorDrop() {
 

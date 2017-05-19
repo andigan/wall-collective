@@ -45,12 +45,3 @@ export function setPreviousClickedIDs(ids) {
     payload: ids
   };
 }
-
-
-// IGRAM-OPTION
-export function setInstaAvailable(bool) {
-  return {
-    type: 'SET_INSTA_AVAILABLE',
-    payload: bool
-  };
-}

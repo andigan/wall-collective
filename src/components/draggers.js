@@ -1,5 +1,5 @@
 import config from '../_config/config';
-import pageSettings from '../_init/pageSettings';
+import pageSettings from '../_init/page-settings';
 import Grid from './grid';
 import stateChange from '../views/state-change';
 import { resetClickCount } from '../actions';
@@ -40,8 +40,8 @@ function set_opacity_dragger_to(id) {
       draggerLeft = (selected_image_opacity * pageSettings.innerWidth);
 
   // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-//  dragger_element.style.top     = (pageSettings.innerHeight / 3 * 2) + 'px';
+  dragger_element.style.left = draggerLeft + 'px';
+//  dragger_element.style.top = (pageSettings.innerHeight / 3 * 2) + 'px';
   dragger_element.style.display = 'block';
   // allow transitions
   setTimeout(function () {
@@ -51,14 +51,14 @@ function set_opacity_dragger_to(id) {
 
 function set_rotation_dragger_to(id) {
   var dragger_element = document.getElementById('dragger-rotation'),
-    imageEl = document.getElementById(id),
-    // calculate the dragger location
-    draggerLeft = parseFloat(imageEl.getAttribute('data-angle') / 360 * pageSettings.innerWidth),
-    draggerTop = parseFloat(imageEl.getAttribute('data-rotateZ') / 360 * pageSettings.innerHeight);
+      imageEl = document.getElementById(id),
+      // calculate the dragger location
+      draggerLeft = parseFloat(imageEl.getAttribute('data-angle') / 360 * pageSettings.innerWidth),
+      draggerTop = parseFloat(imageEl.getAttribute('data-rotateZ') / 360 * pageSettings.innerHeight);
 
   // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
+  dragger_element.style.left = draggerLeft + 'px';
+  dragger_element.style.top = draggerTop + 'px';
   dragger_element.style.display = 'block';
   // allow transitions
   setTimeout(function () {
