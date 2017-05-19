@@ -27,7 +27,7 @@ router.get('/', function (req, res) {
       title               : 'wall-collective',
       databaseResult      : databaseResult,
       useCDN              : config.useCDN,
-      useIGram            : config.useIGram,
+      useIGram            : config.useIGram
     });
   });
 });
@@ -109,9 +109,7 @@ router.get('/resetpage', function (req, res) {
     ImageDocuments.find({}).sort({sort_id: 'asc'}).exec(function (err, databaseResult) {
       if (err) return console.error(err);
 
-      // not sure what I was doing here
-      console.log(databaseResult);
-
+      // hmmm...
 
       // clear out the database
       ImageDocuments.remove({}, function (err) {

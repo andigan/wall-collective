@@ -70,7 +70,7 @@ function onClick(e) {
       alert('logged out');
 
       // insta_step 26: Remove client's access token from server
-      socket.emit('ce: remove_client_from_clients_access', window.store.getState().pageConfig.sessionID);
+      socket.emit('ce:_removeClientAccessToken', window.store.getState().pageConfig.sessionID);
 
       window.store.dispatch(setInstaAvailable(false));
 

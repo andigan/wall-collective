@@ -136,7 +136,7 @@ module.exports = function (socket, sessionID, download, adapters) {
   });
 
   // insta_step 27: Remove client's access token from database
-  socket.on('ce: remove_client_from_clients_access', function (sessionID) {
+  socket.on('ce:_removeClientAccessToken', function (sessionID) {
     InstaSessions.find({ session_id: sessionID }).remove().exec();
     console.log('Instagram session ended...');
   });

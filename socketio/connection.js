@@ -16,10 +16,6 @@ module.exports = function (io) {
   io.on('connection', function (socket) {
     var sessionID = '';
 
-    socket.on('test', function() {
-      io.sockets.emit('tested');
-    });
-
     // check to see if the client is new or revisiting with a cookie
     socket.on('ce:_sendSessionID', function (clientVars) {
       sessionID = clientVars.sessionID;
@@ -70,10 +66,6 @@ module.exports = function (io) {
     // sockets to share image transformations
     socket.on('ce:_moving', function (data) {
       socket.broadcast.emit('bc:_moving', data);
-    });
-
-    socket.on('ce:  store_moved', function (data) {
-      socket.broadcast.emit('bc: moved', data);
     });
 
     socket.on('ce:_resizing', function (data) {
