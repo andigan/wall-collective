@@ -22,7 +22,7 @@ import { pageInit } from './_init/page-helpers';
 
 // components
 import { buttonsInit } from './components/buttons';
-import  { navToggleInit } from './components/ui-elements/nav-toggle-button';
+import { navToggleInit } from './components/ui-elements/nav-toggle-button';
 import { uploadInit } from './components/upload';
 
 // main drag

@@ -483,8 +483,8 @@ export function draggersInit() {
       drag: function (event, ui) {
         let draggerPos = draggerAPI.getPos(ui.position);
 
-        this.rotateX = ((Math.round(draggerPos.y) * 3.6) - 180).toFixed(2),
-        this.rotateY = ((Math.round(draggerPos.x) * 3.6) - 180).toFixed(2);
+        this.rotateX = ((draggerPos.y * 3.6) - 180).toFixed(2),
+        this.rotateY = ((draggerPos.x * 3.6) - 180).toFixed(2);
 
         // display the percentages in the d-info div
         draggerAPI.updateInfo(`rotateX: ${this.rotateX}deg rotateY: ${this.rotateY}deg`);
