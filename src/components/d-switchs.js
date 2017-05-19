@@ -13,6 +13,13 @@ function getSetSwitchStatus() {
   let statusStr = getCookie('switches_status'),
       switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
 
+    if (statusStr === '') {
+      statusStr = 'SRObcgtp';
+      setCookie('switches_status', statusStr, 7);
+    };
+
+  window.store.dispatch(setSwitchesStatus(statusStr));
+
   // if the statusStr character is uppercase, turn on the corresponding switch
   statusStr.split('').forEach(function (switchLetter, index) {
     if (switchLetter === switchLetter.toUpperCase()) {
@@ -48,7 +55,6 @@ function switchFunction() {
         // and replace it with uppercase character to indicate switch is on
         switchesStats[switchesStats.indexOf(dLetter)] = dLetter.toUpperCase();
       } else {
-
         draggerEl.style.display = 'none';
         // replace corresponding letter with lowercase character to indicate switch is off
         switchesStats[switchesStats.indexOf(dLetter.toUpperCase())] = dLetter.toLowerCase();
