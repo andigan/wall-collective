@@ -26,14 +26,10 @@ module.exports = {
     document.getElementById(id).style.display = 'block';
   },
 
-
-
-  deletePreview() {
-    var deleteTarget = window.store.getState().deleteTarget;
-
+  deletePreview(deleteID) {
     // show
     document.getElementById('delete-preview-container').classList.add('delete-preview-container-is-open');
-    document.getElementById('image-delete-preview').src = deleteTarget.element.src;
+    document.getElementById('image-delete-preview').src = document.getElementById(deleteID).src;
 
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
@@ -85,11 +81,13 @@ module.exports = {
   },
 
   afterDelete() {
+    let delPreviewEL = document.getElementById('delete-preview-container');
+
     // show element
     document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
-    document.getElementById('delete-preview-container').style.display = 'none';
-    document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
+    this.hideElement(delPreviewEL);
+    delPreviewEL.classList.remove('delete-preview-container-is-open');
     this.hideDraggers();
     // This setTimeout is so that the delete-preview-container disappears immediately, and then resets
     // to visible after the transition effect takes place
@@ -101,21 +99,23 @@ module.exports = {
   },
 
   rejectDelete() {
-    var deleteTarget = window.store.getState().deleteTarget;
+    let deleteID = window.store.getState().pageConfig.deleteID,
+        delPreviewEL = document.getElementById('delete-preview-container');
 
     // show element
     document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
-    document.getElementById('delete-preview-container').style.display = 'none';
-    document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
+    this.hideElement(delPreviewEL);
+    delPreviewEL.classList.remove('delete-preview-container-is-open');
     setTimeout(function () {
       document.getElementById('delete-preview-container').style.display = 'block';
     }, 500);
     // reshow hidden image that wasn't deleted
-    deleteTarget.element.style.display = 'initial';
+//    debugger
+    document.getElementById(deleteID).style.display = 'block';
 
     // show image on other clients
-    window.socket.emit('ce:  show_image', deleteTarget.id);
+    window.socket.emit('ce:_showImage', deleteID);
   },
 
   closeAll() {
@@ -136,11 +136,9 @@ module.exports = {
     document.getElementById('image-upload-preview').src = '/icons/1x1.png';
     document.getElementById('image-delete-preview').src = '/icons/1x1.png';
     // close navigation button
-    document.body.classList.remove('button_container_is_open');
+    document.body.classList.remove('a-nav-container-is-open');
     // animate close hamburgers
     document.getElementById('ham-line1').style.top = '40%';
     document.getElementById('ham-line3').style.top = '60%';
   }
-
-
 };

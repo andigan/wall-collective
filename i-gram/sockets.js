@@ -22,14 +22,14 @@ module.exports = function (socket, sessionID, download, adapters) {
       return false;
     } else {
       console.log('Found session: ' + sessionID);
-      socket.emit('ce: insta_access_ready');
+      socket.emit('be:_instaTokenReady');
     }
     return true; // or callback
   });
 
 
   // insta_step 7: Fetch Instagram data
-  socket.on('ce: get_instagram_data', function () {
+  socket.on('ce:_fetchIgramData', function () {
 
     // retrieve access token for current session from database
     InstaSessions.findOne({ 'session_id': sessionID }, 'inst_access_token', function (err, session) {
@@ -37,16 +37,16 @@ module.exports = function (socket, sessionID, download, adapters) {
 
       // fetch the instagram data
       adapters.fetchInstaData(session.inst_access_token).then(function (results) {
-        // socket.emit('check_out', results;
+        // socket.emit('be:_checkOut', results;
         // insta_step 9: Send results to client
-        socket.emit('se: add_content_to_insta_div', results);
+        socket.emit('se:_addContentToInstaDiv', results);
       });
     });
 
   });
 
   // insta_step 13: Save the remote Instagram image to local storage
-  socket.on('ce: save_insta_image', function (instaDraggedImage) {
+  socket.on('ce:_saveInstaImage', function (instaDraggedImage) {
 
     var newFileData = {};
 
@@ -58,13 +58,13 @@ module.exports = function (socket, sessionID, download, adapters) {
       console.log(newFileData.newFilename + ' added to directory from instagram feed.');
 
       // insta_step 14: Send newFilename and index to client
-      socket.emit('ce: insta_download_ready', newFileData);
+      socket.emit('ce:_instaDownloadReady', newFileData);
     }); // end of download callback
   });
 
 
   // insta_step 18: Save new image to database; assign dom_id to be consistent on all clients
-  socket.on('ce: insta_drop', function (instaDropData) {
+  socket.on('ce:_instaDrop', function (instaDropData) {
 
     // prepare object for database and sending data to clients
     var instaDBData = {
@@ -124,10 +124,10 @@ module.exports = function (socket, sessionID, download, adapters) {
             console.log(instaDBData.insta_link);
 
             // insta_step 19: Send data to client to update dragged image
-            socket.emit('se: change_clone_to_image', instaDBData);
+            socket.emit('se:_changeCloneToImage', instaDBData);
 
             // insta_step 21: Send data to other clients to add image
-            socket.broadcast.emit('be: add_insta_image_to_other_clients', instaDBData);
+            socket.broadcast.emit('be:_addInstaImageToOtherClients', instaDBData);
 
           } // end of update callback
         ); // end of ImageDocuments update
@@ -136,7 +136,7 @@ module.exports = function (socket, sessionID, download, adapters) {
   });
 
   // insta_step 27: Remove client's access token from database
-  socket.on('ce: remove_client_from_clients_access', function (sessionID) {
+  socket.on('ce:_removeClientAccessToken', function (sessionID) {
     InstaSessions.find({ session_id: sessionID }).remove().exec();
     console.log('Instagram session ended...');
   });

@@ -17,7 +17,7 @@ module.exports = function (io) {
     var sessionID = '';
 
     // check to see if the client is new or revisiting with a cookie
-    socket.on('ce:  sessionID_check', function (clientVars) {
+    socket.on('ce:_sendSessionID', function (clientVars) {
       sessionID = clientVars.sessionID;
 
       // add the instagram_app_id
@@ -29,21 +29,21 @@ module.exports = function (io) {
       // if the client is revisiting, send original sessionID to client
       if (sessionID !== '' && sessionID !== 'null' && sessionID !== '[object Object]') {
         console.log(sessionID + ' reconnected.');
-        socket.emit('connect_set_clientVars', clientVars);
+        socket.emit('connect:_setClientVars', clientVars);
 
       // else when client is new, generate a new sessionID
       } else {
         sessionID = shortID.generate();
         console.log(sessionID + ' connected for first time.');
         clientVars.sessionID = sessionID;
-        socket.emit('connect_set_clientVars', clientVars);
+        socket.emit('connect:_setClientVars', clientVars);
       };
 
       // add sessionID to connectedClients array
       connectedClients.push(sessionID);
 
       // change user count on all clients
-      io.sockets.emit('bc: change_user_count', connectedClients);
+      io.sockets.emit('bc:_changeConnectedClients', connectedClients);
 
 
       if (config.useIGram) {
@@ -60,20 +60,16 @@ module.exports = function (io) {
       // remove sessionID from connectedClients array
       connectedClients.splice(connectedClients.indexOf(sessionID), 1);
       // change user count on remaining clients
-      socket.broadcast.emit('bc: change_user_count', connectedClients);
+      socket.broadcast.emit('bc:_changeConnectedClients', connectedClients);
     });
 
     // sockets to share image transformations
-    socket.on('ce:  moving', function (data) {
-      socket.broadcast.emit('bc: moving', data);
-    });
-
-    socket.on('ce:  store_moved', function (data) {
-      socket.broadcast.emit('bc: moved', data);
+    socket.on('ce:_moving', function (data) {
+      socket.broadcast.emit('bc:_moving', data);
     });
 
     socket.on('ce:_resizing', function (data) {
-      socket.broadcast.emit('bc: resizing', data);
+      socket.broadcast.emit('bc:_resizing', data);
     });
 
     socket.on('ce:_saveResize', function (data) {
@@ -92,7 +88,7 @@ module.exports = function (io) {
         // callback
         function (err) { if (err) return console.error(err); } );
 
-      socket.broadcast.emit('bc: resized', data);
+      socket.broadcast.emit('bc:_resized', data);
     });
 
     socket.on('ce:_saveDataAttributes', function (data) {
@@ -106,11 +102,11 @@ module.exports = function (io) {
         { upsert: true },
         function (err) { if (err) return console.error(err); } );
 
-      socket.broadcast.emit('bc: change_data_attributes', data);
+      socket.broadcast.emit('bc:_changeDataAttributes', data);
     });
 
     socket.on('ce:_transforming', function (data) {
-      socket.broadcast.emit('bc: transforming', data);
+      socket.broadcast.emit('bc:_transforming', data);
     });
 
     socket.on('ce:_saveTransform', function (data) {
@@ -122,7 +118,7 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_opacityChanging', function (data) {
-      socket.broadcast.emit('bc: opacity_changing', data);
+      socket.broadcast.emit('bc:_opacityChanging', data);
     });
 
     socket.on('ce:_saveOpacity', function (data) {
@@ -134,7 +130,7 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_filterChanging', function (data) {
-      socket.broadcast.emit('bc: filter_changing', data);
+      socket.broadcast.emit('bc:_filterChanging', data);
     });
 
     socket.on('ce:_saveFilter', function (data) {
@@ -154,10 +150,10 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_resetPage', function () {
-      socket.broadcast.emit('bc: resetpage');
+      socket.broadcast.emit('bc:_resetPage');
     });
 
-    socket.on('ce:  share_upload', function (data) {
+    socket.on('ce:_share_upload', function (data) {
       var dbImageData = {};
 
       // find matching data.uploadedFilename, return 'result' object
@@ -169,12 +165,12 @@ module.exports = function (io) {
         dbImageData.location = result.location;
         dbImageData.z_index = result.zindex;
 
-        socket.broadcast.emit('bc: add_upload', dbImageData);
+        socket.broadcast.emit('bc:_addUpload', dbImageData);
       });
     });
 
-    socket.on('ce:  delete_image', function (data) {
-      socket.broadcast.emit('bc: delete_image', data);
+    socket.on('ce:_deleteImage', function (data) {
+      socket.broadcast.emit('bc:_deleteImage', data);
       console.log('----------- delete image socket -------------');
       console.log(data.filenameToDelete);
 
@@ -189,26 +185,26 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_removeFilter', function (data) {
-      socket.broadcast.emit('bc: remove_filter', data);
+      socket.broadcast.emit('bc:_removeFilter', data);
     });
 
     socket.on('ce:_restoreFilter', function (data) {
-      socket.broadcast.emit('bc: restore_filter', data);
+      socket.broadcast.emit('bc:_restoreFilter', data);
     });
 
-    socket.on('ce:  freeze', function (data) {
-      socket.broadcast.emit('bc: freeze', data);
+    socket.on('ce:_lockID', function (data) {
+      socket.broadcast.emit('bc:_lockID', data);
     });
-    socket.on('ce:  unfreeze', function (data) {
-      socket.broadcast.emit('bc: unfreeze', data);
+    socket.on('ce:_unlockID', function (data) {
+      socket.broadcast.emit('bc:_unlockID', data);
     });
 
     socket.on('ce:_hideImage', function (data) {
-      socket.broadcast.emit('bc: hide_image', data);
+      socket.broadcast.emit('bc:_hideImage', data);
     });
 
-    socket.on('ce:  show_image', function (data) {
-      socket.broadcast.emit('bc: show_image', data);
+    socket.on('ce:_showImage', function (data) {
+      socket.broadcast.emit('bc:_showImage', data);
     });
 
   });

@@ -1,5 +1,3 @@
-
-
 module.exports = {
   init: function () {
 
@@ -20,8 +18,8 @@ module.exports = {
 
   render: function () {
     let navToggleEl = document.getElementById('nav-toggle-button-container'),
-        closeInfoEl = document.getElementById('close_info_container'),
-        appInfoEl = document.getElementById('app_info'),
+        closeInfoEl = document.getElementById('x-info-container'),
+        appInfoEl = document.getElementById('info-page'),
         closeExploreEl = document.getElementById('x-explore-container'),
         imagesEl = document.getElementById('images'),
         wrapperEl = document.getElementById('wrapper'),
@@ -57,8 +55,8 @@ module.exports = {
     navToggleEl.style.left = (this.mainWide - parseFloat(window.getComputedStyle(navToggleEl).width) + 'px');
     navToggleEl.style.top = (this.mainHigh - parseFloat(window.getComputedStyle(navToggleEl).height) + 'px');
 
-    // set app_info height
-    document.getElementById('app_info').style.height = (this.innerHeight * 0.9) + 'px';
+    // set info-page height
+    document.getElementById('info-page').style.height = (this.innerHeight * 0.9) + 'px';
 
     // set explore-container height
     document.getElementById('explore-container').style.height = (this.innerHeight * 0.9) + 'px';
