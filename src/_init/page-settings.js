@@ -18,9 +18,6 @@ module.exports = {
 
   render: function () {
     let navToggleEl = document.getElementById('nav-toggle-button-container'),
-        closeInfoEl = document.getElementById('x-info-container'),
-        appInfoEl = document.getElementById('info-page'),
-        closeExploreEl = document.getElementById('x-explore-container'),
         imagesEl = document.getElementById('images'),
         wrapperEl = document.getElementById('wrapper'),
         aspectFit = {};
@@ -60,16 +57,6 @@ module.exports = {
 
     // set explore-container height
     document.getElementById('explore-container').style.height = (this.innerHeight * 0.9) + 'px';
-
-    // set position and size of the close_info container divs
-    closeInfoEl.style.width = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
-    closeInfoEl.style.height = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
-    closeInfoEl.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(closeInfoEl.style.height)) + 'px';
-
-    // set position and size of the icon-x container divs
-    closeExploreEl.style.width = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
-    closeExploreEl.style.height = (parseFloat(window.getComputedStyle(appInfoEl).height) * 0.1) + 'px';
-    closeExploreEl.style.top = (this.mainHigh * 0.05) + (parseFloat(window.getComputedStyle(appInfoEl).height) - parseInt(closeInfoEl.style.height)) + 'px';
 
     // add perspective to 3d transforms
     imagesEl.style.webkitPerspective = '500px';

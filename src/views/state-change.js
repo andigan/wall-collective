@@ -53,7 +53,6 @@ module.exports = {
   openInfo() {
     // show
     document.getElementById('info-page').style.display = 'block';
-    document.getElementById('x-info-container').style.display = 'block';
     // hide
     document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
 

@@ -28,9 +28,7 @@ export function buttonsInit() {
     document.getElementById('nav-tog-button'),
     document.getElementById('button-reject-delete'),
     document.getElementById('button-confirm-delete'),
-    document.getElementById('x-info-container'),
-    document.getElementById('button-reject-upload'),
-    document.getElementById('x-explore-container')
+    document.getElementById('button-reject-upload')
   ]);
   exitDoorDrop();
 }
@@ -218,7 +216,6 @@ function onClick(e) {
     // explore to fix
     case 'open-explore':
       document.getElementById('explore-container').style.display = 'block';
-      document.getElementById('x-explore-container').style.display = 'block';
 
       document.getElementById('image-explore').src = document.getElementById(store.getState().selectedImage.id).src;
 

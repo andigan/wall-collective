@@ -854,13 +854,6 @@ position: absolute;
   width: 50%;
 }
 
-#x-info-container {
-  display: none;
-  position: fixed;
-  right: 5vw;
-  z-index: 90001;
-}
-
 .icon-x {
   height: 100%;
   width: 100%;
