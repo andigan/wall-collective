@@ -50,6 +50,15 @@ module.exports = {
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
   },
 
+  openInfo() {
+    // show
+    document.getElementById('info-page').style.display = 'block';
+    document.getElementById('x-info-container').style.display = 'block';
+    // hide
+    document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
+
+  },
+
   openUpload() {
     // show
     document.getElementById('nav-upload-container').classList.add('upload-container-is-open');
@@ -59,7 +68,7 @@ module.exports = {
 
   uploadPreview() {
     // hide
-    document.getElementById('nav-main-container').classList.remove('nav-is-open');
+    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
   },
 
   afterUpload() {
@@ -119,6 +128,9 @@ module.exports = {
   },
 
   closeAll() {
+
+
+
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
     document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
@@ -126,6 +138,7 @@ module.exports = {
     document.getElementById('d-switches-container').classList.remove('d-switches-is-open');
     document.getElementById('nav-tools-container').classList.remove('nav-tools-container-is-open');
     document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
+    document.getElementById('info-page').style.display = 'none';
     document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
     document.getElementById('connect-info').classList.remove('connect-info-is-open');
     document.getElementById('explore-container').style.display = 'none';

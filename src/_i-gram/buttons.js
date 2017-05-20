@@ -3,7 +3,7 @@ import config from '../_config/config';
 import { setInstaAvailable } from '../_i-gram/actions';
 
 export function instaButtonsInit() {
-  createButton('a2', 'insta-logout', 'instagram logout', '/icons/debug_icon.png', 'button-tools');
+  createButton('a2', 'insta-logout', 'instagram logout', '/icons/debug-icon.png', 'button-tools');
   createButton('u3', 'insta-upload', 'Instagram', '/icons/glyph-logo_May2016.png', 'button-tools');
 }
 

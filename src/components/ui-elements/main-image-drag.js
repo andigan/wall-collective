@@ -5,6 +5,7 @@
   import { incrementClickCount } from '../../actions';
   import { setPreviousClickedIDs } from '../../actions';
   import { setDraggerLocations } from '../draggers';
+  import { convertDimToPercent } from '../images';
 
   // use this function to assign draggable to all '.wallPic' elements
   // and then specific elements by passing an id
@@ -34,8 +35,8 @@
           // store the original z index
           this.originalZindex = this.style.zIndex;
 
-          // store image id
           this.imageID = this.getAttribute('id');
+          this.imageEl = document.getElementById(this.imageID);
 
           // assign temporary z-index
           this.style.zIndex = 60000;
@@ -48,10 +49,10 @@
           this.style.webkitFilter = '';
 
           // send emit to remove filter from other clients
-          socket.emit('ce:_removeFilter', this.imageID);
+          window.socket.emit('ce:_removeFilter', this.imageID);
 
           // pass id to ce:_lockID
-          socket.emit('ce:_lockID', this.imageID);
+          window.socket.emit('ce:_lockID', this.imageID);
 
           // begin to prepare socketdata
           this.socketdata = {};
@@ -70,7 +71,7 @@
           this.socketdata.posLeft = (ui.position.left / pageSettings.imagesWide * 100).toFixed(2);
 
           // pass socket data to server
-          socket.emit('ce:_moving', this.socketdata);
+          window.socket.emit('ce:_moving', this.socketdata);
         },
         stop: function () {
           // prepare data to send to ajax post, get all wallPic elements
@@ -86,10 +87,10 @@
           this.removeAttribute('data-filter');
 
           // send emit to restore filter to other clients
-          socket.emit('ce:_restoreFilter', this.imageID);
+          window.socket.emit('ce:_restoreFilter', this.imageID);
 
           // send emit to unfreeze in other clients
-          socket.emit('ce:_unlockID', this.imageID);
+          window.socket.emit('ce:_unlockID', this.imageID);
 
           // prepare data to send to server
           dropPost.domIDs = [];
@@ -101,10 +102,8 @@
 
           // change width and height back to percentage
           // (in safari, draggable width is percentage; in chrome, width is px)
-          if (this.style.width.includes('px')) {
-            document.getElementById(this.imageID).style.width = (parseFloat(this.style.width) / pageSettings.imagesWide * 100).toFixed(2) + '%';
-            document.getElementById(this.imageID).style.height = (parseFloat(this.style.height) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
-          }
+          convertDimToPercent(this.imageEl);
+
           // and left, right
           document.getElementById(this.imageID).style.left = this.socketdata.posLeft + '%';
           document.getElementById(this.imageID).style.top = this.socketdata.posTop + '%';
@@ -130,8 +129,7 @@
         }
       });
 
-
-    $(id).click(function() {
+    $(id).click(function (event) {
       var i,
           imageEls = document.getElementsByClassName('wallPic'),
           clickedElsIdsandZIndexes = [];
@@ -204,6 +202,7 @@
         // set the selected image to an id in the clicked array
         // using the remainder of the clickCount divided by the number of clicked images
         // to cycle through clicks
+        // BUG
         window.store.dispatch(setSelectedImage( clickedElsIdsandZIndexes[(window.store.getState().pageConfig.clickCount - 1) % clickedElsIdsandZIndexes.length][0]));
 
         // add border animation

@@ -207,6 +207,29 @@ module.exports = function (io) {
       socket.broadcast.emit('bc:_showImage', data);
     });
 
+    socket.on('ce:_resetImageAll', function (data) {
+      ImageDocuments.update(
+        { filename : data.filename },
+        { $set: { posleft   : '10%',
+                  postop    : '10%',
+                  zindex    : data.zIndex,
+                  width     : '20%',
+                  height    : '20%',
+                  transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+                  opacity   : '1',
+                  filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+                  scale     : '1',
+                  angle     : '0',
+                  rotateX   : '0deg',
+                  rotateY   : '0deg',
+                  rotateZ   : '0deg' } },
+        { upsert: true },
+        function (err) { if (err) return console.error(err); } );
+
+      socket.broadcast.emit('bc:_resetImage', data);
+    });
+
+
   });
 
 };

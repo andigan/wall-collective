@@ -13,6 +13,8 @@
 
 import config from './_config/config';
 
+
+// redux store
 import configureStore from './_init/configure-store';
 const store = configureStore();
 

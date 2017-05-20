@@ -2,19 +2,24 @@ import config from '../_config/config';
 import stateChange from '../views/state-change';
 import { setDeleteID } from '../actions';
 import { setSelectedImage } from '../actions';
+import { initializeImage } from '../components/images';
+import { highestZ } from '../components/images';
+import { shiftZsAboveXDown } from '../components/images';
+
 
 export function buttonsInit() {
 
-  createButton('n1', 'open-account', 'account', '/icons/person_circle_icon.png', 'button-nav');
-  createButton('n2', 'open-tools', 'tools', '/icons/tools_icon.png', 'button-nav');
-  createButton('n3', 'open-upload', 'upload', '/icons/upload_icon.png', 'button-nav');
-  createButton('n4', 'exit-door', 'remove', '/icons/door_icon.png', 'button-nav');
+  createButton('n1', 'open-account', 'account', '/icons/person_circle-icon.png', 'button-nav');
+  createButton('n2', 'open-tools', 'tools', '/icons/tools-icon.png', 'button-nav');
+  createButton('n3', 'open-upload', 'upload', '/icons/upload-icon.png', 'button-nav');
+  createButton('n4', 'exit-door', 'remove', '/icons/door-icon.png', 'button-nav');
 
-  createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers_icon.png', 'button-tools');
-  createButton('t2', 'choose-color', 'color', '/icons/palette_icon.png', 'button-tools');
-  createButton('t3', 'reset-page', 'reset page', '/icons/reset_icon.png', 'button-tools');
+  createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers-icon.png', 'button-tools');
+  createButton('t2', 'choose-color', 'color', '/icons/palette-icon.png', 'button-tools');
+  createButton('t3', 'reset-page', 'reset page', '/icons/reset-icon.png', 'button-tools');
+  createButton('t4', 'reset-image', 'reset image', '/icons/eraser-icon.png', 'button-tools');
 
-  createButton('a1', 'app-info', 'info', '/icons/info_icon.png', 'button-tools');
+  createButton('a1', 'app-info', 'info', '/icons/info-icon.png', 'button-tools');
   document.getElementById('u2').appendChild(document.getElementById('upload-form-button'));
 
   createjsColor();
@@ -94,8 +99,7 @@ function onClick(e) {
       break;
 
     case 'app-info':
-      document.getElementById('info-page').style.display = 'block';
-      document.getElementById('x-info-container').style.display = 'block';
+      stateChange.openInfo();
       break;
 
     case 'exit-door':
@@ -145,12 +149,30 @@ function onClick(e) {
       };
       break;
 
+    case 'reset-image':
+      let imageID = window.store.getState().selectedImage.id;
+
+      if (imageID !== '') {
+        let imageEl = document.getElementById(imageID),
+            z = highestZ() + 1,
+            socketdata;
+
+        initializeImage(imageEl);
+        imageEl.style.zIndex = z;
+        socketdata = {
+          imageID: imageID,
+          filename: imageEl.title,
+          zIndex: z
+        };
+
+        window.socket.emit('ce:_resetImageAll', socketdata);
+      }
+      break;
+
     case 'choose-color':
       let chooserEl = document.getElementById('color-chooser'),
           chooserPos = config.chooserPos,
           wrapperEl = document.getElementById('wrapper');
-;
-
 
       chooserEl.style.display = 'block';
       // set the initial location for the color
@@ -193,12 +215,6 @@ function onClick(e) {
       stateChange.afterUpload();
       break;
 
-    case 'close-info-page':
-      stateChange.hideID('info-page');
-      stateChange.hideID('x-info-container');
-      break;
-
-
     // explore to fix
     case 'open-explore':
       document.getElementById('explore-container').style.display = 'block';
@@ -219,12 +235,6 @@ function onClick(e) {
       } else {
       };
       break;
-
-    case 'close-explore':
-      stateChange.hideID('explore-container');
-      stateChange.hideID('x-explore-container');
-      break;
-
     default:
       break;
   }

@@ -1,11 +1,11 @@
 module.exports = {
-  debugOn: false, // set debug div
+  debugOn: false,
 
   // set upload placement
-  uploadTop: '2%',
-  uploadLeft: '2%',
-  uploadWidth: '75px',
-  uploadheight: '100px',
+  uploadTop: '10%',
+  uploadLeft: '10%',
+  uploadWidth: '20%',
+  uploadHeight: '20%',
 
   // set maximum limit for draggers
   blurLevel: 7,

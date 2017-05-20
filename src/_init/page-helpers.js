@@ -1,15 +1,6 @@
-import pageSettings from './page-settings';
 import stateChange from '../views/state-change';
 
-
 export function pageInit() {
-
-  // temporary fix: change auto height to percentage
-  Array.from(document.getElementsByClassName('wallPic')).forEach(function (element) {
-    if (element.style.height === 'auto') {
-      element.style.height = ((parseInt(window.getComputedStyle(element).height) / pageSettings.imagesHigh * 100).toFixed(2)) + '%';
-    };
-  });
 
   // // prevent default behavior to prevent iphone dragging and bouncing
   // // http://www.quirksmode.org/mobile/default.html

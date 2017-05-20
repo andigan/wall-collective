@@ -3,7 +3,10 @@ import config from '../_config/config';
 import { getCookie } from '../helpers';
 import { setCookie } from '../helpers';
 
+import { assignImageDrag } from '../components/ui-elements/main-image-drag';
 import { setSessionID } from '../actions';
+import { initializeImage } from '../components/images';
+
 
 export function IOInit() {
   // set socket location
@@ -48,7 +51,7 @@ function viewSockets(socket) {
   // display the number of connected clients
   socket.on('bc:_changeConnectedClients', function (clients) {
     document.getElementById('connect-info').innerHTML = clients.reduce(function (str, client) {
-      return str + `<img id='${client}' src='icons/person_icon.png' class='icon-person' />`;
+      return str + `<img id='${client}' src='icons/person-icon.png' class='icon-person' />`;
     }, '');
   });
 }
@@ -114,17 +117,21 @@ function imageSockets(socket) {
 
     imageEl.setAttribute('id', data.dom_id);
     imageEl.src = data.location + data.imageFilename;
-    imageEl.classList.add('wallPic');
     imageEl.setAttribute('title', data.imageFilename);
+    imageEl.style.zIndex = data.z_index;
+    imageEl.classList.add('wallPic');
+
+//    initializeImage(imageEl);
+
     imageEl.setAttribute('data-scale', '1');
     imageEl.setAttribute('data-angle', '0');
     imageEl.setAttribute('data-rotateX', '0');
     imageEl.setAttribute('data-rotateY', '0');
     imageEl.setAttribute('data-rotateZ', '0');
     imageEl.style.width = config.uploadWidth;
-    imageEl.style.zIndex = data.z_index;
     imageEl.style.top = config.uploadTop;
     imageEl.style.left = config.uploadLeft;
+    imageEl.style.left = config.uploadHeight;
     imageEl.style.opacity = 1;
     imageEl.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
     imageEl.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
@@ -170,6 +177,11 @@ function imageSockets(socket) {
   // enable dragging; other client has stopped moving image
   socket.on('bc:_unlockID', function (data) {
     $('#' + data).draggable ( 'enable' );
+  });
+
+  socket.on('bc:_resetImage', function (data) {
+    document.getElementById(data.imageID).style.zIndex = data.zIndex;
+    initializeImage(document.getElementById(data.imageID));
   });
 
   // if this client is the uploader, show upload statistics from busboy

@@ -1,6 +1,7 @@
 import stateChange from '../views/state-change';
 import config from '../_config/config';
 import { assignImageDrag } from './ui-elements/main-image-drag';
+import { initializeImage } from './images';
 
 export function uploadInit() {
 
@@ -51,25 +52,14 @@ export function uploadInit() {
               imageEl = document.createElement('img'),
               response = JSON.parse(request.response);
 
-//                  create new image
+//        create new image
           imageEl.setAttribute('id', response.dom_id);
           imageEl.setAttribute('title', response.imageFilename);
-          imageEl.classList.add('wallPic');
           imageEl.src = response.location + response.imageFilename;
-          imageEl.setAttribute('data-scale', '1');
-          imageEl.setAttribute('data-angle', '0');
-          imageEl.setAttribute('data-rotateX', '0');
-          imageEl.setAttribute('data-rotateY', '0');
-          imageEl.setAttribute('data-rotateZ', '0');
-          imageEl.setAttribute('data-persective', '0');
-          imageEl.style.width = config.uploadWidth;
-          imageEl.style.height = config.uploadheight;
+          imageEl.classList.add('wallPic');
           imageEl.style.zIndex = response.z_index;
-          imageEl.style.top = config.uploadTop;
-          imageEl.style.left = config.uploadLeft;
-          imageEl.style.opacity = 1;
-          imageEl.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
-          imageEl.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
+
+          initializeImage(imageEl);
 
           imagesEl.appendChild(imageEl);
 
