@@ -36,7 +36,6 @@
           this.originalZindex = this.style.zIndex;
 
           this.imageID = this.getAttribute('id');
-          this.imageEl = document.getElementById(this.imageID);
 
           // assign temporary z-index
           this.style.zIndex = 60000;
@@ -102,7 +101,7 @@
 
           // change width and height back to percentage
           // (in safari, draggable width is percentage; in chrome, width is px)
-          convertDimToPercent(this.imageEl);
+          convertDimToPercent(document.getElementById(this.imageID));
 
           // and left, right
           document.getElementById(this.imageID).style.left = this.socketdata.posLeft + '%';
