@@ -3,31 +3,21 @@ import { clickme } from '../helpers';
 module.exports = {
 
   init: function (store) {
+    let options = {
+      consoleStore: false,
+      consoleZIndexes: false,
+      consoleClickTarget: false,
+      consoleAllElsUnderClick: false // Chrome only
+    };
+
+    //    clickme('nav-tog-button', 50);
+    //    clickme('dragger_switches_button', 1000);
+    //    clickme('nav-upload-container_button', 1000);
+        clickme('debug-button', 1000);
+
     this.createDebugButton();
     this.createDebugDiv();
-    this.setListeners();
-
-//    clickme('nav-tog-button', 50);
-//    clickme('t2', 50);
-//    clickme('dragger_switches_button', 1000);
-//    clickme('explore_button', 0);
-//    clickme('nav-upload-container_button', 1000);
-//    clickme('debug-button', 1000);
-
-    // console log store
-    document.addEventListener('click', function () {
-      console.log(store.getState());
-
-      // uncomment to log whichever element is clicked on
-      // console.log(event.target.getAttribute('id'));
-
-      // uncomment to log all the elements below the click
-      // console.log(document.querySelectorAll( ":hover" ));
-
-      // uncomment to log whichever elements are clicked on. ONLY WORKS WITH CHROME
-      // console.log(document.elementsFromPoint(event.pageX, event.pageY));
-    });
-
+    this.setListeners(options);
   },
 
   createDebugButton: function () {
@@ -44,7 +34,7 @@ module.exports = {
     debugText.setAttribute('id', 'debug-text');
 
     debugIcon.classList.add('button-icon');
-    debugIcon.src = '/icons/debug_icon.png';
+    debugIcon.src = '/icons/debug-icon.png';
     debugButton.appendChild(debugText);
     debugButton.appendChild(debugIcon);
 
@@ -106,8 +96,28 @@ module.exports = {
     });
   },
 
-  setListeners: function () {
+  setListeners: function (options) {
     var that = this;
+
+    document.addEventListener('click', function () {
+      if (options.consoleStore) {
+        console.log(store.getState());
+      };
+
+      if (options.consoleZIndexes) {
+        console.log(Array.from(document.getElementsByClassName('wallPic')).map(function (el) {
+          return el.id + ': z:' + el.style.zIndex;
+        }));
+      }
+
+      if (options.consoleClickTarget) {
+        console.log(event.target.getAttribute('id'));
+      };
+
+      if (options.consoleAllElsUnderClick) {
+        console.log(document.elementsFromPoint(event.pageX, event.pageY));
+      }
+    });
 
     // resize window
     window.addEventListener('resize', function () {
