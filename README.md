@@ -29,7 +29,7 @@ Uses:
   - grayscale/inversion
   - 3D rotation
   - hue-rotation
-- Number of currently connected clients indicated by <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person_icon.png" width="8" height="17" /> icons.
+- Number of currently connected clients indicated by <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person-icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person-icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person-icon.png" width="8" height="17" /> icons.
 - Reset page to remove image transformations.
 - Optional: On a touchscreen, use pinch gesture to change an image size and angle.
 
