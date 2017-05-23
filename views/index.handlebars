@@ -28,7 +28,7 @@
     <div id="images">
       {{#each databaseResult }}
         <img  title={{filename}}
-              src='{{location}}{{filename}}'
+              src='{{../location}}{{filename}}'
               id={{dom_id}}
               class='wallPic'
               style='z-index: {{zindex}}; top: {{postop}}; left: {{posleft}}; width: {{width}}; height: {{height}}; transform: {{transform}}; opacity: {{opacity}}; -webkit-filter: {{filter}}; position: absolute;'
@@ -37,7 +37,8 @@
               data-rotateX='{{rotateX}}'
               data-rotateY='{{rotateY}}'
               data-rotateZ='{{rotateZ}}'
-              data-link='{{insta_link}}'>
+              data-link='{{insta_link}}'
+              data-owner='{{owner}}'>
       {{/each}}
 
     </div>

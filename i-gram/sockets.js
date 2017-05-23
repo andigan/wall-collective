@@ -101,6 +101,7 @@ module.exports = function (socket, sessionID, download, adapters) {
           {           sort_id    : fs.statSync(config.staticImageDir + '/' + instaDropData.iFilename).mtime.toISOString().concat( instaDropData.iFilename ) },
           { $set: {   dom_id     : instaDBData.dom_id,
                       filename   : instaDropData.iFilename,
+                      created    : new Date,
                       location   : config.imageDir,
                       posleft    : instaDropData.posLeft,
                       postop     : instaDropData.posTop,

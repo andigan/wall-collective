@@ -8,7 +8,17 @@ var config = require('../config/config'),
     mongoose = require('mongoose'),
     ImageDocuments = mongoose.model('images'),
     connectedClients = [], // an array of current sessionIDs that are connected
-    instaSockets;
+    instaSockets,
+    AWS = require('aws-sdk'),
+    secrets = require('../config/secrets.js'),
+    accessKeyId =  process.env.AWS_ACCESS_KEY || secrets.s3accessKeyId,
+    secretAccessKey = process.env.AWS_SECRET_KEY || secrets.s3secretAccessKey,
+    s3 = new AWS.S3();
+
+AWS.config.update({
+  accessKeyId: accessKeyId,
+  secretAccessKey: secretAccessKey
+});
 
 module.exports = function (io) {
 
@@ -153,22 +163,6 @@ module.exports = function (io) {
       socket.broadcast.emit('bc:_resetPage');
     });
 
-    socket.on('ce:_share_upload', function (data) {
-      var dbImageData = {};
-
-      // find matching data.uploadedFilename, return 'result' object
-      ImageDocuments.findOne({filename: data.uploadedFilename}).exec(function (err, result) {
-        if (err) return console.error(err);
-
-        dbImageData.dom_id = result.dom_id;
-        dbImageData.imageFilename = result.filename;
-        dbImageData.location = result.location;
-        dbImageData.z_index = result.zindex;
-
-        socket.broadcast.emit('bc:_addUpload', dbImageData);
-      });
-    });
-
     socket.on('ce:_deleteImage', function (data) {
       socket.broadcast.emit('bc:_deleteImage', data);
       console.log('----------- delete image socket -------------');
@@ -177,11 +171,28 @@ module.exports = function (io) {
       // remove from database
       ImageDocuments.find({ filename: data.filenameToDelete }).remove().exec();
 
-      // remove from file system
-      fs.unlink(path.join(config.mainDir, config.staticImageDir, data.filenameToDelete), function (err) {
-        if (err) throw err;
-        console.log('successfully deleted file.');
-      });
+      if (config.uploadTo.local) {
+
+        // remove from file system
+        fs.unlink(path.join(config.mainDir, config.staticImageDir, data.filenameToDelete), function (err) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('successfully deleted file.');
+          };
+        });
+      };
+
+      if (config.uploadTo.s3) {
+        s3.deleteObject({  Bucket: config.bucket, Key: data.filenameToDelete }, function (err, data) {
+          if (err) {
+            console.log(err, err.stack);
+          } else {
+            console.log(data);
+            console.log('successfully deleted from s3');
+          };
+        });
+      }
     });
 
     socket.on('ce:_removeFilter', function (data) {

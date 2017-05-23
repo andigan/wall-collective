@@ -6,6 +6,7 @@ var mongoose = require('mongoose'),
       sort_id: String,
       dom_id: Number,
       filename: String,
+      owner: String,
       location: String,
       posleft: String,
       postop: String,
@@ -20,7 +21,8 @@ var mongoose = require('mongoose'),
       rotateX: String,
       rotateY: String,
       rotateZ: String,
-      insta_link: String
+      insta_link: String,
+      created: Date
     });
 
 module.exports = mongoose.model('images', ImageSchema);

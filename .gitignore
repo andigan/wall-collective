@@ -1,7 +1,9 @@
 /_notes
 /i-gram/config/secrets.js
+/config/secrets.js
 /node_modules
 /logs
 /public/images
 /public/js/cdn_locals
 /public/js/bundle.js
+/public/imagesbk

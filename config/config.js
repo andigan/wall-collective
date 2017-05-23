@@ -11,6 +11,25 @@ module.exports = {
   staticImageDir: 'public/images',
   logDir: 'logs',
 
+  // set up s3
+  bucket: 'wall-collective2',
+
+  // upload options
+  uploadTo: {
+    local: true,
+    s3: true,
+    cloudinary: false
+  },
+
+  // loadFrom: 'local',
+  // loadFromLoc: '/images/',
+
+ loadFrom: 's3',
+ loadFromLoc: 'https://s3.amazonaws.com/wall-collective2/',
+
+//  loadFrom: 'cloudinary',
+// loadFromLoc: 'temp'
+
   // temporary holding spot for database
   backgroundColor: '#000000'
 

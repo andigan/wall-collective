@@ -110,37 +110,6 @@ function imageSockets(socket) {
     window.location.reload(true);
   });
 
-  // add uploaded image
-  socket.on('bc:_addUpload', function (data) {
-    let imagesEl = document.getElementById('images'),
-        imageEl = document.createElement('img');
-
-    imageEl.setAttribute('id', data.dom_id);
-    imageEl.src = data.location + data.imageFilename;
-    imageEl.setAttribute('title', data.imageFilename);
-    imageEl.style.zIndex = data.z_index;
-    imageEl.classList.add('wallPic');
-
-//    initializeImage(imageEl);
-
-    imageEl.setAttribute('data-scale', '1');
-    imageEl.setAttribute('data-angle', '0');
-    imageEl.setAttribute('data-rotateX', '0');
-    imageEl.setAttribute('data-rotateY', '0');
-    imageEl.setAttribute('data-rotateZ', '0');
-    imageEl.style.width = config.uploadWidth;
-    imageEl.style.top = config.uploadTop;
-    imageEl.style.left = config.uploadLeft;
-    imageEl.style.left = config.uploadHeight;
-    imageEl.style.opacity = 1;
-    imageEl.style.WebkitFilter = 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)';
-    imageEl.style.transform = 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)';
-
-    imagesEl.appendChild(imageEl);
-
-    assignImageDrag(data.dom_id);
-  });
-
   // remove deleted image
   socket.on('bc:_deleteImage', function (data) {
     document.getElementById(data.deleteID).remove();
@@ -184,12 +153,35 @@ function imageSockets(socket) {
     initializeImage(document.getElementById(data.imageID));
   });
 
+  socket.on('se:_addUploadToPage', function (newImage) {
+    let imagesEl = document.getElementById('images'),
+        imageEl = document.createElement('img');
+
+    imageEl.setAttribute('id', newImage.domId);
+    imageEl.src = newImage.src;
+    imageEl.setAttribute('title', newImage.filename);
+    imageEl.setAttribute('data-owner', newImage.owner);
+    imageEl.style.zIndex = newImage.zIndex;
+    imageEl.classList.add('wallPic');
+
+    initializeImage(imageEl);
+
+    imageEl.style.top = newImage.top;
+    imageEl.style.left = newImage.left;
+    imageEl.style.height = newImage.height;
+    imageEl.style.width = newImage.width;
+
+
+    imagesEl.appendChild(imageEl);
+
+    assignImageDrag(newImage.domId);
+  });
+
   // if this client is the uploader, show upload statistics from busboy
   socket.on('bc:_uploadChunkSent', function (uploaddata) {
-
-    if (uploaddata.sessionID === window.store.getState().pageConfig.sessionID) {
-      config.uploadtotal += uploaddata.chunkSize;
-      document.getElementById('upload-confirm-info').textContent = 'Uploaded ' + config.uploadtotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
+    if (uploaddata.sessionID === window.store.getState().pageConfig.sessionID && (!!document.getElementById('fileselect').files[0])) {
+      config.uploadTotal += uploaddata.chunkSize;
+      document.getElementById('upload-confirm-info').textContent = 'Uploaded ' + config.uploadTotal  + ' bytes of ' + document.getElementById('fileselect').files[0].size + ' bytes.';
     };
   });
 }

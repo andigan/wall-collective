@@ -1,4 +1,6 @@
+import config from '../_config/config.js';
 import stateChange from '../views/state-change';
+
 
 export function pageInit() {
 
@@ -7,6 +9,8 @@ export function pageInit() {
   // document.ontouchmove = function (event) {
   //   event.preventDefault();
   // };
+
+  config.uploadTotal = 0;
 
   // process any click on the wrapper
   document.getElementById('wrapper').onclick = function (event) {
