@@ -75,7 +75,6 @@
         stop: function () {
           // prepare data to send to ajax post, get all wallPic elements
           let dropPost = {},
-              i,
               imageEls = document.body.getElementsByClassName('wallPic');
 
           // return to the original z-index
@@ -92,12 +91,9 @@
           window.socket.emit('ce:_unlockID', this.imageID);
 
           // prepare data to send to server
-          dropPost.domIDs = [];
-          dropPost.filenames = [];
-          dropPost.zIndexes = [];
-          dropPost.dFilename = this.getAttribute('title');
-          dropPost.posLeft = this.socketdata.posLeft + '%';
-          dropPost.posTop = this.socketdata.posTop + '%';
+          dropPost.filename = this.getAttribute('title');
+          dropPost.left = this.socketdata.posLeft + '%';
+          dropPost.top = this.socketdata.posTop + '%';
 
           // change width and height back to percentage
           // (in safari, draggable width is percentage; in chrome, width is px)
@@ -108,11 +104,9 @@
           document.getElementById(this.imageID).style.top = this.socketdata.posTop + '%';
 
           // populate dropPost
-          for (i = 0; i < imageEls.length; i++) {
-            dropPost.domIDs[i] = imageEls[i].getAttribute('id');
-            dropPost.filenames[i] = imageEls[i].getAttribute('title');
-            dropPost.zIndexes[i] = imageEls[i].style.zIndex;
-          };
+          dropPost.imageEls = Array.from(imageEls).map(function (imageEl) {
+            return { domId: imageEl.getAttribute('id'), zIndex: imageEl.style.zIndex };
+          });
 
           // ajax post from jquery.  FUTURE WORK: replace with a socket
           $.ajax({
