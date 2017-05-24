@@ -4,9 +4,12 @@ var config = require('../config/config'),
     igramAdapter = require('../i-gram/adapters'),
     download = require('../i-gram/helpers/download-helper'),
     IgramSessions = mongoose.model('igram_sessions'),
-    ImageDocuments = mongoose.model('images');
+    ImageDocuments = mongoose.model('images'),
+    igSecrets = require('../i-gram/config/secrets.js');
 
 module.exports = function (socket, sessionID) {
+
+  socket.emit('se:_setIgramAppID', igSecrets.igramAppID);
 
   // igram-#20: On initial page load, check to see if the client has an access token
   // from a previous authorization.

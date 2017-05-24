@@ -4,6 +4,10 @@ var config = require('../config/config'),
 
 module.exports = {
 
+  handleSaveStream(filename) {
+    return fs.createWriteStream(path.join(config.mainDir, config.staticImageDir, filename));
+  },
+
   removeFile(filename) {
     let file = path.join(config.mainDir, config.staticImageDir, filename);
 

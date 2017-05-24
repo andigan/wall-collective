@@ -15,19 +15,31 @@ module.exports = {
   // storage options
   storageOpt: {
     s3:         { save: true,  del: true,  loc: 'https://s3.amazonaws.com/wall-collective/' },
-    local:      { save: false, del: false, loc: '/images/'},
+    local:      { save: true, del: true, loc: '/images/'},
     cloudinary: { save: false, del: false,  loc: 'temp' },
     log:        { save: true, loc: '/logs/' }
   },
 
   // choose url to save to DB
   UrlToDB: 's3',
+  // UrlToDB: 'local',
+  // UrlToDB: 'cloudinary',
 
   // reload option:
   reloadFrom: 'db',
   // reloadFrom: 's3',
   // reloadFrom: 'local',
   // reloadFrom: 'cloudinary',
+
+  sessionStr: {
+    length: 10,
+    charset: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  },
+
+  imageStr: {
+    length: 6,
+    charset: 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  },
 
   // temporary holding spot for database
   backgroundColor: '#000000'

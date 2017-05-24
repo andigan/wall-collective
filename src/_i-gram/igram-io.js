@@ -1,4 +1,4 @@
-import config from '../_config/config';
+import igConfig from './config';
 import stateChange from '../views/state-change';
 import pageSettings from '../_init/page-settings';
 
@@ -8,10 +8,9 @@ import { setHasIgramToken } from './actions';
 
 export function igramIOInit(socket) {
 
-  // initial set up for all visits.
-  socket.on('connect:_setClientVars', function (clientVars) {
-    // igram-#1: Store igramAppID from server
-    config.igramAppID = clientVars.igramAppID;
+  // igram-#1: Store igramAppID from server
+  socket.on('se:_setIgramAppID', function (appId) {
+    igConfig.appId = appId;
   });
 
   // igram-#21: Sent from the server on initial socket when an access token

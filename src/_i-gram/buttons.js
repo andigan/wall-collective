@@ -1,4 +1,4 @@
-import config from '../_config/config';
+import igConfig from './config';
 
 import { setHasIgramToken } from '../_i-gram/actions';
 
@@ -40,7 +40,7 @@ function onClick(e) {
         // Successful authentication will redirect the browser back to the server's
         // app.get('/') with 'myclient_id' and 'code' query parameters
         // which will be caught by the server.
-        window.location = 'https://api.instagram.com/oauth/authorize/?client_id=' + config.igramAppID + '&redirect_uri=' + redirectURL + '&response_type=code'; // (-#3)
+        window.location = 'https://api.instagram.com/oauth/authorize/?client_id=' + igConfig.appId + '&redirect_uri=' + redirectURL + '&response_type=code'; // (-#3)
       } else {
         // igram-#22: If an access token was granted, open Igram divs and fetch data (-#7)
         window.socket.emit('ce:_fetchIgramData');

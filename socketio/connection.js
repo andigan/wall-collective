@@ -1,6 +1,5 @@
 var config = require('../config/config'),
-    igsecrets = require('../i-gram/config/secrets.js'),
-    shortID = require('shortid'),
+    randomstring = require('randomstring'),
     ImageCon = require('../db/controllers/image-controller'),
     connectedClients = [], // an array of current sessionIDs that are connected
     localAdapter = require('../adapters/local'),
@@ -20,9 +19,6 @@ module.exports = function (io) {
         require('../i-gram/igram-io.js')(socket, sessionID);
       };
 
-      // add the instagram_app_id
-      clientVars.igramAppID = igsecrets.igramAppID;
-
       // add backgroundColor
       clientVars.backgroundColor = config.backgroundColor;
 
@@ -33,7 +29,7 @@ module.exports = function (io) {
 
       // else when client is new, generate a new sessionID
       } else {
-        sessionID = shortID.generate();
+        sessionID = randomstring.generate(config.sessionStr);
         console.log('>>>>>>' + sessionID + ' connected for first time.');
         clientVars.sessionID = sessionID;
         socket.emit('connect:_setClientVars', clientVars);

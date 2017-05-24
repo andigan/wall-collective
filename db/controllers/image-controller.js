@@ -208,10 +208,10 @@ module.exports = {
             newImage.src = config.storageOpt.s3.loc + newFilename;
             break;
           case 'local':
-            newImage.src = config.storeageOpt.local.loc + newFilename;
+            newImage.src = config.storageOpt.local.loc + newFilename;
             break;
           case 'cloudinary':
-            newImage.src = config.storeageOpt.cloudinary.loc + newFilename;
+            newImage.src = config.storageOpt.cloudinary.loc + newFilename;
             break;
           default:
             break;

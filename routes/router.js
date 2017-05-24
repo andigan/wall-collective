@@ -4,15 +4,13 @@ var config = require('../config/config.js'),
 
     bodyParser = require('body-parser'), // parse response into objects (req.body.filename)
 
-    fs = require('fs'),
     path = require('path'),
     Busboy = require('busboy'), // streaming parser for HTML multipart/form data
     uniqueId = require('uniqid'), // id generator
 
     ImageCon = require('../db/controllers/image-controller'),
-
-    s3UploadStream = require('s3-stream-upload'),
-    s3 = require('../mods/aws')();
+    s3Adapter = require('../adapters/s3'),
+    localAdapter = require('../adapters/local');
 
 // home page
 router.get('/', function (req, res) {
@@ -34,6 +32,7 @@ router.get('/', function (req, res) {
     });
   }
 
+  // fetch images from DB and render page
   ImageCon.fetchPageLoad(renderPage);
 
 });
@@ -105,7 +104,8 @@ router.post('/addfile', function (req, res) {
       // save image
       if (config.storageOpt.local.save) {
         // write the file to the disk as a stream
-        file.pipe(fs.createWriteStream(path.join(config.mainDir, config.staticImageDir, newFilename)));
+
+        file.pipe(localAdapter.handleSaveStream(newFilename));
 
         if (config.UrlToDB === 'local') {
           file.on('end', function () {
@@ -121,17 +121,17 @@ router.post('/addfile', function (req, res) {
         };
 
         // write the file to Amazon s3 as a stream
-        file.pipe(s3UploadStream(s3, { Bucket: config.bucket, Key: newFilename, ACL: 'public-read' }))
+        file.pipe(s3Adapter.uploadStreamHandler(newFilename))
+            .on('error', function (err) {
+              console.error(err);
+            })
 
-        .on('error', function (err) {
-          console.error(err);
-        })
-
-        .on('finish', function () {
-          if (config.UrlToDB === 's3' || config.UrlToDB === 'db') {
-            ImageCon.addUploadToDB(newFilename, fieldname, res.io);
-          };
-        });
+            .on('finish', function () {
+              console.log('on.finish');
+              if (config.UrlToDB === 's3' || config.UrlToDB === 'db') {
+                ImageCon.addUploadToDB(newFilename, fieldname, res.io);
+              };
+            });
       }
 
       if (config.storageOpt.cloudinary.save) {
