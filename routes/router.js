@@ -7,7 +7,6 @@ var express = require('express'),
     Busboy = require('busboy'), // streaming parser for HTML multipart/form data
     helpers = require('../helpers'),
     path = require('path'),
-    shortID = require('shortid'),
     uniqueId = require('uniqid'),
     AWS = require('aws-sdk'),
     secrets = require('../config/secrets.js'),
@@ -16,6 +15,7 @@ var express = require('express'),
     s3UploadStream = require('s3-stream-upload'),
     s3;
 
+
 AWS.config.update({
   accessKeyId: accessKeyId,
   secretAccessKey: secretAccessKey
@@ -23,8 +23,16 @@ AWS.config.update({
 
 s3 = new AWS.S3();
 
+
 // home page
 router.get('/', function (req, res) {
+
+  // future work; io cookie
+  if (req.cookies) {
+    console.log('\n cookies: ');
+    console.log(req.cookies);
+    console.log('\n');
+  };
 
   var ImageDocuments = mongoose.model('images');
 
@@ -35,12 +43,11 @@ router.get('/', function (req, res) {
   ImageDocuments.find({}).sort({sort_id: 'asc'}).exec(function (err, databaseResult) {
     if (err) return console.error(err);
 
-    console.log('Image data retrieved from database to pass to index.html...\n');
+    console.log('\nImage data retrieved from database to pass to index.handlebars...\n');
 
     res.render('index.handlebars', {
       title               : 'wall-collective',
       databaseResult      : databaseResult,
-      location            : config.loadFromLoc,
       useCDN              : config.useCDN,
       useIGram            : config.useIGram
     });
@@ -89,7 +96,7 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
 
 
 
-function resetToDirectory(res) {
+function resetToDirectory(closeResponse) {
 
   // fs method to read a directory's filenames
   fs.readdir(config.staticImageDir, function (err, dirFilenames) {
@@ -100,7 +107,7 @@ function resetToDirectory(res) {
     sorted = dirFilenames.filter(function (filename) {
       return helpers.imageCheck(filename);
     }).map(function (filename) {
-      // create sorted, a two-dimensional array used for sorting documents by date
+      // create sorted, a two-dimensional array used for sorting images by date
       // sorted[0] = [ modification date, filename ]
       // e.g.
       //   [[2016-03-10T14:01:17.000Z, E1RsRVVRg.jpg],
@@ -112,13 +119,13 @@ function resetToDirectory(res) {
       return [fs.statSync( config.staticImageDir + '/' + filename ).mtime.toISOString(), filename ];
     }).sort(helpers.twoDSort);
 
-    resetDatabase(sorted, res);
+    resetDatabase(sorted, closeResponse);
   });
 }
 
-function resetTos3(res) {
+function resetTos3(closeResponse) {
 
-  // limit of 1000 keys
+  // Note: limit of 1000 keys
   s3.listObjectsV2( { Bucket: config.bucket }, function (err, data) {
     let imagesDate;
 
@@ -131,20 +138,80 @@ function resetTos3(res) {
 
       imagesDate.sort(helpers.twoDSort);
 
-      resetDatabase(imagesDate, res);
+      resetDatabase(imagesDate, closeResponse);
     };
   });
 }
 
+function resetToDB(closeResponse) {
+  let ImageDocuments = mongoose.model('images');
 
-function resetDatabase(sortedDateFilenames, res) {
-  var ImageDocuments = mongoose.model('images');
+
+  ImageDocuments.find({}).sort({sort_id: 'asc'}).exec(function (err, databaseResult) {
+    if (err) return console.error(err);
+
+    databaseResult.forEach(function (result, i) {
+
+      ImageDocuments.update(
+        {           sort_id    : result.sort_id },
+        { $set: {   dom_id     : i,
+                    zindex     : i,
+                    posleft   : '10%',
+                    postop    : '10%',
+                    width     : '20%',
+                    height    : '20%',
+                    transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+                    opacity   : '1',
+                    filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+                    scale     : '1',
+                    angle     : '0',
+                    rotateX   : '0deg',
+                    rotateY   : '0deg',
+                    rotateZ   : '0deg' }
+        },
+        { upsert: true },
+        // update completion callback
+        function (err) {
+          if (err) {
+            return console.error(err);
+          } else {
+            // console.log(result.filename + ' added to database.');
+            if (databaseResult.length === (i + 1)) {
+              console.log('***** reloading page *****');
+              closeResponse();
+            };
+          }
+        });
+    });
+  });
+}
+
+
+
+function resetDatabase(sortedDateFilenames, closeResponse) {
+  let ImageDocuments = mongoose.model('images'),
+      src;
+
+  // assign src based on UrlToDB setting
+  switch (config.UrlToDB) {
+    case 's3':
+      src = config.storageOpt.s3.loc;
+      break;
+    case 'local':
+      src = config.storageOpt.local.loc;
+      break;
+    case 'cloudinary':
+      src = config.storageOpt.cloudinary.loc;
+      break;
+    default:
+      break;
+  }
 
   // clear out the database
   ImageDocuments.remove({}, function (err) {
     if (err) return console.error(err);
 
-    console.log('\nCollection removed.\n\nFiles added to database: \n');
+    console.log('\nCollection removed.\nFiles added to database: ');
 
     sortedDateFilenames.forEach(function (dateFilename, i) {
       console.log(dateFilename[1]);
@@ -154,7 +221,7 @@ function resetDatabase(sortedDateFilenames, res) {
         { sort_id   : dateFilename[0] + dateFilename[1],
           dom_id    : i,
           filename  : dateFilename[1],
-          location  : config.imageDir,
+          url       : src + dateFilename[1],
           created   : dateFilename[0],
           owner     : dateFilename[1].split('-')[0],
           posleft   : '10%',
@@ -176,13 +243,8 @@ function resetDatabase(sortedDateFilenames, res) {
     });
 
     console.log('\nCollection replaced.\n\n');
-    res.sendStatus(200);
+    closeResponse();
   }); // end of ImageDocuments.remove callback
-
-
-
-
-
 }
 
 
@@ -191,18 +253,33 @@ function resetDatabase(sortedDateFilenames, res) {
 // this route will clear the database and repopulate the database with chosen contents
 router.get('/resetpage', function (req, res) {
 
-  if (config.loadFrom === 'local') {
-    resetToDirectory(res);
+  if (req.cookies) {
+    console.log('******' + req.cookies.sessionID + ' reset the page.');
   };
 
-  if (config.loadFrom === 's3') {
-    resetTos3(res);
-  };
+  function closeResponse() {
+    res.sendStatus(200);
+  }
+
+  switch (config.reloadFrom) {
+    case 'db':
+      resetToDB(closeResponse);
+      break;
+    case 'local':
+      resetToDirectory(closeResponse);
+      break;
+    case 's3':
+      resetTos3(closeResponse);
+      break;
+    default:
+      break;
+  }
 
 });
 
 function uploadUpdate(newFilename, sessionID, io) {
-  var ImageDocuments = mongoose.model('images');
+  let created = new Date().toISOString(),
+      ImageDocuments = mongoose.model('images');
 
   // find the highest ID
   ImageDocuments.find().sort({'dom_id':-1}).limit(1).select('dom_id').exec(function (err, highestIdRecord) {
@@ -216,7 +293,21 @@ function uploadUpdate(newFilename, sessionID, io) {
 
       newImage.filename = newFilename;
       newImage.owner = sessionID;
-      newImage.src = config.loadFromLoc + newFilename;
+
+      // assign src based on UrlToDB setting
+      switch (config.UrlToDB) {
+        case 's3':
+          newImage.src = config.storageOpt.s3.loc + newFilename;
+          break;
+        case 'local':
+          newImage.src = config.storeageOpt.local.loc + newFilename;
+          break;
+        case 'cloudinary':
+          newImage.src = config.storeageOpt.cloudinary.loc + newFilename;
+          break;
+        default:
+          break;
+      }
 
       // if database is empty...
       if (highestIdRecord.length < 1) {
@@ -234,10 +325,12 @@ function uploadUpdate(newFilename, sessionID, io) {
 
       ImageDocuments.update(
         {           filename   : newFilename },
-        { $set: {   dom_id     : newImage.domId,
+        { $set: {   sort_id    : created + newFilename,
+                    dom_id     : newImage.domId,
                     zindex     : newImage.zIndex,
                     owner      : sessionID,
-                    created    : new Date,
+                    created    : created,
+                    url        : newImage.src,
                     posleft    : newImage.left,
                     postop     : newImage.top,
                     width      : newImage.width,
@@ -269,8 +362,11 @@ function uploadUpdate(newFilename, sessionID, io) {
 
 // --Add file post
 router.post('/addfile', function (req, res) {
-  var busboy = new Busboy({ headers: req.headers }),
-      filesize = 0;
+  var busboy = new Busboy({ headers: req.headers });
+
+  function responseEnd() {
+    res.end();
+  }
 
   // pipe the request into busboy parser
   req.pipe(busboy);
@@ -278,7 +374,7 @@ router.post('/addfile', function (req, res) {
 // get data from form fields (fires after file)
   busboy.on('field', function (fieldname, val) {
     if (fieldname === 'filesize') {
-      filesize = val;
+      console.log(val);
     };
   });
 
@@ -291,16 +387,16 @@ router.post('/addfile', function (req, res) {
     // validate file mimetype
     if ( (mimetype != 'image/png') && (mimetype != 'image/jpeg') ) {
       file.resume();
-      res.set( { Connection: 'close', Location: '/' });
+      res.set({ Connection: 'close', Location: '/' });
       res.send({ error: 'not a valid mimetype' });
     } else {
 
       // save image
-      if (config.uploadTo.local) {
+      if (config.storageOpt.local.save) {
         // write the file to the disk as a stream
         file.pipe(fs.createWriteStream(path.join(config.mainDir, config.staticImageDir, newFilename)));
 
-        if (config.loadFrom === 'local') {
+        if (config.UrlToDB === 'local') {
           file.on('end', function () {
             uploadUpdate(newFilename, fieldname, res.io);
             res.end();
@@ -308,9 +404,8 @@ router.post('/addfile', function (req, res) {
         };
       };
 
-      if (config.uploadTo.s3) {
-
-        if (config.loadFrom === 's3') {
+      if (config.storageOpt.s3.save) {
+        if (config.UrlToDB === 's3' || config.UrlToDB === 'db') {
           res.end();
         };
 
@@ -322,13 +417,13 @@ router.post('/addfile', function (req, res) {
         })
 
         .on('finish', function () {
-          if (config.loadFrom === 's3') {
+          if (config.UrlToDB === 's3' || config.UrlToDB === 'db') {
             uploadUpdate(newFilename, fieldname, res.io);
           };
         });
       }
 
-      if (config.uploadTo.cloudinary) {
+      if (config.storageOpt.cloudinary.save) {
         console.log('cloudinary');
       };
 

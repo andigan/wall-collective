@@ -7,7 +7,7 @@ var mongoose = require('mongoose'),
       dom_id: Number,
       filename: String,
       owner: String,
-      location: String,
+      url: String,
       posleft: String,
       postop: String,
       width: String,
@@ -21,7 +21,7 @@ var mongoose = require('mongoose'),
       rotateX: String,
       rotateY: String,
       rotateZ: String,
-      insta_link: String,
+      igram_link: String,
       created: Date
     });
 

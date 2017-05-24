@@ -18,11 +18,13 @@ var config = require('./config/config'),
     express = require('express'),
     app = express(),
 
+    cookieParser = require('cookie-parser'),
+
     // MongoDB; functions to connect to database, create models
     db = require('./db/db'),
 
-    // instagram authorization middleware
-    instaAuth = require('./i-gram/auth/instagram_auth.js'),
+    // igram authorization middleware
+    igramAuth = require('./i-gram/auth/igram-auth.js'),
 
     // oauth and sessions; set up passport serialization; manage sessions; save sessions to db
 //    passport = require('passport'),
@@ -58,12 +60,15 @@ app.set('view engine', 'handlebars');
 // express.static middleware serves static files, such as .js, .img, .css files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// cookie Parser
+app.use(cookieParser());
+
 // set up database
 db.init();
 
 // --Initialize server
 server = app.listen(port, function () {
-  console.log('Listening on port %d', server.address().port);
+  console.log('\nListening on port %d \n', server.address().port);
 });
 
 // --Socket.io
@@ -78,9 +83,9 @@ app.use(function (req, res, next) {
 
 // routing
 
-// middleware for instagram authorization
+// middleware for igram authorization
 if (config.useIGram) {
-  app.use(instaAuth);
+  app.use(igramAuth);
 };
 
 app.use('/', router);

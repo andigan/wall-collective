@@ -221,7 +221,7 @@ function onClick(e) {
 
       if (document.getElementById(store.getState().selectedImage.id).getAttribute('data-link').length > 1) {
 
-        document.getElementById('insta_link').setAttribute('href', document.getElementById(store.getState().selectedImage.id).getAttribute('data-link'));
+        document.getElementById('igram-link').setAttribute('href', document.getElementById(store.getState().selectedImage.id).getAttribute('data-link'));
       };
 
 
