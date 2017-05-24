@@ -6,6 +6,9 @@
   import { setPreviousClickedIDs } from '../../actions';
   import { setDraggerLocations } from '../draggers';
   import { convertDimToPercent } from '../images';
+  import { highestZ } from '../images';
+  import { shiftZsAboveXDown } from '../images';
+  import { zReport } from '../images';
 
   // use this function to assign draggable to all '.wallPic' elements
   // and then specific elements by passing an id
@@ -21,7 +24,7 @@
     $(id).draggable(
       {
         // containment: 'window',
-        stack: '.wallPic', // the stack option automatically adjusts z-indexes for all .wallPic elements
+        // stack: '.wallPic', // the stack option automatically adjusts z-indexes for all .wallPic elements
         scroll: true,
         start:  function (event, ui) {
           // convert percentage to original pixel size
@@ -32,13 +35,12 @@
           this.recoupLeft = left - ui.position.left;
           this.recoupTop = top - ui.position.top;
 
-          // store the original z index
-          this.originalZindex = this.style.zIndex;
-
           this.imageID = this.getAttribute('id');
 
-          // assign temporary z-index
-          this.style.zIndex = 60000;
+          // change zIndexes
+          shiftZsAboveXDown(this.style.zIndex);
+          this.style.zIndex = highestZ() + 1;
+          window.socket.emit('ce:_changeZs', zReport());
 
           stateChange.hideDraggers();
 
@@ -78,7 +80,7 @@
               imageEls = document.body.getElementsByClassName('wallPic');
 
           // return to the original z-index
-          this.style.zIndex = this.originalZindex;
+//          this.style.zIndex = this.originalZindex;
 
           // restore filter
           this.style.webkitFilter = this.getAttribute('data-filter');

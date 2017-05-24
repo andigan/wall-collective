@@ -193,7 +193,7 @@ export function draggersInit() {
     socketdata: {
       imageID: '',
       imageEl: '',
-      imageFilename: ''
+      filename: ''
     },
 
     start(dragger) {
@@ -207,7 +207,7 @@ export function draggersInit() {
 
       this.socketdata.imageID = this.imageID;
       this.socketdata.imageEl = this.imageEl;
-      this.socketdata.imageFilename = this.imageEl.getAttribute('title');
+      this.socketdata.filename = this.imageEl.getAttribute('title');
 
       this.dInfo = document.getElementById('d-info');
     },
@@ -298,7 +298,7 @@ export function draggersInit() {
 
         draggerAPI.changeStyle({width: newWidth + '%', height: newHeight + '%', left: newLeft + '%', top: newTop + '%'});
 
-        draggerAPI.socketdata.imageTransform = draggerAPI.imageEl.style.transform;
+        draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
         draggerAPI.socketdata.imageWidth     = newWidth + '%';
         draggerAPI.socketdata.imageHeight    = newHeight + '%';
         draggerAPI.socketdata.imageLeft      = newLeft + '%';
@@ -353,7 +353,7 @@ export function draggersInit() {
 
         draggerAPI.changeTransform({rotate: this.newRotation + 'deg', rotateZ: this.newRotateZ + 'deg'});
 
-        draggerAPI.socketdata.imageTransform = draggerAPI.imageEl.style.transform;
+        draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
         socket.emit('ce:_transforming', draggerAPI.socketdata);
       },
       stop: function () {
@@ -389,7 +389,7 @@ export function draggersInit() {
 
         draggerAPI.changeFilter({invert: draggerPos.x / 100, grayscale: draggerPos.y / 100});
 
-        draggerAPI.socketdata.imageFilter = draggerAPI.imageEl.style.WebkitFilter;
+        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
         socket.emit('ce:_filterChanging', draggerAPI.socketdata);
       },
       stop: function () {
@@ -413,7 +413,7 @@ export function draggersInit() {
 
         draggerAPI.changeFilter({blur: blur + 'px', brightness: brightness});
 
-        draggerAPI.socketdata.imageFilter = draggerAPI.imageEl.style.WebkitFilter;
+        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
         socket.emit('ce:_filterChanging', draggerAPI.socketdata);
       },
       stop: function () {
@@ -437,7 +437,7 @@ export function draggersInit() {
 
         draggerAPI.changeFilter({contrast: contrast, saturate: saturate});
 
-        draggerAPI.socketdata.imageFilter = draggerAPI.imageEl.style.WebkitFilter;
+        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
         socket.emit('ce:_filterChanging', draggerAPI.socketdata);
       },
       stop: function () {
@@ -464,7 +464,7 @@ export function draggersInit() {
 
         draggerAPI.socketdata.imageOpacity = this.draggerXpos;
         socket.emit('ce:_opacityChanging', draggerAPI.socketdata);
-        draggerAPI.socketdata.imageFilter = draggerAPI.imageEl.style.WebkitFilter;
+        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
         socket.emit('ce:_filterChanging', draggerAPI.socketdata);
       },
       stop: function () {
@@ -492,7 +492,7 @@ export function draggersInit() {
         draggerAPI.changeTransform({rotateX: this.rotateX + 'deg', rotateY: this.rotateY + 'deg'});
 
         // socket to other clients
-        draggerAPI.socketdata.imageTransform = draggerAPI.imageEl.style.transform;
+        draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
         socket.emit('ce:_transforming', draggerAPI.socketdata);
       },
       stop: function () {

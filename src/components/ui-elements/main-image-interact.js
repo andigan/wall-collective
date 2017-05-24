@@ -21,7 +21,7 @@ export function assignImageInteract() {
       // prepare socketdata
       this.socketdata = {};
       this.socketdata.imageID = this.imageID;
-      this.socketdata.imageFilename = this.imageEl.getAttribute('title');
+      this.socketdata.filename = this.imageEl.getAttribute('title');
     },
     onmove: function (event) {
       // retrieve scale and angle from event object
@@ -34,7 +34,7 @@ export function assignImageInteract() {
       this.imageEl.style.transform = this.imageEl.style.transform.replace(/scale\(.*?\)/ , 'scale(' + this.scale + ')');
 
       // send socketdata
-      this.socketdata.imageTransform = this.imageEl.style.transform;
+      this.socketdata.transform = this.imageEl.style.transform;
       socket.emit('ce:_transforming', this.socketdata);
     },
     onend: function (event) {
@@ -56,7 +56,7 @@ export function assignImageInteract() {
       this.socketdata.rotateZ = this.imageEl.getAttribute('data-rotateZ');
 
       socket.emit('ce:_saveDataAttributes', this.socketdata);
-      this.socketdata.imageTransform = this.imageEl.style.transform;
+      this.socketdata.transform = this.imageEl.style.transform;
       socket.emit('ce:_saveTransform', this.socketdata);
 
       // pass id to ce:_unlockID

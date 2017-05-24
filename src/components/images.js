@@ -48,11 +48,18 @@ export function highestID() {
   }, 0);
 }
 
+export function zReport() {
+
+  return Array.from(document.getElementsByClassName('wallPic')).map(function (el) {
+    return { id: el.id, zIndex: el.style.zIndex };
+  });
+
+}
 
 
-export function shiftZsAboveXDown(imageEl) {
-  let imageEls = document.getElementsByClassName('wallPic'),
-      x = imageEl.style.zIndex;
+
+export function shiftZsAboveXDown(x) {
+  let imageEls = document.getElementsByClassName('wallPic');
 
   Array.from(imageEls).forEach(function (imageEl) {
     if (imageEl.style.zIndex > x) {
