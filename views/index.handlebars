@@ -28,7 +28,7 @@
     <div id="images">
       {{#each databaseResult }}
         <img  title={{filename}}
-              src='{{location}}{{filename}}'
+              src='{{url}}'
               id={{dom_id}}
               class='wallPic'
               style='z-index: {{zindex}}; top: {{postop}}; left: {{posleft}}; width: {{width}}; height: {{height}}; transform: {{transform}}; opacity: {{opacity}}; -webkit-filter: {{filter}}; position: absolute;'
@@ -37,7 +37,8 @@
               data-rotateX='{{rotateX}}'
               data-rotateY='{{rotateY}}'
               data-rotateZ='{{rotateZ}}'
-              data-link='{{insta_link}}'>
+              data-link='{{igram-link}}'
+              data-owner='{{owner}}'>
       {{/each}}
 
     </div>
@@ -121,7 +122,7 @@
         <img class='icon-x button-icon' src='/icons/x-icon.png'>
       </div>
       <div id='explore-info-container'>
-        <a id='insta_link'> <div id='insta-link-text'> instagram link </div>
+        <a id='igram-link'> <div id='insta-link-text'> instagram link </div>
         </a>
       </div>
     </div>

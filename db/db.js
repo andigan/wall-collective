@@ -12,21 +12,21 @@ module.exports = {
     mongoose.connect(dbConfig.url);
 
     mongoose.connection.on('connected', function () {
-      console.log('Mongoose default connection open to ' + dbConfig.url);
+      console.log('\nMongoose default connection open to ' + dbConfig.url + '\n');
     });
 
     mongoose.connection.on('error',function (err) {
-      console.log('Mongoose default connection error: ' + err);
+      console.log('\nMongoose default connection error: ' + err + '\n');
     });
 
     mongoose.connection.on('disconnected', function () {
-      console.log('Mongoose default connection disconnected');
+      console.log('\nMongoose default connection disconnected\n');
     });
 
     // If the Node process ends, close the Mongoose connection
     process.on('SIGINT', function () {
       mongoose.connection.close(function () {
-        console.log('Mongoose default connection disconnected through app termination');
+        console.log('\nMongoose default connection disconnected through app termination.\n');
         process.exit(0);
       });
     });

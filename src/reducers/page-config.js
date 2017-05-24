@@ -4,9 +4,7 @@ export default function(
     deleteID: '',
     sessionID: '',
     switchesStatus: '',
-    clickedIDs: '',
-    instaAvailable: false,
-    instaFilename: {}
+    clickedIDs: ''
   },
   action) {
   switch (action.type) {
@@ -22,17 +20,6 @@ export default function(
       return {...state, clickCount: state.clickCount + 1};
     case 'SET_CLICKED_IDS':
       return {...state, clickedIDs: action.payload};
-    // IGRAM-OPTION
-    case 'SET_INSTA_AVAILABLE':
-      return {...state, instaAvailable: action.payload};
-    case 'SET_INSTA_FILENAME':
-      return {...state, instaFilename: action.payload};
-    case 'DELETE_INSTA_FILENAME':
-      // total immutable violation
-      delete state.instaFilename[action.payload];
-      return state;
-
-
     default:
       return state
   }

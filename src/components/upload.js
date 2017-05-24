@@ -1,7 +1,7 @@
-import stateChange from '../views/state-change';
 import config from '../_config/config';
+import stateChange from '../views/state-change';
 import { assignImageDrag } from './ui-elements/main-image-drag';
-import { initializeImage } from './images';
+import { initializeImage, highestZ, highestID } from './images';
 
 export function uploadInit() {
 
@@ -31,10 +31,21 @@ export function uploadInit() {
   // confirm upload button
   // on click, send a submit to the html form with id='upload-form-button'
   // the html form with id='upload-form-button' posts to '/addfile'
+  // and is parsed by busboy
   document.getElementById('button-confirm-upload').onclick = function (e) {
     let request = new XMLHttpRequest,
         form = document.getElementById('upload-form-button'),
-        data = new FormData(form);
+        data,
+        inputField = document.createElement('input');
+
+    // send file size as fieldna,e
+    inputField.setAttribute('name', 'filesize');
+    inputField.value = document.getElementById('fileselect').files[0].size;
+    inputField.style.display = 'none';
+
+    form.appendChild(inputField);
+
+    data = new FormData(form);
 
     request.open(form.method, form.action);
     request.send(data);
@@ -45,39 +56,22 @@ export function uploadInit() {
       // readyState 4: request is done.
       if (request.readyState === 4) {
         if (request.status === 200) {
+          let response;
 
-          // response JSON from server is the uploaded file information
-          let socketdata = {},
-              imagesEl = document.getElementById('images'),
-              imageEl = document.createElement('img'),
-              response = JSON.parse(request.response);
-
-//        create new image
-          imageEl.setAttribute('id', response.dom_id);
-          imageEl.setAttribute('title', response.imageFilename);
-          imageEl.src = response.location + response.imageFilename;
-          imageEl.classList.add('wallPic');
-          imageEl.style.zIndex = response.z_index;
-
-          initializeImage(imageEl);
-
-          imagesEl.appendChild(imageEl);
-
-          // assign drag to added element
-          assignImageDrag(response.dom_id);
+          if (request.response) {
+            response = JSON.parse(request.response);
+            console.log(response.error);
+          };
 
           stateChange.afterUpload();
 
-          // emit to other clients
-          socketdata.uploadedFilename = response.imageFilename;
-          socket.emit('ce:_share_upload', socketdata);
+          config.uploadTotal = 0;
 
-          config.uploadtotal = 0;
         } else {
           console.log('Error:' + request.status);
           // change nav-main-container and remove upload_preview
           stateChange.afterUpload();
-          config.uploadtotal = 0;
+          config.uploadTotal = 0;
         };
       }
     };

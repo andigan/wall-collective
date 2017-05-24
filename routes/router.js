@@ -7,10 +7,32 @@ var express = require('express'),
     Busboy = require('busboy'), // streaming parser for HTML multipart/form data
     helpers = require('../helpers'),
     path = require('path'),
-    shortID = require('shortid');
+    uniqueId = require('uniqid'),
+    AWS = require('aws-sdk'),
+    secrets = require('../config/secrets.js'),
+    accessKeyId =  process.env.AWS_ACCESS_KEY || secrets.s3accessKeyId,
+    secretAccessKey = process.env.AWS_SECRET_KEY || secrets.s3secretAccessKey,
+    s3UploadStream = require('s3-stream-upload'),
+    s3;
+
+
+AWS.config.update({
+  accessKeyId: accessKeyId,
+  secretAccessKey: secretAccessKey
+});
+
+s3 = new AWS.S3();
+
 
 // home page
 router.get('/', function (req, res) {
+
+  // future work; io cookie
+  if (req.cookies) {
+    console.log('\n cookies: ');
+    console.log(req.cookies);
+    console.log('\n');
+  };
 
   var ImageDocuments = mongoose.model('images');
 
@@ -21,7 +43,7 @@ router.get('/', function (req, res) {
   ImageDocuments.find({}).sort({sort_id: 'asc'}).exec(function (err, databaseResult) {
     if (err) return console.error(err);
 
-    console.log('Image data retrieved from database to pass to index.html...\n');
+    console.log('\nImage data retrieved from database to pass to index.handlebars...\n');
 
     res.render('index.handlebars', {
       title               : 'wall-collective',
@@ -71,205 +93,355 @@ router.post('/dragstop', bodyParser.json(), function (req, res) {
   };
 });
 
-// --Reset page
-// this route will clear the database and repopulate the database with a directory's contents
-router.get('/resetpage', function (req, res) {
-  var i,
-      ImageDocuments = mongoose.model('images');
+
+
+
+function resetToDirectory(closeResponse) {
 
   // fs method to read a directory's filenames
   fs.readdir(config.staticImageDir, function (err, dirFilenames) {
-    var sortedIdsFilenames = [];
+    let sorted;
 
     if (err) return console.error(err);
 
-    for (i = 0; i < dirFilenames.length; i++) {
-      // only accept image files
-      if (helpers.imageCheck(dirFilenames[i])) {
+    sorted = dirFilenames.filter(function (filename) {
+      return helpers.imageCheck(filename);
+    }).map(function (filename) {
+      // create sorted, a two-dimensional array used for sorting images by date
+      // sorted[0] = [ modification date, filename ]
+      // e.g.
+      //   [[2016-03-10T14:01:17.000Z, E1RsRVVRg.jpg],
+      //   [2016-03-17T17:03:13.000Z, b47GTxyzP.jpg] ]
 
-        // create sortedIdsFilenames, a two-dimensional array used for sorting documents by date
-        // sortedIdsFilenames[i][0] = modification date + filename
-        // sortedIdsFilenames[i][1] = filename
-        // example value:
-        //                [[2016-03-10T14:01:17.000ZE1RsRVVRg.jpg, E1RsRVVRg.jpg],
-        //                 [2016-03-17T17:03:13.000Zb47GTxyzP.jpg, b47GTxyzP.jpg] ]
+      // fsstatSync: node method to get data about a file
+      // .mtime: a method to retrieve a 'modification date' object from the fsstatsync result
+      // .toISOString: a date prototype method that converts the date object to a string
+      return [fs.statSync( config.staticImageDir + '/' + filename ).mtime.toISOString(), filename ];
+    }).sort(helpers.twoDSort);
 
-        // fsstatSync: node method to get data about a file
-        // .mtime: a method to retrieve a 'modification date' object from the fsstatsync result
-        // .toISOString: a date prototype method that converts the date object to a string
-        // .concat: a string prototype method that appends a second string
-        sortedIdsFilenames.push([fs.statSync( config.staticImageDir + '/' + dirFilenames[i] ).mtime.toISOString().concat( dirFilenames[i] ), dirFilenames[i] ]);
-      };
+    resetDatabase(sorted, closeResponse);
+  });
+}
+
+function resetTos3(closeResponse) {
+
+  // Note: limit of 1000 keys
+  s3.listObjectsV2( { Bucket: config.bucket }, function (err, data) {
+    let imagesDate;
+
+    if (err) {
+      console.log(err, err.stack);
+    } else {
+      imagesDate  = data.Contents.map(function (image) {
+        return [image.LastModified.toISOString(), image.Key];
+      });
+
+      imagesDate.sort(helpers.twoDSort);
+
+      resetDatabase(imagesDate, closeResponse);
     };
+  });
+}
 
-    // .sort: an array protype method (destructive)
-    sortedIdsFilenames.sort(helpers.twoDSort);
+function resetToDB(closeResponse) {
+  let ImageDocuments = mongoose.model('images');
 
-    // retrieve insta_links from database
-    ImageDocuments.find({}).sort({sort_id: 'asc'}).exec(function (err, databaseResult) {
+
+  ImageDocuments.find({}).sort({sort_id: 'asc'}).exec(function (err, databaseResult) {
+    if (err) return console.error(err);
+
+    databaseResult.forEach(function (result, i) {
+
+      ImageDocuments.update(
+        {           sort_id    : result.sort_id },
+        { $set: {   dom_id     : i,
+                    zindex     : i,
+                    posleft   : '10%',
+                    postop    : '10%',
+                    width     : '20%',
+                    height    : '20%',
+                    transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+                    opacity   : '1',
+                    filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+                    scale     : '1',
+                    angle     : '0',
+                    rotateX   : '0deg',
+                    rotateY   : '0deg',
+                    rotateZ   : '0deg' }
+        },
+        { upsert: true },
+        // update completion callback
+        function (err) {
+          if (err) {
+            return console.error(err);
+          } else {
+            // console.log(result.filename + ' added to database.');
+            if (databaseResult.length === (i + 1)) {
+              console.log('***** reloading page *****');
+              closeResponse();
+            };
+          }
+        });
+    });
+  });
+}
+
+
+
+function resetDatabase(sortedDateFilenames, closeResponse) {
+  let ImageDocuments = mongoose.model('images'),
+      src;
+
+  // assign src based on UrlToDB setting
+  switch (config.UrlToDB) {
+    case 's3':
+      src = config.storageOpt.s3.loc;
+      break;
+    case 'local':
+      src = config.storageOpt.local.loc;
+      break;
+    case 'cloudinary':
+      src = config.storageOpt.cloudinary.loc;
+      break;
+    default:
+      break;
+  }
+
+  // clear out the database
+  ImageDocuments.remove({}, function (err) {
+    if (err) return console.error(err);
+
+    console.log('\nCollection removed.\nFiles added to database: ');
+
+    sortedDateFilenames.forEach(function (dateFilename, i) {
+      console.log(dateFilename[1]);
+      // create a new document using the ImageDocuments model, then save it to the database
+      new ImageDocuments(
+
+        { sort_id   : dateFilename[0] + dateFilename[1],
+          dom_id    : i,
+          filename  : dateFilename[1],
+          url       : src + dateFilename[1],
+          created   : dateFilename[0],
+          owner     : dateFilename[1].split('-')[0],
+          posleft   : '10%',
+          postop    : '10%',
+          zindex    : i,
+          width     : '20%',
+          height    : '20%',
+          transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+          opacity   : '1',
+          filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+          scale     : '1',
+          angle     : '0',
+          rotateX   : '0deg',
+          rotateY   : '0deg',
+          rotateZ   : '0deg'
+        })
+      // .save is a mongoose method for model prototypes .save(function (err, tempfile) { });
+      .save(function (err) { if (err) return console.error(err); });
+    });
+
+    console.log('\nCollection replaced.\n\n');
+    closeResponse();
+  }); // end of ImageDocuments.remove callback
+}
+
+
+
+// --Reset page
+// this route will clear the database and repopulate the database with chosen contents
+router.get('/resetpage', function (req, res) {
+
+  if (req.cookies) {
+    console.log('******' + req.cookies.sessionID + ' reset the page.');
+  };
+
+  function closeResponse() {
+    res.sendStatus(200);
+  }
+
+  switch (config.reloadFrom) {
+    case 'db':
+      resetToDB(closeResponse);
+      break;
+    case 'local':
+      resetToDirectory(closeResponse);
+      break;
+    case 's3':
+      resetTos3(closeResponse);
+      break;
+    default:
+      break;
+  }
+
+});
+
+function uploadUpdate(newFilename, sessionID, io) {
+  let created = new Date().toISOString(),
+      ImageDocuments = mongoose.model('images');
+
+  // find the highest ID
+  ImageDocuments.find().sort({'dom_id':-1}).limit(1).select('dom_id').exec(function (err, highestIdRecord) {
+    if (err) return console.error(err);
+
+    // find the highest z-index
+    ImageDocuments.find().sort({'zindex':-1}).limit(1).select('zindex').exec(function (err, highestzIndexRecord) {
+      let newImage = {};
+
       if (err) return console.error(err);
 
-      // hmmm...
+      newImage.filename = newFilename;
+      newImage.owner = sessionID;
 
-      // clear out the database
-      ImageDocuments.remove({}, function (err) {
-        var i = 0,
-            temp_document;
+      // assign src based on UrlToDB setting
+      switch (config.UrlToDB) {
+        case 's3':
+          newImage.src = config.storageOpt.s3.loc + newFilename;
+          break;
+        case 'local':
+          newImage.src = config.storeageOpt.local.loc + newFilename;
+          break;
+        case 'cloudinary':
+          newImage.src = config.storeageOpt.cloudinary.loc + newFilename;
+          break;
+        default:
+          break;
+      }
 
-        if (err) return console.error(err);
+      // if database is empty...
+      if (highestIdRecord.length < 1) {
+        newImage.domId = 0;
+        newImage.zIndex = 0;
+      } else {
+        newImage.domId = highestIdRecord[0].dom_id + 1;
+        newImage.zIndex = highestzIndexRecord[0].zindex + 1;
+      };
 
-        console.log('\nCollection removed.\n\nFiles added to database: \n');
+      newImage.left = '10%';
+      newImage.top = '10%';
+      newImage.width = '20%';
+      newImage.height = '20%';
 
-        // repopulate the database
-        for (i = 0; i < sortedIdsFilenames.length; i++) {
-          console.log(sortedIdsFilenames[i][1]); // filenames
-          console.log(sortedIdsFilenames[i][0]); // sort_id
+      ImageDocuments.update(
+        {           filename   : newFilename },
+        { $set: {   sort_id    : created + newFilename,
+                    dom_id     : newImage.domId,
+                    zindex     : newImage.zIndex,
+                    owner      : sessionID,
+                    created    : created,
+                    url        : newImage.src,
+                    posleft    : newImage.left,
+                    postop     : newImage.top,
+                    width      : newImage.width,
+                    height     : newImage.height,
+                    transform  : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
+                    filter     : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
+                    opacity    : '1',
+                    scale      : '1',
+                    angle      : '0',
+                    rotateX    : '0deg',
+                    rotateY    : '0deg',
+                    rotateZ    : '0deg' }
+        },
+        { upsert: true },
+        // update completion callback
+        function (err) {
+          if (err) {
+            return console.error(err);
+          } else {
+            console.log(newFilename + ' added to database.');
 
-          // create a new document using the ImageDocuments model, then save it to the database
-          temp_document = new ImageDocuments(
-
-            { sort_id   : sortedIdsFilenames[i][0],
-              dom_id    : i,
-              filename  : sortedIdsFilenames[i][1],
-              location  : config.imageDir,
-              posleft   : '10%',
-              postop    : '10%',
-              zindex    : i,
-              width     : '20%',
-              height    : '20%',
-              transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
-              opacity   : '1',
-              filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
-              scale     : '1',
-              angle     : '0',
-              rotateX   : '0deg',
-              rotateY   : '0deg',
-              rotateZ   : '0deg'
-            });
-          // .save is a mongoose method for model prototypes .save(function (err, tempfile) { });
-          temp_document.save(function (err) { if (err) return console.error(err); });
-        }; // end of for loop
-        console.log('\nCollection replaced.\n\n');
-        res.sendStatus(200);
-      }); // end of ImageDocuments.remove callback
+            // add image to all connected pages
+            io.emit('se:_addUploadToPage', newImage);
+          }
+        });
     });
-  }); // end of fs.readdir callback
-}); // end of app.get('resetpage')
-
-
-
+  });
+}
 
 // --Add file post
 router.post('/addfile', function (req, res) {
-  var ImageDocuments = mongoose.model('images'),
-      busboy = new Busboy({ headers: req.headers });
+  var busboy = new Busboy({ headers: req.headers });
 
-  // pipe the request into busboy
+  function responseEnd() {
+    res.end();
+  }
+
+  // pipe the request into busboy parser
   req.pipe(busboy);
 
-  // busboy receives request and emits a 'file' event
+// get data from form fields (fires after file)
+  busboy.on('field', function (fieldname, val) {
+    if (fieldname === 'filesize') {
+      console.log(val);
+    };
+  });
+
   busboy.on('file', function (fieldname, file, filename, encoding, mimetype) {
+    var extension = path.extname(filename),
+        newFilename = fieldname + '-' + uniqueId() + extension.toLowerCase();
+
     console.log('sessionID: ' + fieldname + ': filename: ' + filename + ', encoding: ' + encoding + ', mimetype: ' + mimetype);
 
     // validate file mimetype
     if ( (mimetype != 'image/png') && (mimetype != 'image/jpeg') ) {
       file.resume();
-      console.log('not a valid mimetype');
-      res.end();
+      res.set({ Connection: 'close', Location: '/' });
+      res.send({ error: 'not a valid mimetype' });
     } else {
 
-      console.log('busboy.on.file fires...');
+      // save image
+      if (config.storageOpt.local.save) {
+        // write the file to the disk as a stream
+        file.pipe(fs.createWriteStream(path.join(config.mainDir, config.staticImageDir, newFilename)));
 
-      // write the file to the disk as a stream
-      file.pipe(fs.createWriteStream(path.join(config.mainDir, config.staticImageDir, filename)));
+        if (config.UrlToDB === 'local') {
+          file.on('end', function () {
+            uploadUpdate(newFilename, fieldname, res.io);
+            res.end();
+          });
+        };
+      };
+
+      if (config.storageOpt.s3.save) {
+        if (config.UrlToDB === 's3' || config.UrlToDB === 'db') {
+          res.end();
+        };
+
+        // write the file to Amazon s3 as a stream
+        file.pipe(s3UploadStream(s3, { Bucket: config.bucket, Key: newFilename, ACL: 'public-read' }))
+
+        .on('error', function (err) {
+          console.error(err);
+        })
+
+        .on('finish', function () {
+          if (config.UrlToDB === 's3' || config.UrlToDB === 'db') {
+            uploadUpdate(newFilename, fieldname, res.io);
+          };
+        });
+      }
+
+      if (config.storageOpt.cloudinary.save) {
+        console.log('cloudinary');
+      };
 
       // receiving file's data chunks
       file.on('data', function (data) {
-        var uploaddata = {};
+        var uploadData = {};
 
-        uploaddata.sessionID = fieldname;
-        uploaddata.chunkSize = data.length;
+        uploadData.sessionID = fieldname;
+        uploadData.chunkSize = data.length;
 
         console.log('File [' + filename + '] got ' + data.length + ' bytes');
-        res.io.emit('bc:_uploadChunkSent', uploaddata);
+        res.io.emit('bc:_uploadChunkSent', uploadData);
       });
-
-      file.on('end', function () {
-        // get extension from filename using node method
-        var extension = path.extname(filename),
-            // create unique filename using shortid dependency
-            newFilename = shortID.generate() + extension.toLowerCase();
-
-        console.log('File [' + filename + '] Finished');
-
-        // rename file
-        console.log('About to fs.rename...');
-        fs.rename(path.join(config.mainDir, config.staticImageDir, filename),
-                  path.join(config.mainDir, config.staticImageDir, newFilename),
-                  function () {
-                    console.log('file ' + filename + ' renamed: ' + newFilename);
-
-                    // find the highest z-index
-                    ImageDocuments.findOne().sort('-zindex').exec(function (err, highZItem) {
-                      if (err) return console.error(err);
-
-                      // find the highest dom_id
-                      ImageDocuments.findOne().sort('-dom_id').exec(function (err, highDOMItem) {
-                        var uploadResponse = {};
-
-                        if (err) return console.error(err);
-
-                        // prepare uploadResponse for client
-                        uploadResponse.imageFilename = newFilename;
-                        uploadResponse.location = config.imageDir;
-
-                        // if there are z-index results, add 1
-                        if (highZItem !== null) {
-                          uploadResponse.dom_id = highDOMItem.dom_id + 1;
-                          uploadResponse.z_index = highZItem.zindex + 1;
-                        // else if there are no results, assign value of 1
-                        } else {
-                          uploadResponse.dom_id = 1;
-                          uploadResponse.z_index = 1;
-                        };
-
-                        ImageDocuments.update(
-                          {           sort_id   : fs.statSync(config.staticImageDir + '/' + newFilename).mtime.toISOString().concat( newFilename ) },
-                          { $set: {   dom_id    : uploadResponse.dom_id,
-                                      filename  : uploadResponse.imageFilename,
-                                      location  : config.imageDir,
-                                      posleft   : '5%',
-                                      postop    : '5%',
-                                      width     : '20%',
-                                      height    : '20%',
-                                      transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
-                                      filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
-                                      opacity   : '1',
-                                      zindex    : uploadResponse.z_index,
-                                      scale     : '1',
-                                      angle     : '0',
-                                      rotateX   : '0deg',
-                                      rotateY   : '0deg',
-                                      rotateZ   : '0deg' } },
-                          { upsert: true },
-                          function (err) {
-                            if (err) return console.error(err);
-
-                            console.log(uploadResponse.imageFilename + ' added to database.');
-
-                            res.set( { Connection: 'close', Location: '/' });
-                            res.send(uploadResponse);
-                          } // end of update callback
-                        ); // end of ImageDocuments update
-                      }); // end of ImageDocuments findOne dom_id
-                    }); // end of ImageDocuments findOne z-index
-                  }); // end of fs.rename and callback
-      }); // end of file.on(end)
-    }; // end of image validation if
+    }; // end of image validation
   }); // end of busboy.on(file)
 
   busboy.on('finish', function () {
-    console.log('Done parsing form, says busboy.on.finish.');
+    console.log('Busboy done parsing form.');
   });
 });
 

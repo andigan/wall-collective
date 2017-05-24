@@ -1,4 +1,4 @@
-export function instaInit() {
+export function igramInit() {
 
   // set insta-container's height
   document.getElementById('insta-container').style.height = (window.innerHeight) + 'px';
@@ -8,10 +8,11 @@ export function instaInit() {
   document.getElementById('background-opacity').style.height = (window.innerHeight * 0.8) + 'px';
   document.getElementById('background-opacity').style.top = (window.innerHeight * 0.1) + 'px';
 
-  // insta_step 5, 6: on initial load, if query includes ?open_igram (added after i-gram auth),
+
+  // igram-#6: On page load, if query includes ?open_igram (added by igram middleware),
   // fetch igram data and open the divs
   if (window.location.href.includes('open_igram')) {
-    window.socket.emit('ce:_fetchIgramData');
+    window.socket.emit('ce:_fetchIgramData'); // (-#7)
 
     document.getElementById('insta-header').style.display = 'flex';
     document.getElementById('insta-container').style.display = 'block';

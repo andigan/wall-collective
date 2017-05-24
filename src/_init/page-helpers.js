@@ -1,4 +1,6 @@
+import config from '../_config/config.js';
 import stateChange from '../views/state-change';
+
 
 export function pageInit() {
 
@@ -8,6 +10,8 @@ export function pageInit() {
   //   event.preventDefault();
   // };
 
+  config.uploadTotal = 0;
+
   // process any click on the wrapper
   document.getElementById('wrapper').onclick = function (event) {
     var draggerEls = {};
@@ -15,7 +19,7 @@ export function pageInit() {
     document.getElementById('color-chooser').style.display = 'none';
 
     // if the images div alone is clicked...
-    if (event.target.getAttribute('id') === 'images') {
+    if (event.target.getAttribute('id') === 'wrapper') {
       draggerEls = document.getElementsByClassName('dragger');
       // remove all draggers
       stateChange.hideDraggers();

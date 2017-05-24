@@ -1,20 +1,6 @@
-export function setInstaAvailable(bool) {
+export function setHasIgramToken(bool) {
   return {
-    type: 'SET_INSTA_AVAILABLE',
+    type: 'SET_HAS_TOKEN',
     payload: bool
-  };
-}
-
-export function setInstaFilename(filenameObj) {
-  return {
-    type: 'SET_INSTA_FILENAME',
-    payload: filenameObj
-  };
-}
-
-export function deleteInstaFilename(filenameKey) {
-  return {
-    type: 'DELETE_INSTA_FILENAME',
-    payload: filenameKey
   };
 }

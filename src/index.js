@@ -41,9 +41,9 @@ import { dSwitchsInit } from './components/d-switchs';
 import { IOInit } from './sockets/io';
 
 // insta imports
-import { instaInit } from './_i-gram/init';
-import { IOInstaInit } from './_i-gram/insta-sockets';
-import { instaButtonsInit } from './_i-gram/buttons';
+import { igramInit } from './_i-gram/init';
+import { igramIOInit } from './_i-gram/igram-io';
+import { igramButtonsInit } from './_i-gram/buttons';
 
 // DEBUG
 import debug from './debug/debug'; // DEBUG
@@ -54,9 +54,9 @@ window.socket = IOInit();
 // i-gram conditional
 if (useIGram) {
   config.useIGram = useIGram; // instagram switch; arriving from server response
-  instaInit();
-  IOInstaInit(window.socket);
-  instaButtonsInit();
+  igramInit();
+  igramIOInit(window.socket);
+  igramButtonsInit();
 };
 
 // debug conditional

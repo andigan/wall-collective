@@ -1,5 +1,5 @@
 var config = require('../config/config'),
-    secrets = require('../i-gram/config/secrets.js'),
+    igsecrets = require('../i-gram/config/secrets.js'),
     fs = require('fs'),
     path = require('path'),
     shortID = require('shortid'),
@@ -8,7 +8,17 @@ var config = require('../config/config'),
     mongoose = require('mongoose'),
     ImageDocuments = mongoose.model('images'),
     connectedClients = [], // an array of current sessionIDs that are connected
-    instaSockets;
+    instaSockets,
+    AWS = require('aws-sdk'),
+    secrets = require('../config/secrets.js'),
+    accessKeyId =  process.env.AWS_ACCESS_KEY || secrets.s3accessKeyId,
+    secretAccessKey = process.env.AWS_SECRET_KEY || secrets.s3secretAccessKey,
+    s3 = new AWS.S3();
+
+AWS.config.update({
+  accessKeyId: accessKeyId,
+  secretAccessKey: secretAccessKey
+});
 
 module.exports = function (io) {
 
@@ -21,20 +31,20 @@ module.exports = function (io) {
       sessionID = clientVars.sessionID;
 
       // add the instagram_app_id
-      clientVars.instaAppID = secrets.instaAppID;
+      clientVars.igramAppID = igsecrets.igramAppID;
 
       // add backgroundColor
       clientVars.backgroundColor = config.backgroundColor;
 
       // if the client is revisiting, send original sessionID to client
       if (sessionID !== '' && sessionID !== 'null' && sessionID !== '[object Object]') {
-        console.log(sessionID + ' reconnected.');
+        console.log('>>>' + sessionID + ' reconnected.');
         socket.emit('connect:_setClientVars', clientVars);
 
       // else when client is new, generate a new sessionID
       } else {
         sessionID = shortID.generate();
-        console.log(sessionID + ' connected for first time.');
+        console.log('>>>>>>' + sessionID + ' connected for first time.');
         clientVars.sessionID = sessionID;
         socket.emit('connect:_setClientVars', clientVars);
       };
@@ -47,7 +57,7 @@ module.exports = function (io) {
 
 
       if (config.useIGram) {
-        instaSockets = require('../i-gram/sockets.js');
+        instaSockets = require('../i-gram/igram-io.js');
         instaSockets(socket, sessionID, download, instaAdapter);
       };
 
@@ -56,7 +66,7 @@ module.exports = function (io) {
 
     // on disconnect
     socket.on('disconnect', function () {
-      console.log(sessionID + ' disconnected...');
+      console.log('<<<' + sessionID + ' disconnected...');
       // remove sessionID from connectedClients array
       connectedClients.splice(connectedClients.indexOf(sessionID), 1);
       // change user count on remaining clients
@@ -153,35 +163,36 @@ module.exports = function (io) {
       socket.broadcast.emit('bc:_resetPage');
     });
 
-    socket.on('ce:_share_upload', function (data) {
-      var dbImageData = {};
-
-      // find matching data.uploadedFilename, return 'result' object
-      ImageDocuments.findOne({filename: data.uploadedFilename}).exec(function (err, result) {
-        if (err) return console.error(err);
-
-        dbImageData.dom_id = result.dom_id;
-        dbImageData.imageFilename = result.filename;
-        dbImageData.location = result.location;
-        dbImageData.z_index = result.zindex;
-
-        socket.broadcast.emit('bc:_addUpload', dbImageData);
-      });
-    });
-
     socket.on('ce:_deleteImage', function (data) {
       socket.broadcast.emit('bc:_deleteImage', data);
-      console.log('----------- delete image socket -------------');
+      console.log('\n----------- delete image socket -------------\n');
       console.log(data.filenameToDelete);
 
       // remove from database
       ImageDocuments.find({ filename: data.filenameToDelete }).remove().exec();
 
-      // remove from file system
-      fs.unlink(path.join(config.mainDir, config.staticImageDir, data.filenameToDelete), function (err) {
-        if (err) throw err;
-        console.log('successfully deleted file.');
-      });
+      if (config.storageOpt.local.del) {
+
+        // remove from file system
+        fs.unlink(path.join(config.mainDir, config.staticImageDir, data.filenameToDelete), function (err) {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('successfully deleted: ' + data.filenameToDelete + '\n');
+          };
+        });
+      };
+
+      if (config.storageOpt.s3.del) {
+        s3.deleteObject({  Bucket: config.bucket, Key: data.filenameToDelete }, function (err, data) {
+          if (err) {
+            console.log(err, err.stack);
+          } else {
+            console.log(data);
+            console.log('Successfully deleted from s3: ' + data.filenameToDelete + '\n');
+          };
+        });
+      }
     });
 
     socket.on('ce:_removeFilter', function (data) {

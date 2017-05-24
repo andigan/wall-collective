@@ -12,10 +12,10 @@ var mongoose = require('mongoose'),
       googleAccessToken: String,
       lastUpdate: String,
       strategy: String,
-      inst_username: String,
-      inst_access_token: String,
-      insta_profile_picture: String,
-      insta_full_name: String,
+      igram_username: String,
+      igram_token: String,
+      igram_profile_pic: String,
+      igram_full_name: String,
       session_id: String
 
     });
