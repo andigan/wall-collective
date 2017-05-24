@@ -1,10 +1,12 @@
 var config = require('../config/config'),
     uniqueId = require('uniqid'),
     mongoose = require('mongoose'),
+    igramAdapter = require('../i-gram/adapters'),
+    download = require('../i-gram/helpers/download-helper'),
     IgramSessions = mongoose.model('igram_sessions'),
     ImageDocuments = mongoose.model('images');
 
-module.exports = function (socket, sessionID, download, adapters) {
+module.exports = function (socket, sessionID) {
 
   // igram-#20: On initial page load, check to see if the client has an access token
   // from a previous authorization.
@@ -35,7 +37,7 @@ module.exports = function (socket, sessionID, download, adapters) {
 
       // fetch the instagram data (-#8)
       if (session !== null) {
-        adapters.fetchIgramData(session.igram_token).then(function (results) {
+        igramAdapter.fetchIgramData(session.igram_token).then(function (results) {
           // console.log fetch results
           // socket.emit('be:_checkOut', results);
 
@@ -112,7 +114,6 @@ module.exports = function (socket, sessionID, download, adapters) {
             if (err) return console.error(err);
 
             console.log(iDBData.filename + ' added to database from instagram feed.');
-
 
             // igram-#16: Send data to client to update dragged image
             socket.emit('se:_changeCloneToImage', iDBData);

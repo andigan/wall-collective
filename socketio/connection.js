@@ -1,24 +1,10 @@
 var config = require('../config/config'),
     igsecrets = require('../i-gram/config/secrets.js'),
-    fs = require('fs'),
-    path = require('path'),
     shortID = require('shortid'),
-    download = require('../i-gram/helpers/download-helper'),
-    instaAdapter = require('../i-gram/adapters'),
-    mongoose = require('mongoose'),
-    ImageDocuments = mongoose.model('images'),
+    ImageCon = require('../db/controllers/image-controller'),
     connectedClients = [], // an array of current sessionIDs that are connected
-    instaSockets,
-    AWS = require('aws-sdk'),
-    secrets = require('../config/secrets.js'),
-    accessKeyId =  process.env.AWS_ACCESS_KEY || secrets.s3accessKeyId,
-    secretAccessKey = process.env.AWS_SECRET_KEY || secrets.s3secretAccessKey,
-    s3 = new AWS.S3();
-
-AWS.config.update({
-  accessKeyId: accessKeyId,
-  secretAccessKey: secretAccessKey
-});
+    localAdapter = require('../adapters/local'),
+    s3Adapter = require('../adapters/s3');
 
 module.exports = function (io) {
 
@@ -29,6 +15,10 @@ module.exports = function (io) {
     // check to see if the client is new or revisiting with a cookie
     socket.on('ce:_sendSessionID', function (clientVars) {
       sessionID = clientVars.sessionID;
+
+      if (config.useIGram) {
+        require('../i-gram/igram-io.js')(socket, sessionID);
+      };
 
       // add the instagram_app_id
       clientVars.igramAppID = igsecrets.igramAppID;
@@ -54,14 +44,6 @@ module.exports = function (io) {
 
       // change user count on all clients
       io.sockets.emit('bc:_changeConnectedClients', connectedClients);
-
-
-      if (config.useIGram) {
-        instaSockets = require('../i-gram/igram-io.js');
-        instaSockets(socket, sessionID, download, instaAdapter);
-      };
-
-
     });
 
     // on disconnect
@@ -83,35 +65,12 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_saveResize', function (data) {
-
-      ImageDocuments.update(
-        // filter
-        { filename : data.imageFilename },
-        // set
-        { $set: { transform : data.imageTransform,
-                  posleft   : data.imageLeft,
-                  postop    : data.imageTop,
-                  width     : data.imageWidth,
-                  height    : data.imageHeight } },
-        // options
-        { upsert: true }, // if query isn't met, creates new document
-        // callback
-        function (err) { if (err) return console.error(err); } );
-
+      ImageCon.saveResize(data);
       socket.broadcast.emit('bc:_resized', data);
     });
 
     socket.on('ce:_saveDataAttributes', function (data) {
-      ImageDocuments.update(
-        { filename : data.imageFilename },
-        { $set: { scale   : data.scale,
-                  angle   : data.angle,
-                  rotateX : data.rotateX,
-                  rotateY : data.rotateY,
-                  rotateZ : data.rotateZ  } },
-        { upsert: true },
-        function (err) { if (err) return console.error(err); } );
-
+      ImageCon.saveAttributes(data);
       socket.broadcast.emit('bc:_changeDataAttributes', data);
     });
 
@@ -120,11 +79,7 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_saveTransform', function (data) {
-      ImageDocuments.update(
-        { filename : data.imageFilename },
-        { $set: { transform : data.imageTransform } },
-        { upsert: true },
-        function (err) { if (err) return console.error(err); } );
+      ImageCon.saveTransform(data);
     });
 
     socket.on('ce:_opacityChanging', function (data) {
@@ -132,11 +87,7 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_saveOpacity', function (data) {
-      ImageDocuments.update(
-        { filename : data.imageFilename },
-        { $set: { opacity : data.imageOpacity } },
-        { upsert: true },
-        function (err) { if (err) return console.error(err); } );
+      ImageCon.saveOpacity(data);
     });
 
     socket.on('ce:_filterChanging', function (data) {
@@ -144,11 +95,7 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_saveFilter', function (data) {
-      ImageDocuments.update(
-        { filename : data.imageFilename },
-        { $set: { filter : data.imageFilter } },
-        { upsert: true },
-        function (err) { if (err) return console.error(err); } );
+      ImageCon.saveFilter(data);
     });
 
     socket.on('ce:_changeBackground', function (data) {
@@ -164,34 +111,19 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_deleteImage', function (data) {
-      socket.broadcast.emit('bc:_deleteImage', data);
       console.log('\n----------- delete image socket -------------\n');
       console.log(data.filenameToDelete);
 
-      // remove from database
-      ImageDocuments.find({ filename: data.filenameToDelete }).remove().exec();
+      socket.broadcast.emit('bc:_deleteImage', data);
+
+      ImageCon.removeImage(data.filenameToDelete);
 
       if (config.storageOpt.local.del) {
-
-        // remove from file system
-        fs.unlink(path.join(config.mainDir, config.staticImageDir, data.filenameToDelete), function (err) {
-          if (err) {
-            console.log(err);
-          } else {
-            console.log('successfully deleted: ' + data.filenameToDelete + '\n');
-          };
-        });
+        localAdapter.removeFile(data.filenameToDelete);
       };
 
       if (config.storageOpt.s3.del) {
-        s3.deleteObject({  Bucket: config.bucket, Key: data.filenameToDelete }, function (err, data) {
-          if (err) {
-            console.log(err, err.stack);
-          } else {
-            console.log(data);
-            console.log('Successfully deleted from s3: ' + data.filenameToDelete + '\n');
-          };
-        });
+        s3Adapter.deleteImage(data.filenameToDelete);
       }
     });
 
@@ -219,28 +151,13 @@ module.exports = function (io) {
     });
 
     socket.on('ce:_resetImageAll', function (data) {
-      ImageDocuments.update(
-        { filename : data.filename },
-        { $set: { posleft   : '10%',
-                  postop    : '10%',
-                  zindex    : data.zIndex,
-                  width     : '20%',
-                  height    : '20%',
-                  transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',
-                  opacity   : '1',
-                  filter    : 'grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)',
-                  scale     : '1',
-                  angle     : '0',
-                  rotateX   : '0deg',
-                  rotateY   : '0deg',
-                  rotateZ   : '0deg' } },
-        { upsert: true },
-        function (err) { if (err) return console.error(err); } );
-
+      ImageCon.resetImageAll(data);
       socket.broadcast.emit('bc:_resetImage', data);
     });
 
-
+    socket.on('ce:_changeZs', function (zReport) {
+      socket.broadcast.emit('bc:_changeZs', zReport);
+    });
   });
 
 };

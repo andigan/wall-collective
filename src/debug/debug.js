@@ -5,7 +5,7 @@ module.exports = {
   init: function (store) {
     let options = {
       consoleStore: false,
-      consoleZIndexes: false,
+      consoleZIndexes: true,
       consoleClickTarget: false,
       consoleAllElsUnderClick: false // Chrome only
     };

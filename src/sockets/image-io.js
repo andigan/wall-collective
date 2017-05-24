@@ -1,5 +1,7 @@
 import { assignImageDrag } from '../components/ui-elements/main-image-drag';
 import { initializeImage } from '../components/images';
+import { setSelectedImage } from '../actions';
+import stateChange from '../views/state-change';
 
 export default function (socket) {
   socket.on('bc:_moving', function (data) {
@@ -8,7 +10,7 @@ export default function (socket) {
   });
 
   socket.on('bc:_resizing', function (data) {
-    document.getElementById(data.imageID).style.transform = data.imageTransform;
+    document.getElementById(data.imageID).style.transform = data.transform;
     document.getElementById(data.imageID).style.top = data.imageTop;
     document.getElementById(data.imageID).style.left = data.imageLeft;
     document.getElementById(data.imageID).style.width = data.imageWidth;
@@ -16,7 +18,7 @@ export default function (socket) {
   });
 
   socket.on('bc:_resized', function (data) {
-    document.getElementById(data.imageID).style.transform = data.imageTransform;
+    document.getElementById(data.imageID).style.transform = data.transform;
     document.getElementById(data.imageID).style.top = data.imageTop;
     document.getElementById(data.imageID).style.left = data.imageLeft;
     document.getElementById(data.imageID).style.width = data.imageWidth;
@@ -24,7 +26,7 @@ export default function (socket) {
   });
 
   socket.on('bc:_transforming', function (data) {
-    document.getElementById(data.imageID).style.transform = data.imageTransform;
+    document.getElementById(data.imageID).style.transform = data.transform;
   });
 
   // on transform changes, modify data attributes used by setDraggerLocations
@@ -42,7 +44,7 @@ export default function (socket) {
 
   // on filter changing, adjust target
   socket.on('bc:_filterChanging', function (data) {
-    document.getElementById(data.imageID).style.WebkitFilter = data.imageFilter;
+    document.getElementById(data.imageID).style.WebkitFilter = data.filter;
   });
 
   // remove deleted image
@@ -81,6 +83,12 @@ export default function (socket) {
   // enable dragging; other client has stopped moving image
   socket.on('bc:_unlockID', function (data) {
     $('#' + data).draggable ( 'enable' );
+  });
+
+  socket.on('bc:_changeZs', function (zReport) {
+    zReport.forEach(function (image) {
+      document.getElementById(image.id).style.zIndex = image.zIndex;
+    });
   });
 
   socket.on('bc:_resetImage', function (data) {
