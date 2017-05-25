@@ -29,7 +29,8 @@
         start:  function (event, ui) {
           // convert percentage to original pixel size
           let left = parseInt(this.style.left) / 100 * pageSettings.imagesWide,
-              top = parseInt(this.style.top) / 100 * pageSettings.imagesHigh;
+              top = parseInt(this.style.top) / 100 * pageSettings.imagesHigh,
+              topZ = highestZ();
 
           // recoup for transformed objects, to keep the drag event centered on a transformed object.
           this.recoupLeft = left - ui.position.left;
@@ -38,9 +39,11 @@
           this.imageID = this.getAttribute('id');
 
           // change zIndexes
-          shiftZsAboveXDown(this.style.zIndex);
-          this.style.zIndex = highestZ() + 1;
-          window.socket.emit('ce:_changeZs', zReport());
+          if (parseInt(this.style.zIndex) < topZ) {
+            shiftZsAboveXDown(this.style.zIndex);
+            this.style.zIndex = topZ;
+            window.socket.emit('ce:_changeZs', zReport());
+          };
 
           stateChange.hideDraggers();
 
@@ -127,31 +130,35 @@
     $(id).click(function (event) {
       var i,
           imageEls = document.getElementsByClassName('wallPic'),
-          clickedElsIdsandZIndexes = [];
+          clickedElsIdsandZIndexes;
 
-      // for each .wallPic on the page...
-      for (i = 0; i < imageEls.length; i ++) {
+
+       clickedElsIdsandZIndexes = Array.from(imageEls).filter(function (imageEl) {
         let imagePxRange = {},
             offsetLeft,
             offsetTop;
 
-        // calculate the range of pixels it occupies on the page...
-        offsetLeft = imageEls[i].getBoundingClientRect().left + document.body.scrollLeft;
-        offsetTop = imageEls[i].getBoundingClientRect().top + document.body.scrollTop;
-        imagePxRange = { xRange: [ offsetLeft, offsetLeft + imageEls[i].offsetWidth ],
-                         yRange: [ offsetTop, offsetTop + imageEls[i].offsetHeight] };
+            // calculate the range of pixels it occupies on the page...
+            offsetLeft = imageEl.getBoundingClientRect().left + document.body.scrollLeft;
+            offsetTop = imageEl.getBoundingClientRect().top + document.body.scrollTop;
+            imagePxRange = { xRange: { left: offsetLeft, right: offsetLeft + imageEl.offsetWidth },
+                             yRange: { top: offsetTop, bottom: offsetTop + imageEl.offsetHeight } };
 
-        // if the event click is within the image's range
-        if ( (event.pageX >= imagePxRange.xRange[0] && event.pageX <= imagePxRange.xRange[1]) && (event.pageY >= imagePxRange.yRange[0] && event.pageY <= imagePxRange.yRange[1]) ) {
-          // add the .wallPic id and z-index to an array.
-          clickedElsIdsandZIndexes.push([ imageEls[i].id, imageEls[i].style.zIndex ]);
-        };
-      };
+       // if the event click is within the image's range
+       return (event.pageX >= imagePxRange.xRange.left && event.pageX <= imagePxRange.xRange.right) && (event.pageY >= imagePxRange.yRange.top && event.pageY <= imagePxRange.yRange.bottom);
+
+     }).map(function(clickedEl) {
+       return [ clickedEl.id, clickedEl.style.zIndex ];
+     });
 
       // sort the array by z-index, highest to lowest.
       clickedElsIdsandZIndexes.sort(function (a, b) {
         return b[1] - a[1];
       });
+
+      if (clickedElsIdsandZIndexes.length === 0) {
+        clickedElsIdsandZIndexes = [this.id, this.style.zIndex];
+      };
 
       // if selected_file is not empty, remove animation-selected-image class
       if ( store.getState().selectedImage.id !== '') {
@@ -199,6 +206,8 @@
         // to cycle through clicks
         // BUG
         window.store.dispatch(setSelectedImage( clickedElsIdsandZIndexes[(window.store.getState().pageConfig.clickCount - 1) % clickedElsIdsandZIndexes.length][0]));
+
+
 
         // add border animation
         document.getElementById(window.store.getState().selectedImage.id).classList.add('animation-selected-image');

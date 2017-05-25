@@ -164,7 +164,6 @@ module.exports = {
       { filename : data.filename },
       { $set: { posleft   : '10%',
                 postop    : '10%',
-                zindex    : data.zIndex,
                 width     : '20%',
                 height    : '20%',
                 transform : 'rotate(0deg) scale(1) rotateX(0deg) rotateY(0deg) rotateZ(0deg)',

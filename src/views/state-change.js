@@ -33,6 +33,7 @@ module.exports = {
 
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
+    this.hideDraggers();
   },
 
   openTools() {
@@ -55,6 +56,7 @@ module.exports = {
     document.getElementById('info-page').style.display = 'block';
     // hide
     document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
+    this.hideDraggers();
 
   },
 
@@ -68,6 +70,7 @@ module.exports = {
   uploadPreview() {
     // hide
     document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
+    this.hideDraggers();
   },
 
   afterUpload() {
@@ -128,9 +131,6 @@ module.exports = {
   },
 
   closeAll() {
-
-
-
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
     document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');

@@ -4,6 +4,7 @@ module.exports = {
 
   useCDN: true, // use CDNs rather than local modules
   useIGram: true, // enable Instagram integration
+  debug: false,
 
   // storage options
   storageOpt: {
@@ -24,6 +25,25 @@ module.exports = {
 
   // reload option:
   reloadFrom: 'db', // db, s3, local, or cloudinary
+
+  // initial dragger settings
+  initialDraggers: 'SrObcgTP',
+
+  // set upload placement
+  uploadTop: '10%',
+  uploadLeft: '10%',
+  uploadWidth: '20%',
+  uploadHeight: '20%',
+
+  // set maximum limit for draggers
+  blurLevel: 7,
+  brightnessLevel: 8,
+  contrastLevel: 10,
+  saturateLevel: 10,
+
+  // color chooser size in pixels
+  chooserPos: { width: 180,
+                height: 100 },
 
   // session string generator
   sessionStr: { length: 10,

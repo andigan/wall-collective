@@ -1,11 +1,9 @@
 // --Interact.gesturable, for touchscreen rotating and scaling
-
 import stateChange from '../../views/state-change';
 
 export function assignImageInteract() {
   interact('.wallPic').gesturable({
     onstart: function (event) {
-
       this.imageID = event.target.getAttribute('id');
       this.imageEl = event.target;
 

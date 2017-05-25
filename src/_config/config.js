@@ -7,6 +7,8 @@ module.exports = {
   uploadWidth: '20%',
   uploadHeight: '20%',
 
+  initialDraggers: 'SrObcgTP',
+
   // set maximum limit for draggers
   blurLevel: 7,
   brightnessLevel: 8,

@@ -1,3 +1,4 @@
+import config from '../_config/config';
 import { setDraggerLocations } from './draggers';
 import { setSwitchesStatus } from '../actions';
 import { getCookie } from '../helpers';
@@ -14,7 +15,7 @@ function getSetSwitchStatus() {
       switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
 
     if (statusStr === '') {
-      statusStr = 'SRObcgtp';
+      statusStr = config.initialDraggers;
       setCookie('switches_status', statusStr, 7);
     };
 

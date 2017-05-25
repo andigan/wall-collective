@@ -1,19 +1,20 @@
 import { clickme } from '../helpers';
 
+var options = {
+  consoleStore: false,
+  consoleZIndexes: true,
+  consoleClickTarget: true,
+  consoleAllElsUnderClick: false // Chrome only
+};
+
 module.exports = {
 
-  init: function (store) {
-    let options = {
-      consoleStore: false,
-      consoleZIndexes: true,
-      consoleClickTarget: false,
-      consoleAllElsUnderClick: false // Chrome only
-    };
+  init: function () {
 
     //    clickme('nav-tog-button', 50);
     //    clickme('dragger_switches_button', 1000);
     //    clickme('nav-upload-container_button', 1000);
-        clickme('debug-button', 1000);
+    clickme('debug-button', 1000);
 
     this.createDebugButton();
     this.createDebugDiv();

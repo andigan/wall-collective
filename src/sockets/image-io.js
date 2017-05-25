@@ -92,8 +92,12 @@ export default function (socket) {
   });
 
   socket.on('bc:_resetImage', function (data) {
-    document.getElementById(data.imageID).style.zIndex = data.zIndex;
+//    document.getElementById(data.imageID).style.zIndex = data.zIndex;
     initializeImage(document.getElementById(data.imageID));
+
+    if (data.imageID === window.store.getState().selectedImage.id) {
+      stateChange.hideDraggers();
+    };
   });
 
   socket.on('se:_addUploadToPage', function (newImage) {

@@ -25,10 +25,10 @@ router.get('/', function (req, res) {
 
   function renderPage(databaseResult) {
     res.render('index.handlebars', {
-      title               : 'wall-collective',
-      databaseResult      : databaseResult,
-      useCDN              : config.useCDN,
-      useIGram            : config.useIGram
+      title          : 'wall-collective',
+      databaseResult : databaseResult,
+      useCDN         : config.useCDN,
+      useIGram       : config.useIGram
     });
   }
 

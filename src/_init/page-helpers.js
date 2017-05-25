@@ -14,13 +14,11 @@ export function pageInit() {
 
   // process any click on the wrapper
   document.getElementById('wrapper').onclick = function (event) {
-    var draggerEls = {};
 
     document.getElementById('color-chooser').style.display = 'none';
 
     // if the images div alone is clicked...
-    if (event.target.getAttribute('id') === 'wrapper') {
-      draggerEls = document.getElementsByClassName('dragger');
+    if (event.target.getAttribute('id') === 'wrapper' || event.target.getAttribute('id') === 'images') {
       // remove all draggers
       stateChange.hideDraggers();
       // close button containers and remove d-transition

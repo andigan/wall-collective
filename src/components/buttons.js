@@ -5,6 +5,8 @@ import { setSelectedImage } from '../actions';
 import { initializeImage } from '../components/images';
 import { highestZ } from '../components/images';
 import { shiftZsAboveXDown } from '../components/images';
+import { zReport } from '../components/images';
+import { setDraggerLocations } from '../components/draggers';
 
 
 export function buttonsInit() {
@@ -152,16 +154,24 @@ function onClick(e) {
 
       if (imageID !== '') {
         let imageEl = document.getElementById(imageID),
-            z = highestZ() + 1,
+            topZ = highestZ(),
             socketdata;
 
+        // change zIndexes
+        if (parseInt(imageEl.style.zIndex) < topZ) {
+          shiftZsAboveXDown(imageEl.style.zIndex);
+          imageEl.style.zIndex = topZ;
+          window.socket.emit('ce:_changeZs', zReport());
+        };
+
         initializeImage(imageEl);
-        imageEl.style.zIndex = z;
+
         socketdata = {
           imageID: imageID,
-          filename: imageEl.title,
-          zIndex: z
+          filename: imageEl.title
         };
+
+        setDraggerLocations(imageID);
 
         window.socket.emit('ce:_resetImageAll', socketdata);
       }
@@ -171,6 +181,8 @@ function onClick(e) {
       let chooserEl = document.getElementById('color-chooser'),
           chooserPos = config.chooserPos,
           wrapperEl = document.getElementById('wrapper');
+
+      stateChange.hideDraggers();
 
       chooserEl.style.display = 'block';
       // set the initial location for the color
