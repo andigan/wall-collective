@@ -22,8 +22,7 @@ export function igramInit() {
     document.getElementById('ham-line1').style.top = '35%';
     document.getElementById('ham-line3').style.top = '65%';
 
-    // possible fix: remove query string from url
-    //   history.replaceState({}, 'wall-collective', '/');
-    // };
+    // remove query string from url
+    window.history.pushState('object or string', 'Title', '/' + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split('?')[0]);
   };
 }
