@@ -39,6 +39,8 @@ import { dSwitchsInit } from './components/d-switchs';
 // sockets
 import { IOInit } from './sockets/io';
 
+import { textboxInit } from './components/ui-elements/textbox.js';
+
 // insta imports
 import { igramInit } from './_i-gram/init';
 import { igramIOInit } from './_i-gram/igram-io';
@@ -69,6 +71,7 @@ pageSettings.init(); // set page sizes and resize listeners
 navToggleInit(); // make nav-toggle-button draggable
 draggersInit(); // set up draggers functionality
 dSwitchsInit(); // set up dragger switches
+textboxInit();
 uploadInit();
 
 assignImageDrag(); // assign draggable to all .wallPic elements

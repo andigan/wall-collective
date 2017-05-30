@@ -23,6 +23,8 @@ export function buttonsInit() {
 
   createButton('a1', 'app-info', 'info', '/icons/info-icon.png', 'button-tools');
   document.getElementById('u2').appendChild(document.getElementById('upload-form-button'));
+  createButton('a3', 'textbox', 'textbox', '/icons/info-icon.png', 'button-tools');
+
 
   createjsColor();
 
@@ -176,6 +178,16 @@ function onClick(e) {
         window.socket.emit('ce:_resetImageAll', socketdata);
       }
       break;
+
+    case 'textbox':
+      let x = document.getElementById('cube');
+       if (x.style.display === 'none') {
+           x.style.display = 'block';
+       } else {
+           x.style.display = 'none';
+       };
+      break;
+
 
     case 'choose-color':
       let chooserEl = document.getElementById('color-chooser'),
