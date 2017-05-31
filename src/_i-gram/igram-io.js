@@ -24,16 +24,16 @@ export function igramIOInit(socket) {
     console.log(data);
   });
 
-  // igram-#11: Add content to insta-container
+  // igram-#11: Add content to igram-container
   socket.on('se:_addContentToIgramDiv', function (igramResponse) {
-    var instaImagesEl = document.getElementById('insta-images-container');
+    var instaImagesEl = document.getElementById('igram-images-container');
 
-    // set content in insta-header
-    document.getElementById('insta-info-username').textContent = igramResponse.username;
-    document.getElementById('insta-image-profile').src = igramResponse.profilePic;
+    // set content in igram-header
+    document.getElementById('igram-info-username').textContent = igramResponse.username;
+    document.getElementById('igram-profile-image').src = igramResponse.profilePic;
     document.getElementById('insta-profile-link').setAttribute('href', 'https://www.instagram.com/' + igramResponse.username + '/?hl=en');
 
-    // destroy current images in insta-images-container
+    // destroy current images in igram-images-container
     instaImagesEl.innerHTML = '';
 
     igramResponse.images.forEach(function (image, i, images) {
@@ -44,16 +44,16 @@ export function igramIOInit(socket) {
           spacerMiddle = document.createElement('div'),
           spacerBottom = document.createElement('div');
 
-      tempEl.classList.add('insta-image-div');
+      tempEl.classList.add('igram-image-container');
 
       tempImg.setAttribute('id', 'insta' + i);
-      tempImg.classList.add('insta_image');
+      tempImg.classList.add('igram-image');
       tempImg.src = image.url;
       tempImg.setAttribute('data-link', image.pageLink);
 
-      spacerTop.classList.add('spacer-top-bottom');
-      spacerMiddle.classList.add('spacer-middle');
-      spacerBottom.classList.add('spacer-top-bottom');
+      spacerTop.classList.add('igram-spacer-topbottom');
+      spacerMiddle.classList.add('igram-spacer-middle');
+      spacerBottom.classList.add('igram-spacer-topbottom');
 
       tempEl.appendChild(tempImg);
       instaImagesEl.appendChild(tempEl);
@@ -82,11 +82,11 @@ export function igramIOInit(socket) {
     });
   });
 
-// igram-#13: Make dragged insta_images droppable in images div
+// igram-#13: Make dragged igram-images droppable in images div
 // http://stackoverflow.com/questions/36181050/jquery-ui-draggable-and-droppable-duplicate-issue
 // This allows the image to be draggable outside of the scrollable div
   $('#images').droppable({
-    accept: '.insta_image',
+    accept: '.igram-image',
     drop: function (event, ui) {
       var clone = {},
           dropData = {};
@@ -133,7 +133,7 @@ export function igramIOInit(socket) {
     imageEl.style.width = dbDropData.width;
     imageEl.style.height = dbDropData.height;
 
-    imageEl.classList.remove('insta_image');
+    imageEl.classList.remove('igram-image');
     imageEl.setAttribute('title', dbDropData.filename);
     imageEl.setAttribute('data-link', dbDropData.link);
     imageEl.setAttribute('data-scale', '1');

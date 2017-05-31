@@ -1,0 +1,63 @@
+// draggers
+.dragger {
+  display:none;
+  transform: scale(0);
+  position:fixed;
+  top:0;
+  z-index:40000;
+  width: 36px;
+  border-radius: 100%;
+  height: 36px;
+}
+
+.d-on {
+  transform: scale(1);
+}
+
+.d-icon-container {
+  width: 36px;
+  border-radius: 100%;
+  height: 36px;
+}
+
+.d-icon {
+  width: 50%;
+  left: 50%;
+  top: 50%;
+  position: relative;
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.d-transition {
+  -webkit-transition:left .1s, top .1s, width .1s, height .1s, background-color .1s, 0 .1s;
+  transition:left .1s, top .1s, width .1s, height .1s, background-color .1s, transform .1s;
+}
+
+
+// switches
+#switches-container {
+  flex-direction: row;
+  flex-wrap: wrap;
+  bottom: 55px;
+  justify-content: space-around;
+  position: fixed;
+  display: none;
+  height: 48px;
+  width: 100%;
+}
+
+.switch-container {
+  width: 12.5%;
+}
+
+.switch-icon-container {
+  width: 36px;
+  border-radius: 100%;
+  height: 36px;
+  transform: scale(0.75) rotateY(60deg);
+  transition: all .2s ease-in-out;
+}
+
+.switchon {
+  transform: scale(1) rotateY(0deg);
+}

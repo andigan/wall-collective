@@ -1,34 +1,25 @@
 import config from '../_config/config';
+import dData from '../_config/config-draggers';
 import { setDraggerLocations } from './draggers';
 import { setSwitchesStatus } from '../actions';
 import { getCookie } from '../helpers';
 import { setCookie } from '../helpers';
 
+export function dSwitchsInit() {
+  createSwitches();
+  getSetSwitchStatus();
+  switchFunction();
+}
 
 function createSwitches() {
   let wrapperEl = document.getElementById('wrapper'),
       switchesEl = document.createElement('div');
 
-  switchesEl.id = 'switches';
-
-
-
-
+  switchesEl.id = 'switches-container';
 
   wrapperEl.appendChild(switchesEl);
 
-  let switches =
-    [{ name: 'stretch', color: 'blue',  icon: 'icons/ic_photo_size_select_small_black_24px.svg' },
-    { name: 'rotation', color: 'green',  icon: 'icons/ic_rotate_90_degrees_ccw_black_24px.svg' },
-    { name: 'opacity', color: 'white',  icon: 'icons/ic_opacity_black_24px.svg'},
-    { name: 'blur_brightness', color: 'darkorange',  icon: 'icons/ic_blur_on_black_24px.svg'},
-    { name: 'contrast_saturate', color: 'crimson',  icon: 'icons/ic_tonality_black_24px.svg'},
-    { name: 'grayscale_invert', color: 'silver',  icon: 'icons/ic_cloud_black_24px.svg'},
-    { name: 'threeD', color: 'deeppink',  icon: 'icons/ic_3d_rotation_black_24px.svg'},
-    { name: 'party', color: 'purple', icon: 'icons/ic_hot_tub_black_24px.svg'}]
-  ;
-
-  switches.forEach(function (aswitch) {
+  dData.forEach(function (aswitch) {
     let switchContainerEl = document.createElement('div'),
         iconContainerEl = document.createElement('div'),
         iconEl = document.createElement('img');
@@ -38,54 +29,28 @@ function createSwitches() {
     switchContainerEl.classList.add('switch-container');
     switchContainerEl.classList.add('dragger-switch');
 
-    iconContainerEl.classList.add('d-icon-container');
+    iconContainerEl.classList.add('switch-icon-container');
     iconContainerEl.style.backgroundColor = aswitch.color;
 
-    iconEl.classList.add('d-icon');
-
     iconEl.src = aswitch.icon;
-
-
+    iconEl.classList.add('d-icon');
 
     iconContainerEl.appendChild(iconEl);
 
     switchContainerEl.appendChild(iconContainerEl);
 
     switchesEl.appendChild(switchContainerEl);
-
-
-
   });
-
-
-
-
-
-
-}
-
-
-
-
-
-
-
-
-
-export function dSwitchsInit() {
-  createSwitches();
-  getSetSwitchStatus();
-  switchFunction();
 }
 
 function getSetSwitchStatus() {
   let statusStr = getCookie('switches_status'),
       switches = ['stretch', 'rotation', 'opacity', 'blur_brightness', 'contrast_saturate', 'grayscale_invert', 'threeD', 'party'];
 
-    if (statusStr === '') {
-      statusStr = config.initialDraggers;
-      setCookie('switches_status', statusStr, 7);
-    };
+  if (statusStr === '') {
+    statusStr = config.initialDraggers;
+    setCookie('switches_status', statusStr, 7);
+  };
 
   window.store.dispatch(setSwitchesStatus(statusStr));
 
@@ -120,7 +85,7 @@ function switchFunction() {
         // if an image is selected, show dragger
         if (window.store.getState().selectedImage.id !== '') {
 //          draggerEl.style.display = 'block';
-          draggerEl.classList.add('draggeron');
+          draggerEl.classList.add('d-on');
         };
 
         // use d-letter to find corresponding character in the array
@@ -128,7 +93,7 @@ function switchFunction() {
         switchesStats[switchesStats.indexOf(dLetter)] = dLetter.toUpperCase();
       } else {
 //        draggerEl.style.display = 'none';
-        draggerEl.classList.remove('draggeron');
+        draggerEl.classList.remove('d-on');
         // replace corresponding letter with lowercase character to indicate switch is off
         switchesStats[switchesStats.indexOf(dLetter.toUpperCase())] = dLetter.toLowerCase();
       };

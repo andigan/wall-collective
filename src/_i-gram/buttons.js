@@ -15,7 +15,7 @@ function createButton(targetID, action, text, iconPath, buttonClass) {
   buttonEl.classList.add('button', buttonClass);
   buttonEl.setAttribute('data-action', action);
   buttonEl.innerText = text;
-  iconEl.classList.add('button-icon');
+  iconEl.classList.add('nav-button-icon');
   iconEl.src = iconPath;
   buttonEl.appendChild(iconEl);
 
@@ -45,8 +45,8 @@ function onClick(e) {
         // igram-#22: If an access token was granted, open Igram divs and fetch data (-#7)
         window.socket.emit('ce:_fetchIgramData');
 
-        document.getElementById('insta-header').style.display = 'flex';
-        document.getElementById('insta-container').style.display = 'block';
+        document.getElementById('igram-header').style.display = 'flex';
+        document.getElementById('igram-container').style.display = 'block';
         document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
         document.body.classList.add('a-nav-container-is-open');
 

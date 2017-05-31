@@ -1,0 +1,123 @@
+#cube {
+  position: relative;
+  margin: 0 auto;
+  height: 200px;
+  width: 200px;
+  display: none;
+  -webkit-transition: -webkit-transform .25s linear;
+  -webkit-transform-style: preserve-3d;
+}
+
+.textbox-input {
+  opacity: 0;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  z-index: 80000;
+  left: 0px;
+  top: 0px;
+  color: transparent;
+}
+
+
+.face {
+  position: absolute;
+  height: 200px;
+  width: 200px;
+  padding: 0;
+  color: black;
+  background-color: rgba(50, 50, 50, 0.9);
+}
+
+#cube .face1  {
+  -webkit-transform: rotateX(90deg) translateZ(100px);
+  background-color: blue;
+}
+
+#cube .face2 {
+  -webkit-transform: translateZ(100px);
+  background-color: red;
+}
+
+#cube .face3 {
+  -webkit-transform: rotateY(90deg) translateZ(100px);
+  background-color: yellow;
+}
+
+#cube .face4 {
+  -webkit-transform: rotateY(180deg) translateZ(100px) rotate(180deg);
+  background-color: orange;
+}
+
+#cube .face5 {
+  -webkit-transform: rotateY(-90deg) translateZ(100px);
+  background-color: green;
+}
+
+#cube .face6 {
+  -webkit-transform: rotateX(-90deg) translateZ(100px);
+  background-color: purple;
+}
+
+.face-content {
+  text-align: center;
+  top: 50%;
+  height: 100%;
+  position: relative;
+}
+
+
+
+#explore-container {
+  background-color: gray;
+  display: none;
+  left: 5vw;
+  overflow-y: scroll; /* has to be scroll, not auto */
+  -webkit-overflow-scrolling: touch;
+  position: absolute;
+  top: 5vh;
+  width: 90vw;
+  z-index: 90000;
+}
+
+#x-explore-container {
+  display: none;
+  position: fixed;
+  right: 5vw;
+  z-index: 90001;
+}
+
+
+#explore-image-container {
+  width: 80%;
+  height: 60%;
+  margin: auto;
+}
+
+#image-explore {
+  max-height:100%;
+  max-width:100%;
+  display:block;
+  margin:2vh auto auto;
+
+
+}
+
+#button-explore-left {
+  left: 0;
+  width: 5vw;
+  top: 50%;
+  position: absolute;
+}
+
+#button-explore-right {
+  width: 5vw;
+  right: 0;
+    top: 50%;
+    position: absolute;
+}
+
+.explore-icon-arrow {
+  height: 100%;
+  width: 100%;
+}

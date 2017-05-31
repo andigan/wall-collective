@@ -1,0 +1,56 @@
+#app-info {
+  background-color: white;
+  display: none;
+  left: 5%;
+  overflow-y: scroll; /* scroll, not auto */
+  -webkit-overflow-scrolling: touch;
+  position: fixed;
+  top: 5%;
+  height: 80%;
+  width: 90%;
+  z-index: 90000;
+}
+
+#app-info-header {
+  position: fixed;
+  width: 90%;
+  height: 10%;
+  z-index: 91000;
+  background-color: white;
+
+  .app-info-title {
+    font-size: 21px;
+    font-family: Courier New, Courier, monospace;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .app-info-spacer {
+    background-color: black;
+    top: 30px;
+    height: 2px;
+    left: 25%;
+    position: absolute;
+    width: 50%;
+  }
+
+}
+
+#app-info-inner-container {
+  height: 100%;
+  left: 10%;
+  top: 72px;
+  position: absolute;
+  width: 80%;
+
+  .app-info-paragraph {
+    display: block;
+    text-align: justify;
+    position: static;
+  }
+
+  .app-info-person-icon {
+    height: 2vh;
+  }
+
+}

@@ -1,0 +1,83 @@
+// optional
+@import './experimental.scss';
+
+// essential
+@import './nav.scss';
+@import './modals/modals.scss';
+@import './draggers-and-switches.scss';
+
+
+* {
+  border:0;
+  margin:0;
+  padding:0;
+}
+
+body {
+  background-color: black; // initial flash
+  overflow-x:hidden;
+  overflow-y:hidden;  /* fixed the scrolling problem */
+  position:fixed;
+}
+
+#wrapper {
+  background-color:black;
+  display:block;
+  left:0;
+  position:absolute;
+  top:0;
+}
+
+#images {
+  border: 1px black solid;
+  position: relative;
+  margin: auto;
+}
+
+.wallPic {
+  position:absolute;
+}
+
+// selected image animation
+@-webkit-keyframes blink {
+  0%   { outline: 1px solid white;
+         z-index: 90000;  }
+  33%  { outline: 1px solid white;
+    z-index: 90000;  }
+  100% { outline: 1px solid transparent;
+    z-index: 90000;  }
+}
+
+.animation-selected-image {
+  outline: 1px solid transparent;
+  -webkit-animation: blink 2s ease-out 0s 1;
+  animation: blink 2s ease-out 0s 1;
+}
+
+@-webkit-keyframes animation-temp-fade {
+  0%   { opacity: .50; }
+  33%  { opacity: .50; }
+  100% { opacity: .50; }
+}
+
+.animation-temp-fade {
+  -webkit-animation: animation-temp-fade 2s ease-out 0s 1;
+  animation: animation-temp-fade 2s ease-out 0s 1;
+}
+
+// alert will appear when transform fails
+#hid-transform-alert {
+  align-items: center;
+  background-color: black;
+  color: white;
+  display: flex;
+  font-family:Courier New, Courier, monospace;
+  font-size:2.25vh;
+  font-weight:300;
+  height: 100vh;
+  justify-content: center;
+  position: fixed;
+  width: 100vw;
+  transform: translateX(100vw) translateY(100vh) scaleX(0) scaleY(0);
+  z-index: 99999;
+}

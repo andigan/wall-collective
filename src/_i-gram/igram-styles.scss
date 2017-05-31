@@ -1,0 +1,95 @@
+#igram-container {
+	display: none;
+	right: 0;
+	position: absolute;
+	top: 0;
+	width: 20%;
+	z-index: 50000;
+}
+
+#igram-link {
+	left: 45%;
+	top: 80%;
+	position: absolute;
+}
+
+#igram-images-container {
+	align-items: center;
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	justify-content: space-between;
+	right: 0;
+	min-width: 64px;
+	overflow: hidden;
+	overflow-y: scroll; /* not auto */
+	-webkit-overflow-scrolling: touch;
+	position: absolute;
+	width: 100%;
+	z-index: 50000;
+}
+
+.igram-image-container {
+	width: 100%;
+	text-align: center;
+	padding-top: 4vh;
+	padding-bottom: 4vh;
+	margin: auto;
+}
+
+.igram-image {
+	height: 10vh;
+	width: 10vh;
+}
+
+#igram-opacity-mask {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	background: gray;
+	opacity: 0.3;
+	z-index: 1;
+}
+
+.igram-spacer-topbottom {
+	background-color: gray;
+	height: 1px;
+	width: 15vw;
+	margin: auto;
+}
+
+.igram-spacer-middle {
+	background-color: gray;
+	height: 1px;
+	width: 10vw;
+	margin: 1vh auto;
+}
+
+#igram-header {
+	align-items: center;
+	border-bottom: 1px solid gray;
+	display: none;
+	flex-wrap: nowrap;
+	flex-direction: row;
+	justify-content: space-around;
+	position: absolute;
+	right: 4vw;
+	top: 0;
+}
+
+#igram-info-username {
+	color: #FFF;
+	text-decoration: underline;
+}
+
+#igram-profile-image-container {
+	padding-left: 1vw;
+	width: 5vh;
+	height: 5vh;
+	margin: auto;
+}
+
+#igram-profile-image {
+	width: 5vh;
+	height: 5vh;
+}

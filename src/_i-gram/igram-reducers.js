@@ -1,5 +1,5 @@
-export default function(
-  state={
+export default function (
+  state = {
     hasIGramToken: false,
     instaFilename: {}
   },
@@ -8,6 +8,6 @@ export default function(
     case 'SET_HAS_TOKEN':
       return {...state, hasIGramToken: action.payload};
     default:
-      return state
+      return state;
   }
 };

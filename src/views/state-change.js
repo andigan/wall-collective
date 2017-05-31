@@ -4,22 +4,22 @@ module.exports = {
     Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
 
 //      this.hideElement(dragger);
-      dragger.classList.remove('draggeron');
+      dragger.classList.remove('d-on');
 
     }.bind(this));
 
-    document.getElementById('switches').style.display = 'none';
+    document.getElementById('switches-container').style.display = 'none';
   },
 
   hideOtherDraggers(id) {
     Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
       if (dragger.id !== id) {
 //        this.hideElement(dragger);
-        dragger.classList.remove('draggeron');
+        dragger.classList.remove('d-on');
       };
     }.bind(this));
 
-    document.getElementById('switches').style.display = 'none';
+    document.getElementById('switches-container').style.display = 'none';
   },
 
   hideID(id) {
@@ -37,7 +37,7 @@ module.exports = {
   deletePreview(deleteID) {
     // show
     document.getElementById('delete-preview-container').classList.add('delete-preview-container-is-open');
-    document.getElementById('image-delete-preview').src = document.getElementById(deleteID).src;
+    document.getElementById('delete-image-preview').src = document.getElementById(deleteID).src;
 
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
@@ -49,7 +49,7 @@ module.exports = {
     document.getElementById('nav-tools-container').classList.add('nav-tools-container-is-open');
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
-    document.getElementById('switches').classList.remove('d-switches-is-open');
+    document.getElementById('switches-container').classList.remove('d-switches-is-open');
   },
 
   openAccount() {
@@ -61,7 +61,7 @@ module.exports = {
 
   openInfo() {
     // show
-    document.getElementById('info-page').style.display = 'block';
+    document.getElementById('app-info').style.display = 'block';
     // hide
     document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
     this.hideDraggers();
@@ -96,8 +96,8 @@ module.exports = {
       document.getElementById('upload-confirm-info').textContent = '';
       document.getElementById('upload-confirm-container').style.display = 'flex';
     }, 500);
-    // replace image-upload-preview image
-    document.getElementById('image-upload-preview').src = '/icons/1x1.png';
+    // replace upload-image-preview image
+    document.getElementById('upload-image-preview').src = '/icons/1x1.png';
   },
 
   afterDelete() {
@@ -114,8 +114,8 @@ module.exports = {
     setTimeout(function () {
       document.getElementById('delete-preview-container').style.display = 'block';
     }, 500);
-    // replace image-delete-preview
-    document.getElementById('image-delete-preview').src = '/icons/1x1.png';
+    // replace delete-image-preview
+    document.getElementById('delete-image-preview').src = '/icons/1x1.png';
   },
 
   rejectDelete() {
@@ -140,22 +140,21 @@ module.exports = {
 
   closeAll() {
     // hide
-    document.getElementById('switches').style.display = 'none';
+    document.getElementById('switches-container').style.display = 'none';
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
     document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
     document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
     document.getElementById('nav-tools-container').classList.remove('nav-tools-container-is-open');
     document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
-    document.getElementById('info-page').style.display = 'none';
+    document.getElementById('app-info').style.display = 'none';
     document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
     document.getElementById('connect-info').classList.remove('connect-info-is-open');
-    document.getElementById('explore-container').style.display = 'none';
-    document.getElementById('insta-header').style.display = 'none';
-    document.getElementById('insta-container').style.display = 'none';
+    document.getElementById('igram-header').style.display = 'none';
+    document.getElementById('igram-container').style.display = 'none';
 
-    // replace image-upload-preview image and image-delete-preview image
-    document.getElementById('image-upload-preview').src = '/icons/1x1.png';
-    document.getElementById('image-delete-preview').src = '/icons/1x1.png';
+    // replace upload-image-preview image and delete-image-preview image
+    document.getElementById('upload-image-preview').src = '/icons/1x1.png';
+    document.getElementById('delete-image-preview').src = '/icons/1x1.png';
     // close navigation button
     document.body.classList.remove('a-nav-container-is-open');
     // animate close hamburgers

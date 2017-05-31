@@ -34,7 +34,7 @@ module.exports = {
     debugText.textContent = 'report is off';
     debugText.setAttribute('id', 'debug-text');
 
-    debugIcon.classList.add('button-icon');
+    debugIcon.classList.add('nav-button-icon');
     debugIcon.src = '/icons/debug-icon.png';
     debugButton.appendChild(debugText);
     debugButton.appendChild(debugIcon);
@@ -67,7 +67,7 @@ module.exports = {
     for (i = 1; i <= 10; i++) {
       infoLineEl = document.createElement('div');
       infoLineEl.setAttribute('id', 'info' + i);
-      infoLineEl.classList.add('info');
+      infoLineEl.classList.add('debug-info');
       debugEl.appendChild(infoLineEl);
     };
 
@@ -175,7 +175,7 @@ module.exports = {
   },
 
   clearDebugInfo: function () {
-    Array.from(document.getElementsByClassName('info')).forEach(function (element) {
+    Array.from(document.getElementsByClassName('debug-info')).forEach(function (element) {
       element.textContent = '';
     });
   }

@@ -12,6 +12,9 @@
 
 import config from './_config/config';
 
+// css for webpack
+import styles from './assets/stylesheets/main.scss';
+
 // redux store
 import configureStore from './_init/configure-store';
 const store = configureStore();
@@ -41,13 +44,15 @@ import { IOInit } from './sockets/io';
 
 import { textboxInit } from './components/ui-elements/textbox.js';
 
-// insta imports
+// OPTIONAL Igram
 import { igramInit } from './_i-gram/init';
 import { igramIOInit } from './_i-gram/igram-io';
 import { igramButtonsInit } from './_i-gram/buttons';
+import igramStyle from './_i-gram/igram-styles.scss';
 
-// DEBUG
-import debug from './debug/debug'; // DEBUG
+// OPTIONAL debug
+import debug from './_debug/debug';
+import debugCss from './_debug/debug.scss';
 
 window.store = store;
 window.socket = IOInit();

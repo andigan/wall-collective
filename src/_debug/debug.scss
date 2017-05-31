@@ -1,0 +1,23 @@
+#debug-container {
+  background-color:transparent;
+  border:1px dashed white;
+  color:white;
+  display:block;
+  height:30vh;
+  margin:0;
+  padding:0;
+  position:absolute;
+  right:0;
+  top:0;
+  width:50vw;
+  z-index:90000;
+}
+
+.debug-info {
+  font-size: 1.75vh;
+}
+
+
+#debug-info li {
+margin-left: 5%;
+}

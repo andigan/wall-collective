@@ -13,7 +13,7 @@
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
 
   {{! css }}
-  <link rel="stylesheet" type="text/css" href="/css/style.css" />
+  <link rel="stylesheet" type="text/css" href="/css/styles.css" />
 
   {{>scripts}}
 
@@ -21,7 +21,7 @@
 
 <body>
   <div id='wrapper'>
-    <div id='info-update-message'>
+    <div id='hid-transform-alert'>
       Please update your browser or phone to continue!
     </div>
 
@@ -31,7 +31,7 @@
               src='{{url}}'
               id={{dom_id}}
               class='wallPic'
-              style='z-index: {{zindex}}; top: {{postop}}; left: {{posleft}}; width: {{width}}; height: {{height}}; transform: {{transform}}; opacity: {{opacity}}; -webkit-filter: {{filter}}; position: absolute;'
+              style='z-index: {{zindex}}; top: {{postop}}; left: {{posleft}}; width: {{width}}; height: {{height}}; transform: {{transform}}; opacity: {{opacity}}; -webkit-filter: {{filter}};'
               data-scale='{{scale}}'
               data-angle='{{angle}}'
               data-rotateX='{{rotateX}}'
@@ -77,7 +77,6 @@
       {{/repeat}}
     </div>
 
-
     <div id='nav-upload-container'>
       {{#repeat 5}}
       <div id='u{{@index}}' class='button-no-show'>
@@ -86,62 +85,17 @@
 
       <form id='upload-form-button' name='title' method='post' enctype='multipart/form-data' action='addfile/' runat='server'>
          <div class='btn-file button button-tools'> device
-           <img class='button-icon' src='/icons/upload-icon.png'>
+           <img class='nav-button-icon' src='/icons/upload-icon.png'>
            <input id='fileselect' type='file' name='session_id_goes_here'>
          </div>
       </form>
     </div>
 
-
-    <div id='upload-preview-container' class='rainbow-border'>
-      <img id='image-upload-preview' src='/icons/1x1.png'/>
-      <div id='upload-confirm-container'>
-        <div id='button-confirm-upload' class='button-confirmer confirm-yes' data-action='upload-confirm'> Confirm Upload </div>
-        <div id='button-reject-upload' class='button-confirmer confirm-no' data-action='upload-reject'> Cancel </div>
-      </div>
-      <div id='upload-confirm-info'> </div>
-    </div>
-
-    <div id='delete-preview-container' class='rainbow-border'>
-      <img id='image-delete-preview' src='/icons/1x1.png'/>
-      <div id='delete-confirm-container'>
-        <div id='button-confirm-delete' class='button-confirmer confirm-yes' data-action='delete-confirm'> Confirm Delete </div>
-        <div id='button-reject-delete' class='button-confirmer confirm-no' data-action='delete-reject'> Cancel </div>
-      </div>
-      <div id='delete-confirm-info'></div>
-    </div>
-
-    <div id='explore-container'>
-      <div id='explore-image-container'>
-        <img id='image-explore' src='/icons/1x1.png'/>
-      </div>
-      <div id='button-explore-left' class='button-explore'>
-        <img class='icon-x button-icon' src='/icons/x-icon.png'>
-      </div>
-      <div id='button-explore-right' class='button-explore'>
-        <img class='icon-x button-icon' src='/icons/x-icon.png'>
-      </div>
-      <div id='explore-info-container'>
-        <a id='igram-link'> <div id='insta-link-text'> instagram link </div>
-        </a>
-      </div>
-    </div>
-
-    <a id='insta-profile-link'>
-    <div id='insta-header'>
-      <div id='insta-info-username'></div>
-      <div id='insta-image-profile-container'>
-        <img id='insta-image-profile' src='/icons/1x1.png'/>
-      </div>
-    </div>
-  </a>
-    <div id='insta-container'>
-      <div id='insta-images-container'></div>
-      <div id='background-opacity'></div>
-    </div>
-
     <div id='connect-info' class='connect-info'></div>
+    {{>upload-download-previews}}
 
+    {{!>experimental}}
+    {{>igram}}
   </div>
 
   {{>info_and_privacy}}

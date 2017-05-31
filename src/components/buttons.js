@@ -45,7 +45,7 @@ function createButton(targetID, action, text, iconPath, buttonClass) {
   buttonEl.classList.add('button', buttonClass);
   buttonEl.setAttribute('data-action', action);
   buttonEl.innerText = text;
-  iconEl.classList.add('button-icon');
+  iconEl.classList.add('nav-button-icon');
   iconEl.src = iconPath;
   buttonEl.appendChild(iconEl);
 
@@ -168,16 +168,6 @@ function onClick(e) {
       }
       break;
 
-    case 'textbox':
-      let x = document.getElementById('cube');
-       if (x.style.display === 'none') {
-           x.style.display = 'block';
-       } else {
-           x.style.display = 'none';
-       };
-      break;
-
-
     case 'choose-color':
       let chooserEl = document.getElementById('color-chooser'),
           chooserPos = config.chooserPos,
@@ -226,7 +216,19 @@ function onClick(e) {
       stateChange.afterUpload();
       break;
 
-    // explore to fix
+    // experimental
+
+    case 'textbox':
+      let x = document.getElementById('cube');
+
+      if (x.style.display === 'none') {
+        x.style.display = 'block';
+      } else {
+        x.style.display = 'none';
+      };
+      break;
+
+
     case 'open-explore':
       document.getElementById('explore-container').style.display = 'block';
 
@@ -293,7 +295,7 @@ function exitDoorDrop() {
   $('#n4').droppable({
     accept: '.wallPic',
     // activeClass: 'exit_active_class',
-    hoverClass: 'exit_door_hover',
+    hoverClass: 'exit-door-hover',
     tolerance: 'pointer',
 
     over: function () { /* console.log('over exit door'); */ },

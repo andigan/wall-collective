@@ -18,7 +18,7 @@ export function createDraggers() {
     draggerEl.style.backgroundColor = d.color;
     draggerEl.style.boxShadow = '0 0 2px 2px ' + d.shadowColor;
 
-    iconContainerEl.classList.add('dragger-icon-container');
+    iconContainerEl.classList.add('d-icon-container');
     iconContainerEl.style.backgroundColor = d.color;
 
     iconEl.classList.add('d-icon');
@@ -391,7 +391,7 @@ export function setDraggerLocations(id) {
   if (id) {
     // if a nav bar is open, show the dragger switches
     if (document.body.classList.contains('a-nav-container-is-open')) {
-      document.getElementById('switches').style.display = 'flex';
+      document.getElementById('switches-container').style.display = 'flex';
     };
 
     dData.forEach(function (sw) {
@@ -422,7 +422,7 @@ function getValue(value, string) {
 function showDragger(draggerEl) {
 
   draggerEl.style.display = 'block';
-  draggerEl.classList.add('draggeron');
+  draggerEl.classList.add('d-on');
 
   // setTimeout is needed because the dragger will otherwise transition from no selection to selection
   setTimeout(function () {

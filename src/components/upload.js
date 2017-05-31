@@ -1,7 +1,5 @@
 import config from '../_config/config';
 import stateChange from '../views/state-change';
-import { assignImageDrag } from './ui-elements/main-image-drag';
-import { initializeImage, highestZ, highestID } from './images';
 
 export function uploadInit() {
 
@@ -22,7 +20,7 @@ export function uploadInit() {
       reader.onload = function (event) {
         // wait until the image is ready to upload_preview container
         document.getElementById('upload-preview-container').classList.add('upload-preview-container_is_open');
-        document.getElementById('image-upload-preview').src = event.target.result;
+        document.getElementById('upload-image-preview').src = event.target.result;
       };
       reader.readAsDataURL(input.files[0]);
     };
@@ -32,7 +30,7 @@ export function uploadInit() {
   // on click, send a submit to the html form with id='upload-form-button'
   // the html form with id='upload-form-button' posts to '/addfile'
   // and is parsed by busboy
-  document.getElementById('button-confirm-upload').onclick = function (e) {
+  document.getElementById('button-confirm-upload').onclick = function () {
     let request = new XMLHttpRequest,
         form = document.getElementById('upload-form-button'),
         data,

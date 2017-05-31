@@ -1,0 +1,19 @@
+#grid-info {
+  background-color: transparent;
+  color: white;
+  font-family: monospace;
+  position: fixed;
+  text-align: center;
+  top: 10px;
+  z-index: 86000;
+}
+
+.grid-hline {
+  height: 1px;
+  position: absolute;
+}
+
+.grid-vline {
+  position: absolute;
+  width: 1px;
+}
