@@ -16,10 +16,9 @@ export function buttonsInit() {
   createButton('n3', 'open-upload', 'upload', '/icons/upload-icon.png', 'button-nav');
   createButton('n4', 'exit-door', 'remove', '/icons/door-icon.png', 'button-nav');
 
-  createButton('t1', 'dragger-switch', 'draggers', '/icons/draggers-icon.png', 'button-tools');
-  createButton('t2', 'choose-color', 'color', '/icons/palette-icon.png', 'button-tools');
-  createButton('t3', 'reset-page', 'reset page', '/icons/reset-icon.png', 'button-tools');
-  createButton('t4', 'reset-image', 'reset image', '/icons/eraser-icon.png', 'button-tools');
+  createButton('t1', 'choose-color', 'color', '/icons/palette-icon.png', 'button-tools');
+  createButton('t2', 'reset-page', 'reset page', '/icons/reset-icon.png', 'button-tools');
+  createButton('t3', 'reset-image', 'reset image', '/icons/eraser-icon.png', 'button-tools');
 
   createButton('a1', 'app-info', 'info', '/icons/info-icon.png', 'button-tools');
   document.getElementById('u2').appendChild(document.getElementById('upload-form-button'));
@@ -115,16 +114,6 @@ function onClick(e) {
         stateChange.hideDraggers();
         stateChange.deletePreview(deleteID);
         window.socket.emit('ce:_hideImage', deleteID);
-      };
-      break;
-
-    case 'dragger-switch':
-      let switchesEl = document.getElementById('d-switches-container');
-
-      switchesEl.classList.toggle('d-switches-is-open');
-      // if dragger_switches container opens, close navigation container
-      if (switchesEl.classList.contains('d-switches-is-open')) {
-        document.getElementById('nav-main-container').classList.remove('nav-is-open');
       };
       break;
 

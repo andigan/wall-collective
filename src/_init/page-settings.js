@@ -30,8 +30,25 @@ module.exports = {
     this.mainWide = window.innerWidth;
     this.mainHigh = window.innerHeight;
 
-    this.innerWidth = this.mainWide - this.draggerWidth;
-    this.innerHeight = this.mainHigh - this.draggerHeight;
+    // set dragger limits
+    this.dLimits = {
+      top: 50,
+      bottom: this.mainWide - 50,
+      left: 50,
+      right: this.mainWide - 50
+    };
+
+    this.dLimits.height = this.dLimits.bottom - this.dLimits.top;
+    this.dLimits.width = this.dLimits.right - this.dLimits.left;
+
+    this.dLimits.intop = this.dLimits.top + this.draggerHeight / 2;
+    this.dLimits.inbottom = this.dLimits.bottom - this.draggerHeight / 2;
+    this.dLimits.inleft = this.dLimits.left + this.draggerWidth / 2;
+    this.dLimits.inright = this.dLimits.right - this.draggerHeight / 2;
+    this.dLimits.inwidth = this.dLimits.inright - this.dLimits.inleft;
+    this.dLimits.inheight = this.dLimits.inbottom - this.dLimits.intop;
+    this.dLimits.inmiddlex = this.dLimits.width / 2 + this.dLimits.left;
+    this.dLimits.inmiddley = this.dLimits.height / 2 + this.dLimits.top;
 
     // set wrapper size; (css vh and vw were not working with mobile safari)
     wrapperEl.style.width = this.mainWide + 'px';
@@ -51,12 +68,6 @@ module.exports = {
     // position the nav-toggle-button-container on the bottom right
     navToggleEl.style.left = (this.mainWide - parseFloat(window.getComputedStyle(navToggleEl).width) + 'px');
     navToggleEl.style.top = (this.mainHigh - parseFloat(window.getComputedStyle(navToggleEl).height) + 'px');
-
-    // set info-page height
-    document.getElementById('info-page').style.height = (this.innerHeight * 0.9) + 'px';
-
-    // set explore-container height
-    document.getElementById('explore-container').style.height = (this.innerHeight * 0.9) + 'px';
 
     // add perspective to 3d transforms
     imagesEl.style.webkitPerspective = '500px';

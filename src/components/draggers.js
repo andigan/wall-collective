@@ -5,187 +5,46 @@ import stateChange from '../views/state-change';
 import { resetClickCount } from '../actions';
 
 
-function set_stretch_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-stretch'),
-      imageEl = document.getElementById(id),
+export function createDraggers() {
 
-      // get the width and height
-      selected_imageWidth = parseFloat(imageEl.style.width),
-      selected_imageHeight = parseFloat(imageEl.style.height),
+  let draggers =
+    [{ name: 'stretch', color: 'blue',  icon: 'icons/ic_photo_size_select_small_black_24px.svg' },
+    { name: 'rotation', color: 'green',  icon: 'icons/ic_rotate_90_degrees_ccw_black_24px.svg' },
+    { name: 'opacity', color: 'white',  icon: 'icons/ic_opacity_black_24px.svg'},
+    { name: 'blur_brightness', color: 'darkorange',  icon: 'icons/ic_blur_on_black_24px.svg'},
+    { name: 'contrast_saturate', color: 'crimson',  icon: 'icons/ic_tonality_black_24px.svg'},
+    { name: 'grayscale_invert', color: 'silver',  icon: 'icons/ic_cloud_black_24px.svg'},
+    { name: 'threeD', color: 'deeppink',  icon: 'icons/ic_3d_rotation_black_24px.svg'},
+    { name: 'party', color: 'purple', icon: 'icons/ic_hot_tub_black_24px.svg'}]
+  ;
 
-      // calculate the dragger location
-      selected_imageWidth_percentage  = selected_imageWidth / 100,
-      selected_imageHeight_percentage = selected_imageHeight / 100,
-      draggerLeft = selected_imageWidth_percentage * pageSettings.innerWidth,
-      draggerTop = (1 - selected_imageHeight_percentage) * pageSettings.innerHeight;
+  draggers.forEach(function (aswitch) {
+    let draggerEl = document.createElement('div'),
+        iconContainerEl = document.createElement('div'),
+        iconEl = document.createElement('img'),
+        wrapperEl = document.getElementById('wrapper');
 
-  // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
-  dragger_element.style.display = 'block';
+    draggerEl.id = `dragger-${aswitch.name}`;
+    draggerEl.classList.add('dragger', 'd-transition');
+    draggerEl.style.backgroundColor = aswitch.color;
 
-  // allow transitions
-  // setTimeout is needed because the dragger will otherwise transition from no selection to selection
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
+    iconContainerEl.classList.add('dragger-icon-container');
+    iconContainerEl.style.backgroundColor = aswitch.color;
 
-function set_opacity_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-opacity'),
-      imageEl = document.getElementById(id),
-      // get the opacity percentage: 0-1
-      selected_image_opacity = parseInt( imageEl.style.opacity * 100) / 100,
-      // calculate the dragger location
-      draggerLeft = (selected_image_opacity * pageSettings.innerWidth);
+    iconEl.classList.add('switch-icon');
 
-  // set the dragger location
-  dragger_element.style.left = draggerLeft + 'px';
-//  dragger_element.style.top = (pageSettings.innerHeight / 3 * 2) + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
-
-function set_rotation_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-rotation'),
-      imageEl = document.getElementById(id),
-      // calculate the dragger location
-      draggerLeft = parseFloat(imageEl.getAttribute('data-angle') / 360 * pageSettings.innerWidth),
-      draggerTop = parseFloat(imageEl.getAttribute('data-rotateZ') / 360 * pageSettings.innerHeight);
-
-  // set the dragger location
-  dragger_element.style.left = draggerLeft + 'px';
-  dragger_element.style.top = draggerTop + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
-
-function set_grayscale_invert_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-grayscale_invert');
-  var imageEl = document.getElementById(id);
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-  var selected_image_filter = imageEl.style.WebkitFilter;
-      // get the numbers within the grayscale and invert parentheses
-
-//        console.log(imageEl);
-
-
-  var grayscale_Exp = /grayscale\(([^)]+)\)/,
-      invert_Exp = /invert\(([^)]+)\)/,
-      grayscale_matches = grayscale_Exp.exec(selected_image_filter),
-      invert_matches    = invert_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      draggerTop = ((1 - parseFloat(grayscale_matches[1])) * pageSettings.innerHeight),
-      draggerLeft = (parseFloat(invert_matches[1]) * pageSettings.innerWidth);
+    iconEl.src = aswitch.icon;
 
 
 
+    iconContainerEl.appendChild(iconEl);
 
-  // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
+    draggerEl.appendChild(iconContainerEl);
+    wrapperEl.appendChild(draggerEl);
+  });
+}
 
-function set_blur_brightness_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-blur_brightness'),
-      imageEl = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      selected_image_filter = imageEl.style.WebkitFilter,
-      // get the numbers within the blur and brightness parentheses
-      blur_Exp = /blur\(([^)]+)\)/,
-      brightness_Exp = /brightness\(([^)]+)\)/,
-      blur_matches = blur_Exp.exec(selected_image_filter),
-      brightness_matches    = brightness_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      draggerTop = (parseFloat(blur_matches[1]) * pageSettings.innerHeight / config.blurLevel),
-      draggerLeft = (parseFloat(brightness_matches[1]) * pageSettings.innerWidth / config.brightnessLevel);
-
-  // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
-
-function set_contrast_saturate_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-contrast_saturate'),
-      imageEl = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      selected_image_filter = imageEl.style.WebkitFilter,
-      // get the numbers within the contrast and saturate parentheses
-      contrast_Exp = /contrast\(([^)]+)\)/,
-      saturate_Exp = /saturate\(([^)]+)\)/,
-      contrast_matches = contrast_Exp.exec(selected_image_filter),
-      saturate_matches = saturate_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      draggerTop = (parseFloat(contrast_matches[1]) * pageSettings.innerHeight / config.contrastLevel),
-      draggerLeft = (parseFloat(saturate_matches[1]) * pageSettings.innerWidth / config.saturateLevel);
-
-  // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
-
-function set_party_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-party'),
-      imageEl = document.getElementById(id),
-      // get the filter. example: ('grayscale(0) blur(0px) invert(0) brightness(1) contrast(1) saturate(1) hue-rotate(0deg)')
-      // and opacity percentage: (0-1)
-      selected_image_filter = imageEl.style.WebkitFilter,
-      selected_image_opacity = parseInt( imageEl.style.opacity * 100) / 100,
-      // get the number within the hue-rotation parentheses
-      hue_rotate_Exp = /hue-rotate\(([^)]+)\)/,
-      hue_rotate_matches = hue_rotate_Exp.exec(selected_image_filter),
-      // calculate the dragger location
-      draggerLeft = (selected_image_opacity * pageSettings.innerWidth),
-      draggerTop = (pageSettings.innerHeight - (parseFloat(hue_rotate_matches[1]) / 360 * pageSettings.innerHeight));
-
-  // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
-
-function set_threeD_dragger_to(id) {
-  var dragger_element = document.getElementById('dragger-threeD'),
-    imageEl = document.getElementById(id),
-    // calculate the dragger location
-    draggerTop = pageSettings.innerHeight - ((( 180 + parseFloat(imageEl.getAttribute('data-rotateX')) ) / 360) * pageSettings.innerHeight),
-    draggerLeft = (( 180 + parseFloat(imageEl.getAttribute('data-rotateY')) ) / 360) * pageSettings.innerWidth;
-
-  // set the dragger location
-  dragger_element.style.left    = draggerLeft + 'px';
-  dragger_element.style.top     = draggerTop + 'px';
-  dragger_element.style.display = 'block';
-  // allow transitions
-  setTimeout(function () {
-    dragger_element.classList.add('d-transition');
-  }, 0);
-};
-
+// dragger API
 export function draggersInit() {
 
   var draggerAPI = {
@@ -209,7 +68,7 @@ export function draggersInit() {
       this.socketdata.imageEl = this.imageEl;
       this.socketdata.filename = this.imageEl.getAttribute('title');
 
-      this.dInfo = document.getElementById('d-info');
+      this.dInfo = document.getElementById('grid-info');
     },
 
     updateInfo: function (message) {
@@ -217,8 +76,9 @@ export function draggersInit() {
     },
 
     getPos: function (position) {
-      return { x: (position.left / pageSettings.innerWidth * 100).toFixed(2),
-               y: ((pageSettings.innerHeight - position.top) / pageSettings.innerHeight * 100).toFixed(2) };
+
+      return { x: (((position.left + pageSettings.draggerWidth / 2) - pageSettings.dLimits.inleft) / pageSettings.dLimits.inwidth * 100).toFixed(2),
+               y: ((pageSettings.dLimits.inheight - ((position.top + pageSettings.draggerHeight / 2) - pageSettings.dLimits.intop)) / pageSettings.dLimits.inheight * 100).toFixed(2) };
     },
 
     drag: function () {
@@ -266,292 +126,417 @@ export function draggersInit() {
       this.imageEl.style.WebkitFilter = this.imageEl.getAttribute('data-filter');
       this.imageEl.removeAttribute('data-filter');
       socket.emit('ce:_restoreFilter', this.imageID);
-    }
+    },
 
+    limitDrag(ui) {
+      // top
+      if (ui.position.top < pageSettings.dLimits.top) {
+        ui.position.top = pageSettings.dLimits.top;
+      };
+      // bottom
+      if (ui.position.top > pageSettings.dLimits.bottom - pageSettings.draggerHeight) {
+        ui.position.top = pageSettings.dLimits.bottom - pageSettings.draggerHeight;
+      };
+      // left
+      if (ui.position.left < pageSettings.dLimits.left) {
+        ui.position.left = pageSettings.dLimits.left;
+      };
+      // right
+      if (ui.position.left > pageSettings.dLimits.right - pageSettings.draggerWidth) {
+        ui.position.left = pageSettings.dLimits.right - pageSettings.draggerWidth;
+      };
+    }
   };
 
 
+// draggable draggers
+
+  $('#dragger-stretch').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+      draggerAPI.removeFilter();
+
+      this.imageCenterX = parseFloat(draggerAPI.imageEl.style.left) + (parseFloat(draggerAPI.imageEl.style.width) / 2);
+      this.imageCenterY = parseFloat(draggerAPI.imageEl.style.top) + (parseFloat(draggerAPI.imageEl.style.height) / 2);
+    },
+    drag: function (event, ui) {
+
+      draggerAPI.limitDrag(ui);
+
+      let draggerPos = draggerAPI.getPos(ui.position),
+          newWidth = draggerPos.x,
+          newHeight = draggerPos.y,
+          newLeft = this.imageCenterX - (newWidth / 2),
+          newTop = this.imageCenterY - (newHeight / 2);
+
+      draggerAPI.updateInfo(`width: ${draggerPos.x}% height: ${draggerPos.y}%`);
+
+      draggerAPI.changeStyle({width: newWidth + '%', height: newHeight + '%', left: newLeft + '%', top: newTop + '%'});
+
+      draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
+      draggerAPI.socketdata.imageWidth     = newWidth + '%';
+      draggerAPI.socketdata.imageHeight    = newHeight + '%';
+      draggerAPI.socketdata.imageLeft      = newLeft + '%';
+      draggerAPI.socketdata.imageTop       = newTop + '%';
+      socket.emit('ce:_resizing', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.restoreFilter();
+      draggerAPI.stop();
+
+      // save to database
+      socket.emit('ce:_saveResize', draggerAPI.socketdata);
+    }
+  });
 
 
+  $('#dragger-opacity').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
+      let draggerPos = draggerAPI.getPos(ui.position);
 
+      draggerAPI.updateInfo(`opacity: ${draggerPos.x}%`);
 
-    $('#dragger-stretch').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI = draggerAPI;
-        draggerAPI.start(this);
-        draggerAPI.removeFilter();
+      draggerAPI.changeStyle({'opacity': draggerPos.x / 100});
 
-        this.imageCenterX = parseFloat(draggerAPI.imageEl.style.left) + (parseFloat(draggerAPI.imageEl.style.width) / 2);
-        this.imageCenterY = parseFloat(draggerAPI.imageEl.style.top) + (parseFloat(draggerAPI.imageEl.style.height) / 2);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position),
-            newWidth = draggerPos.x,
-            newHeight = draggerPos.y,
-            newLeft = this.imageCenterX - (newWidth / 2),
-            newTop = this.imageCenterY - (newHeight / 2);
+      draggerAPI.socketdata.imageOpacity = draggerPos.x / 100;
+      socket.emit('ce:_opacityChanging', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.stop();
+      socket.emit('ce:_saveOpacity', draggerAPI.socketdata);
+    }
+  });
 
-        draggerAPI.updateInfo(`width: ${draggerPos.x}% height: ${draggerPos.y}%`);
+  $('#dragger-rotation').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
-        draggerAPI.changeStyle({width: newWidth + '%', height: newHeight + '%', left: newLeft + '%', top: newTop + '%'});
+      let draggerPos = draggerAPI.getPos(ui.position);
 
-        draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
-        draggerAPI.socketdata.imageWidth     = newWidth + '%';
-        draggerAPI.socketdata.imageHeight    = newHeight + '%';
-        draggerAPI.socketdata.imageLeft      = newLeft + '%';
-        draggerAPI.socketdata.imageTop       = newTop + '%';
-        socket.emit('ce:_resizing', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.restoreFilter();
-        draggerAPI.stop();
+      this.newRotation = Math.round(draggerPos.x * 3.6);
+      this.newRotateZ = Math.round((100 - draggerPos.y) * 3.6);
 
-        // save to database
-        socket.emit('ce:_saveResize', draggerAPI.socketdata);
-      }
-    });
+      draggerAPI.updateInfo(`rotation: ${this.newRotation.toFixed(2)}deg rotateZ: ${this.newRotateZ.toFixed(2)}deg`);
 
+      draggerAPI.changeTransform({rotate: this.newRotation + 'deg', rotateZ: this.newRotateZ + 'deg'});
 
-    $('#dragger-opacity').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position);
+      draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
+      socket.emit('ce:_transforming', draggerAPI.socketdata);
+    },
+    stop: function () {
+      // store angle in data-angle
+      draggerAPI.imageEl.setAttribute('data-angle', this.newRotation.toFixed(2));
+      draggerAPI.imageEl.setAttribute('data-rotateZ', this.newRotateZ.toFixed(2));
 
-        draggerAPI.updateInfo(`opacity: ${draggerPos.x}%`);
+      draggerAPI.stop();
 
-        draggerAPI.changeStyle({'opacity': draggerPos.x / 100});
+      // save to database
+      socket.emit('ce:_saveTransform', draggerAPI.socketdata);
 
-        draggerAPI.socketdata.imageOpacity = draggerPos.x / 100;
-        socket.emit('ce:_opacityChanging', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.stop();
-        socket.emit('ce:_saveOpacity', draggerAPI.socketdata);
-      }
-    });
+      // send to socket
+      draggerAPI.socketdata.angle = this.newRotation.toString();
+      draggerAPI.socketdata.scale = draggerAPI.imageEl.getAttribute('data-scale');
+      draggerAPI.socketdata.rotateX = draggerAPI.imageEl.getAttribute('data-rotateX');
+      draggerAPI.socketdata.rotateY = draggerAPI.imageEl.getAttribute('data-rotateY');
+      draggerAPI.socketdata.rotateZ = draggerAPI.imageEl.getAttribute('data-rotateZ');
+      socket.emit('ce:_saveDataAttributes', draggerAPI.socketdata);
+    }
+  });
 
-    $('#dragger-rotation').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position);
+  $('#dragger-grayscale_invert').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
-        this.newRotation = Math.round(draggerPos.x * 3.6);
-        this.newRotateZ = Math.round((100 - draggerPos.y) * 3.6);
+      let draggerPos = draggerAPI.getPos(ui.position);
 
-        draggerAPI.updateInfo(`rotation: ${this.newRotation.toFixed(2)}deg rotateZ: ${this.newRotateZ.toFixed(2)}deg`);
+      draggerAPI.updateInfo(`grayscale: ${draggerPos.y}% invert: ${draggerPos.x}%`);
 
-        draggerAPI.changeTransform({rotate: this.newRotation + 'deg', rotateZ: this.newRotateZ + 'deg'});
+      draggerAPI.changeFilter({invert: draggerPos.x / 100, grayscale: draggerPos.y / 100});
 
-        draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
-        socket.emit('ce:_transforming', draggerAPI.socketdata);
-      },
-      stop: function () {
-        // store angle in data-angle
-        draggerAPI.imageEl.setAttribute('data-angle', this.newRotation.toFixed(2));
-        draggerAPI.imageEl.setAttribute('data-rotateZ', this.newRotateZ.toFixed(2));
+      draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('ce:_filterChanging', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.stop();
+      socket.emit('ce:_saveFilter', draggerAPI.socketdata);
+    }
+  });
 
-        draggerAPI.stop();
+  $('#dragger-blur_brightness').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
-        // save to database
-        socket.emit('ce:_saveTransform', draggerAPI.socketdata);
+      let draggerPos = draggerAPI.getPos(ui.position),
+          brightness = (draggerPos.x / 100 * config.brightnessLevel).toFixed(2),
+          blur = ((1 - draggerPos.y / 100) * config.blurLevel).toFixed(2);
 
-        // send to socket
-        draggerAPI.socketdata.angle = this.newRotation.toString();
-        draggerAPI.socketdata.scale = draggerAPI.imageEl.getAttribute('data-scale');
-        draggerAPI.socketdata.rotateX = draggerAPI.imageEl.getAttribute('data-rotateX');
-        draggerAPI.socketdata.rotateY = draggerAPI.imageEl.getAttribute('data-rotateY');
-        draggerAPI.socketdata.rotateZ = draggerAPI.imageEl.getAttribute('data-rotateZ');
-        socket.emit('ce:_saveDataAttributes', draggerAPI.socketdata);
-      }
-    });
+      draggerAPI.updateInfo(`blur: ${blur}px brightness: ${brightness}`);
 
-    $('#dragger-grayscale_invert').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position);
+      draggerAPI.changeFilter({blur: blur + 'px', brightness: brightness});
 
-        draggerAPI.updateInfo(`grayscale: ${draggerPos.y}% invert: ${draggerPos.x}%`);
+      draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('ce:_filterChanging', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.stop();
+      socket.emit('ce:_saveFilter', draggerAPI.socketdata);
+    }
+  });
 
-        draggerAPI.changeFilter({invert: draggerPos.x / 100, grayscale: draggerPos.y / 100});
+  $('#dragger-contrast_saturate').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
-        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
-        socket.emit('ce:_filterChanging', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.stop();
-        socket.emit('ce:_saveFilter', draggerAPI.socketdata);
-      }
-    });
+      let draggerPos = draggerAPI.getPos(ui.position),
+          saturate = (draggerPos.x / 100 * config.saturateLevel).toFixed(2),
+          contrast = ((1 - draggerPos.y / 100) * config.contrastLevel).toFixed(2);
 
-    $('#dragger-blur_brightness').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position),
-            brightness = (draggerPos.x / 100 * config.brightnessLevel).toFixed(2),
-            blur = ((1 - draggerPos.y / 100) * config.blurLevel).toFixed(2);
+      draggerAPI.updateInfo(`contrast: ${contrast} saturate: ${saturate}`);
 
-        draggerAPI.updateInfo(`blur: ${blur}px brightness: ${brightness}`);
+      draggerAPI.changeFilter({contrast: contrast, saturate: saturate});
 
-        draggerAPI.changeFilter({blur: blur + 'px', brightness: brightness});
+      draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('ce:_filterChanging', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.stop();
+      socket.emit('ce:_saveFilter', draggerAPI.socketdata);
+    }
+  });
 
-        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
-        socket.emit('ce:_filterChanging', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.stop();
-        socket.emit('ce:_saveFilter', draggerAPI.socketdata);
-      }
-    });
+  $('#dragger-party').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
-    $('#dragger-contrast_saturate').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position),
-            saturate = (draggerPos.x / 100 * config.saturateLevel).toFixed(2),
-            contrast = ((1 - draggerPos.y / 100) * config.contrastLevel).toFixed(2);
+      let draggerPos = draggerAPI.getPos(ui.position),
+          opacity = draggerPos.x < 50 ? (draggerPos.x * 0.02).toFixed(2) : (1 - (draggerPos.x - 50) * 0.02).toFixed(2),
+          hueRotate = draggerPos.y < 50 ? (360 - draggerPos.y * 7.2).toFixed(2) : (draggerPos.y * 7.2 - 360).toFixed(2);
 
-        draggerAPI.updateInfo(`contrast: ${contrast} saturate: ${saturate}`);
+      draggerAPI.updateInfo(`opacity: ${(opacity * 100).toFixed(0)}% hue-rotation: ${hueRotate}`);
 
-        draggerAPI.changeFilter({contrast: contrast, saturate: saturate});
+      draggerAPI.changeStyle({'opacity': opacity});
+      draggerAPI.changeFilter({'hue-rotate': hueRotate + 'deg'});
 
-        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
-        socket.emit('ce:_filterChanging', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.stop();
-        socket.emit('ce:_saveFilter', draggerAPI.socketdata);
-      }
-    });
+      draggerAPI.socketdata.imageOpacity = opacity;
+      socket.emit('ce:_opacityChanging', draggerAPI.socketdata);
+      draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
+      socket.emit('ce:_filterChanging', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.stop();
+      socket.emit('ce:_saveOpacity', draggerAPI.socketdata);
+      socket.emit('ce:_saveFilter', draggerAPI.socketdata);
+    }
+  });
 
-    $('#dragger-party').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position),
-            opacity = (draggerPos.x / 100).toFixed(2),
-            hueRotate = (draggerPos.y * 3.6).toFixed(2);
+  $('#dragger-threeD').draggable({
+    scroll: false,
+    start: function () {
+      draggerAPI.start(this);
+    },
+    drag: function (event, ui) {
+      draggerAPI.limitDrag(ui);
 
-        draggerAPI.updateInfo(`opacity: ${(opacity * 100).toFixed(0)}% hue-rotation: ${hueRotate}`);
+      let draggerPos = draggerAPI.getPos(ui.position);
 
-        draggerAPI.changeStyle({'opacity': opacity});
-        draggerAPI.changeFilter({'hue-rotate': hueRotate + 'deg'});
+      this.rotateX = ((draggerPos.y * 3.6) - 180).toFixed(2),
+      this.rotateY = ((draggerPos.x * 3.6) - 180).toFixed(2);
 
-        draggerAPI.socketdata.imageOpacity = this.draggerXpos;
-        socket.emit('ce:_opacityChanging', draggerAPI.socketdata);
-        draggerAPI.socketdata.filter = draggerAPI.imageEl.style.WebkitFilter;
-        socket.emit('ce:_filterChanging', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.stop();
-        socket.emit('ce:_saveOpacity', draggerAPI.socketdata);
-        socket.emit('ce:_saveFilter', draggerAPI.socketdata);
-      }
-    });
+      // display the percentages in the grid-info div
+      draggerAPI.updateInfo(`rotateX: ${this.rotateX}deg rotateY: ${this.rotateY}deg`);
 
-    $('#dragger-threeD').draggable({
-      containment: 'parent',
-      scroll: false,
-      start: function () {
-        draggerAPI.start(this);
-      },
-      drag: function (event, ui) {
-        let draggerPos = draggerAPI.getPos(ui.position);
+      draggerAPI.changeTransform({rotateX: this.rotateX + 'deg', rotateY: this.rotateY + 'deg'});
 
-        this.rotateX = ((draggerPos.y * 3.6) - 180).toFixed(2),
-        this.rotateY = ((draggerPos.x * 3.6) - 180).toFixed(2);
+      // socket to other clients
+      draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
+      socket.emit('ce:_transforming', draggerAPI.socketdata);
+    },
+    stop: function () {
+      draggerAPI.imageEl.setAttribute('data-rotateX', this.rotateX);
+      draggerAPI.imageEl.setAttribute('data-rotateY', this.rotateY);
 
-        // display the percentages in the d-info div
-        draggerAPI.updateInfo(`rotateX: ${this.rotateX}deg rotateY: ${this.rotateY}deg`);
+      draggerAPI.stop();
 
-        draggerAPI.changeTransform({rotateX: this.rotateX + 'deg', rotateY: this.rotateY + 'deg'});
+      // save to database
+      socket.emit('ce:_saveTransform', draggerAPI.socketdata);
 
-        // socket to other clients
-        draggerAPI.socketdata.transform = draggerAPI.imageEl.style.transform;
-        socket.emit('ce:_transforming', draggerAPI.socketdata);
-      },
-      stop: function () {
-        draggerAPI.imageEl.setAttribute('data-rotateX', this.rotateX);
-        draggerAPI.imageEl.setAttribute('data-rotateY', this.rotateY);
-
-        draggerAPI.stop();
-
-        // save to database
-        socket.emit('ce:_saveTransform', draggerAPI.socketdata);
-
-        // send to socket
-        draggerAPI.socketdata.scale = draggerAPI.imageEl.getAttribute('data-scale');
-        draggerAPI.socketdata.angle = draggerAPI.imageEl.getAttribute('data-angle');
-        draggerAPI.socketdata.rotateX = draggerAPI.imageEl.getAttribute('data-rotateX');
-        draggerAPI.socketdata.rotateY = draggerAPI.imageEl.getAttribute('data-rotateY');
-        draggerAPI.socketdata.rotateZ = draggerAPI.imageEl.getAttribute('data-rotateZ');
-        socket.emit('ce:_saveDataAttributes', draggerAPI.socketdata);
-      }
-    });
-
-
-
-
+      // send to socket
+      draggerAPI.socketdata.scale = draggerAPI.imageEl.getAttribute('data-scale');
+      draggerAPI.socketdata.angle = draggerAPI.imageEl.getAttribute('data-angle');
+      draggerAPI.socketdata.rotateX = draggerAPI.imageEl.getAttribute('data-rotateX');
+      draggerAPI.socketdata.rotateY = draggerAPI.imageEl.getAttribute('data-rotateY');
+      draggerAPI.socketdata.rotateZ = draggerAPI.imageEl.getAttribute('data-rotateZ');
+      socket.emit('ce:_saveDataAttributes', draggerAPI.socketdata);
+    }
+  });
 }
-
-
-
-
-
-
-
 
 export function setDraggerLocations(id) {
 
   if (id) {
-    if (document.getElementById('switch-stretch').classList.contains('switchon')) {
-      set_stretch_dragger_to(id);
+    // if a nav bar is open, show the dragger switches
+    if (document.body.classList.contains('a-nav-container-is-open')) {
+      document.getElementById('switches').style.display = 'flex';
     };
-    if (document.getElementById('switch-opacity').classList.contains('switchon')) {
-      set_opacity_dragger_to(id);
-    };
-    if (document.getElementById('switch-rotation').classList.contains('switchon')) {
-      set_rotation_dragger_to(id);
-    };
-    if (document.getElementById('switch-grayscale_invert').classList.contains('switchon')) {
-      set_grayscale_invert_dragger_to(id);
-    };
-    if (document.getElementById('switch-blur_brightness').classList.contains('switchon')) {
-      set_blur_brightness_dragger_to(id);
-    };
-    if (document.getElementById('switch-contrast_saturate').classList.contains('switchon')) {
-      set_contrast_saturate_dragger_to(id);
-    };
-    if (document.getElementById('switch-threeD').classList.contains('switchon')) {
-      set_threeD_dragger_to(id);
-    };
-    if (document.getElementById('switch-party').classList.contains('switchon')) {
-      set_party_dragger_to(id);
-    };
+
+    let sws = [
+      { name: 'switch-stretch',
+        handler: setStretchD },
+      { name: 'switch-opacity',
+        handler: setOpacityD },
+      { name: 'switch-rotation',
+        handler: setRotationD },
+      { name: 'switch-grayscale_invert',
+        handler: setGrayscaleInvertD },
+      { name: 'switch-blur_brightness',
+        handler: setBlurBrightnessD },
+      { name: 'switch-contrast_saturate',
+        handler: setContrastSaturateD },
+      { name: 'switch-threeD',
+        handler: setThreeDD },
+      { name: 'switch-party',
+        handler: setPartyD }
+    ];
+
+    sws.forEach(function (sw) {
+      if (document.getElementById(sw.name).classList.contains('switchon')) {
+        sw.handler(id);
+      }
+    });
   };
 }
+
+// set dragger helpers
+
+// set the dragger location within inner limits
+function setDraggerLoc(draggerEl, x, y) {
+  draggerEl.style.left = `${pageSettings.dLimits.left + x * pageSettings.dLimits.inwidth}px`;
+  draggerEl.style.top = `${pageSettings.dLimits.top + y * pageSettings.dLimits.inheight}px`;
+}
+
+// get the numbers within the parentheses before the value from the string
+function getValue(value, string) {
+  let x = new RegExp(value + '\\(.*?\\)'),
+      y = x.exec(string)[0],
+      z = y.replace(')','').replace('(', '').replace(value, '');
+
+  return parseFloat(z);
+}
+
+function showDragger(draggerEl) {
+
+  draggerEl.style.display = 'block';
+  draggerEl.classList.add('draggeron');
+
+  // setTimeout is needed because the dragger will otherwise transition from no selection to selection
+  setTimeout(function () {
+    draggerEl.classList.add('d-transition');
+  }, 0);
+}
+
+
+// set dragger functions
+function setStretchD(id) {
+  let draggerEl = document.getElementById('dragger-stretch'),
+      imageEl = document.getElementById(id);
+
+  setDraggerLoc(draggerEl, parseFloat(imageEl.style.width) / 100, 1 - parseFloat(imageEl.style.height) / 100);
+  showDragger(draggerEl);
+};
+
+function setOpacityD(id) {
+  let draggerEl = document.getElementById('dragger-opacity'),
+      imageEl = document.getElementById(id);
+
+  setDraggerLoc(draggerEl, imageEl.style.opacity, 0);
+  showDragger(draggerEl);
+};
+
+function setRotationD(id) {
+  let draggerEl = document.getElementById('dragger-rotation'),
+      imageEl = document.getElementById(id);
+
+  setDraggerLoc(draggerEl, parseFloat(imageEl.getAttribute('data-angle')) / 360, parseFloat(imageEl.getAttribute('data-rotateZ')) / 360);
+  showDragger(draggerEl);
+};
+
+function setGrayscaleInvertD(id) {
+  let draggerEl = document.getElementById('dragger-grayscale_invert'),
+      imageEl = document.getElementById(id),
+      imageFilter = imageEl.style.WebkitFilter;
+
+  setDraggerLoc(draggerEl, getValue('invert', imageFilter), 1 - getValue('grayscale', imageFilter));
+  showDragger(draggerEl);
+};
+
+function setBlurBrightnessD(id) {
+  let draggerEl = document.getElementById('dragger-blur_brightness'),
+      imageEl = document.getElementById(id),
+      imageFilter = imageEl.style.WebkitFilter;
+
+  setDraggerLoc(draggerEl, getValue('brightness', imageFilter) / config.brightnessLevel, getValue('blur', imageFilter) / config.blurLevel);
+  showDragger(draggerEl);
+};
+
+function setContrastSaturateD(id) {
+  let draggerEl = document.getElementById('dragger-contrast_saturate'),
+      imageEl = document.getElementById(id),
+      imageFilter = imageEl.style.WebkitFilter;
+
+  setDraggerLoc(draggerEl, getValue('saturate', imageFilter) / config.saturateLevel, getValue('contrast', imageFilter) / config.contrastLevel);
+  showDragger(draggerEl);
+};
+
+function setPartyD(id) {
+  let draggerEl = document.getElementById('dragger-party'),
+      imageEl = document.getElementById(id),
+
+      imageFilter = imageEl.style.WebkitFilter,
+      opacity = parseInt( imageEl.style.opacity * 100) / 100,
+
+      isLeft = (draggerEl.offsetLeft + pageSettings.draggerWidth / 2 < pageSettings.dLimits.inmiddlex),
+      isTop = (draggerEl.offsetTop + pageSettings.draggerWidth / 2 < pageSettings.dLimits.inmiddley),
+
+      adjustedY = isTop ? ((1 - (getValue('hue-rotate', imageFilter) / 360)) / 2 ).toFixed(2) : (0.5 + getValue('hue-rotate', imageFilter) / 720).toFixed(2),
+      adjustedZ = isLeft ? opacity / 2 : 1 - opacity / 2;
+
+  setDraggerLoc(draggerEl, adjustedZ, adjustedY);
+  showDragger(draggerEl);
+};
+
+function setThreeDD(id) {
+  let draggerEl = document.getElementById('dragger-threeD'),
+      imageEl = document.getElementById(id),
+      x = (( 180 + parseFloat(imageEl.getAttribute('data-rotateY')) ) / 360),
+      y = 1 - (( 180 + parseFloat(imageEl.getAttribute('data-rotateX')) ) / 360);
+
+  setDraggerLoc(draggerEl, x, y);
+  showDragger(draggerEl);
+};

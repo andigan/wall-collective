@@ -2,16 +2,24 @@ module.exports = {
 
   hideDraggers() {
     Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
-      this.hideElement(dragger);
+
+//      this.hideElement(dragger);
+      dragger.classList.remove('draggeron');
+
     }.bind(this));
+
+    document.getElementById('switches').style.display = 'none';
   },
 
   hideOtherDraggers(id) {
     Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
       if (dragger.id !== id) {
-        this.hideElement(dragger);
+//        this.hideElement(dragger);
+        dragger.classList.remove('draggeron');
       };
     }.bind(this));
+
+    document.getElementById('switches').style.display = 'none';
   },
 
   hideID(id) {
@@ -41,7 +49,7 @@ module.exports = {
     document.getElementById('nav-tools-container').classList.add('nav-tools-container-is-open');
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
-    document.getElementById('d-switches-container').classList.remove('d-switches-is-open');
+    document.getElementById('switches').classList.remove('d-switches-is-open');
   },
 
   openAccount() {
@@ -132,10 +140,10 @@ module.exports = {
 
   closeAll() {
     // hide
+    document.getElementById('switches').style.display = 'none';
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
     document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
     document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
-    document.getElementById('d-switches-container').classList.remove('d-switches-is-open');
     document.getElementById('nav-tools-container').classList.remove('nav-tools-container-is-open');
     document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
     document.getElementById('info-page').style.display = 'none';

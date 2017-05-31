@@ -3,7 +3,6 @@
 // Version: 0.7.0
 // Requires: jQuery v1.7+
 //           jquery-ui
-//           jquery.form
 //           jquery.mobile-events
 //           jquery.ui.touch-punch
 //           socket.io v1.3.7+
@@ -22,6 +21,7 @@ import pageSettings from './_init/page-settings';
 import { pageInit } from './_init/page-helpers';
 
 // components
+import { createDraggers } from './components/draggers';
 import { buttonsInit } from './components/buttons';
 import { navToggleInit } from './components/ui-elements/nav-toggle-button';
 import { uploadInit } from './components/upload';
@@ -65,6 +65,8 @@ if (config.debugOn) debug.init(store);
 
 
 pageInit();
+
+createDraggers();
 
 buttonsInit(); // create buttons and assign functionality
 pageSettings.init(); // set page sizes and resize listeners

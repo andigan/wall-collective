@@ -1,4 +1,3 @@
-import config from '../../_config/config';
 import pageSettings from '../../_init/page-settings';
 
 module.exports = {
