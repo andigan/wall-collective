@@ -100,7 +100,7 @@
   width: 12.5%;
 }
 
-.switch-icon-container {
+.d-icon-container {
   width: 36px;
   border-radius: 100%;
   height: 36px;
@@ -108,7 +108,7 @@
   transition: all .2s ease-in-out;
 }
 
-.switch-icon {
+.d-icon {
   width: 50%;
   left: 50%;
   top: 50%;
@@ -943,54 +943,4 @@ position: absolute;
 #insta-image-profile {
 width: 5vh;
 height: 5vh;
-}
-
-
-
-
-
-
-
-
-
-/* delete? */
-
-#dragger-stretch {
-  box-shadow:0 0 3px 3px blue;
-  color:blue;
-}
-
-#dragger-threeD {
-  box-shadow: 0 0 3px 3px deeppink;
-  color: deeppink;
-}
-
-#dragger-party {
-  box-shadow:0 0 3px 3px purple;
-  color:purple;
-}
-
-#dragger-rotation {
-  box-shadow:0 0 3px 3px green;
-  color:green;
-}
-
-#dragger-contrast_saturate {
-  box-shadow:0 0 3px 3px crimson;
-  color:crimson;
-}
-
-#dragger-blur_brightness {
-  box-shadow: 0 0 3px 3px darkorange;
-  color: darkorange;
-}
-
-#dragger-grayscale_invert {
-  box-shadow:0 0 3px 3px silver;
-  color:silver;
-}
-
-#dragger-opacity {
-  box-shadow:0 0 3px 3px white;
-  color:white;
 }

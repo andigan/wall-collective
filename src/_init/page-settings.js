@@ -33,7 +33,7 @@ module.exports = {
     // set dragger limits
     this.dLimits = {
       top: 50,
-      bottom: this.mainWide - 50,
+      bottom: this.mainHigh - 200,
       left: 50,
       right: this.mainWide - 50
     };

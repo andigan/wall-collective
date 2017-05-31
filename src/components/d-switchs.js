@@ -38,10 +38,10 @@ function createSwitches() {
     switchContainerEl.classList.add('switch-container');
     switchContainerEl.classList.add('dragger-switch');
 
-    iconContainerEl.classList.add('switch-icon-container');
+    iconContainerEl.classList.add('d-icon-container');
     iconContainerEl.style.backgroundColor = aswitch.color;
 
-    iconEl.classList.add('switch-icon');
+    iconEl.classList.add('d-icon');
 
     iconEl.src = aswitch.icon;
 

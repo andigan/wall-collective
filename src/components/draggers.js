@@ -1,41 +1,29 @@
 import config from '../_config/config';
+import dData from '../_config/config-draggers';
 import pageSettings from '../_init/page-settings';
 import Grid from './grid';
 import stateChange from '../views/state-change';
 import { resetClickCount } from '../actions';
 
-
 export function createDraggers() {
 
-  let draggers =
-    [{ name: 'stretch', color: 'blue',  icon: 'icons/ic_photo_size_select_small_black_24px.svg' },
-    { name: 'rotation', color: 'green',  icon: 'icons/ic_rotate_90_degrees_ccw_black_24px.svg' },
-    { name: 'opacity', color: 'white',  icon: 'icons/ic_opacity_black_24px.svg'},
-    { name: 'blur_brightness', color: 'darkorange',  icon: 'icons/ic_blur_on_black_24px.svg'},
-    { name: 'contrast_saturate', color: 'crimson',  icon: 'icons/ic_tonality_black_24px.svg'},
-    { name: 'grayscale_invert', color: 'silver',  icon: 'icons/ic_cloud_black_24px.svg'},
-    { name: 'threeD', color: 'deeppink',  icon: 'icons/ic_3d_rotation_black_24px.svg'},
-    { name: 'party', color: 'purple', icon: 'icons/ic_hot_tub_black_24px.svg'}]
-  ;
-
-  draggers.forEach(function (aswitch) {
+  dData.forEach(function (d) {
     let draggerEl = document.createElement('div'),
         iconContainerEl = document.createElement('div'),
         iconEl = document.createElement('img'),
         wrapperEl = document.getElementById('wrapper');
 
-    draggerEl.id = `dragger-${aswitch.name}`;
+    draggerEl.id = `dragger-${d.name}`;
     draggerEl.classList.add('dragger', 'd-transition');
-    draggerEl.style.backgroundColor = aswitch.color;
+    draggerEl.style.backgroundColor = d.color;
+    draggerEl.style.boxShadow = '0 0 2px 2px ' + d.shadowColor;
 
     iconContainerEl.classList.add('dragger-icon-container');
-    iconContainerEl.style.backgroundColor = aswitch.color;
+    iconContainerEl.style.backgroundColor = d.color;
 
-    iconEl.classList.add('switch-icon');
+    iconEl.classList.add('d-icon');
 
-    iconEl.src = aswitch.icon;
-
-
+    iconEl.src = d.icon;
 
     iconContainerEl.appendChild(iconEl);
 
@@ -227,7 +215,7 @@ export function draggersInit() {
       this.newRotation = Math.round(draggerPos.x * 3.6);
       this.newRotateZ = Math.round((100 - draggerPos.y) * 3.6);
 
-      draggerAPI.updateInfo(`rotation: ${this.newRotation.toFixed(2)}deg rotateZ: ${this.newRotateZ.toFixed(2)}deg`);
+      draggerAPI.updateInfo(`rotation: ${this.newRotation.toFixed(0)}\xB0 rotateZ: ${this.newRotateZ.toFixed(0)}\xB0`);
 
       draggerAPI.changeTransform({rotate: this.newRotation + 'deg', rotateZ: this.newRotateZ + 'deg'});
 
@@ -339,7 +327,7 @@ export function draggersInit() {
           opacity = draggerPos.x < 50 ? (draggerPos.x * 0.02).toFixed(2) : (1 - (draggerPos.x - 50) * 0.02).toFixed(2),
           hueRotate = draggerPos.y < 50 ? (360 - draggerPos.y * 7.2).toFixed(2) : (draggerPos.y * 7.2 - 360).toFixed(2);
 
-      draggerAPI.updateInfo(`opacity: ${(opacity * 100).toFixed(0)}% hue-rotation: ${hueRotate}`);
+      draggerAPI.updateInfo(`opacity: ${(opacity * 100).toFixed(0)}% hue-rotation: ${hueRotate}\xB0`);
 
       draggerAPI.changeStyle({'opacity': opacity});
       draggerAPI.changeFilter({'hue-rotate': hueRotate + 'deg'});
@@ -370,7 +358,7 @@ export function draggersInit() {
       this.rotateY = ((draggerPos.x * 3.6) - 180).toFixed(2);
 
       // display the percentages in the grid-info div
-      draggerAPI.updateInfo(`rotateX: ${this.rotateX}deg rotateY: ${this.rotateY}deg`);
+      draggerAPI.updateInfo(`rotateX: ${this.rotateX}\xB0 rotateY: ${this.rotateY}\xB0`);
 
       draggerAPI.changeTransform({rotateX: this.rotateX + 'deg', rotateY: this.rotateY + 'deg'});
 
@@ -406,27 +394,8 @@ export function setDraggerLocations(id) {
       document.getElementById('switches').style.display = 'flex';
     };
 
-    let sws = [
-      { name: 'switch-stretch',
-        handler: setStretchD },
-      { name: 'switch-opacity',
-        handler: setOpacityD },
-      { name: 'switch-rotation',
-        handler: setRotationD },
-      { name: 'switch-grayscale_invert',
-        handler: setGrayscaleInvertD },
-      { name: 'switch-blur_brightness',
-        handler: setBlurBrightnessD },
-      { name: 'switch-contrast_saturate',
-        handler: setContrastSaturateD },
-      { name: 'switch-threeD',
-        handler: setThreeDD },
-      { name: 'switch-party',
-        handler: setPartyD }
-    ];
-
-    sws.forEach(function (sw) {
-      if (document.getElementById(sw.name).classList.contains('switchon')) {
+    dData.forEach(function (sw) {
+      if (document.getElementById('switch-' + sw.name).classList.contains('switchon')) {
         sw.handler(id);
       }
     });
@@ -435,13 +404,13 @@ export function setDraggerLocations(id) {
 
 // set dragger helpers
 
-// set the dragger location within inner limits
+// set the dragger location within inner limits using percentages normalized between 0 and 1
 function setDraggerLoc(draggerEl, x, y) {
   draggerEl.style.left = `${pageSettings.dLimits.left + x * pageSettings.dLimits.inwidth}px`;
   draggerEl.style.top = `${pageSettings.dLimits.top + y * pageSettings.dLimits.inheight}px`;
 }
 
-// get the numbers within the parentheses before the value from the string
+// get the number within the parentheses before the value from the string
 function getValue(value, string) {
   let x = new RegExp(value + '\\(.*?\\)'),
       y = x.exec(string)[0],
@@ -462,8 +431,8 @@ function showDragger(draggerEl) {
 }
 
 
-// set dragger functions
-function setStretchD(id) {
+// set dragger locations
+export function setStretchD(id) {
   let draggerEl = document.getElementById('dragger-stretch'),
       imageEl = document.getElementById(id);
 
@@ -471,7 +440,7 @@ function setStretchD(id) {
   showDragger(draggerEl);
 };
 
-function setOpacityD(id) {
+export function setOpacityD(id) {
   let draggerEl = document.getElementById('dragger-opacity'),
       imageEl = document.getElementById(id);
 
@@ -479,7 +448,7 @@ function setOpacityD(id) {
   showDragger(draggerEl);
 };
 
-function setRotationD(id) {
+export function setRotationD(id) {
   let draggerEl = document.getElementById('dragger-rotation'),
       imageEl = document.getElementById(id);
 
@@ -487,7 +456,7 @@ function setRotationD(id) {
   showDragger(draggerEl);
 };
 
-function setGrayscaleInvertD(id) {
+export function setGrayscaleInvertD(id) {
   let draggerEl = document.getElementById('dragger-grayscale_invert'),
       imageEl = document.getElementById(id),
       imageFilter = imageEl.style.WebkitFilter;
@@ -496,7 +465,7 @@ function setGrayscaleInvertD(id) {
   showDragger(draggerEl);
 };
 
-function setBlurBrightnessD(id) {
+export function setBlurBrightnessD(id) {
   let draggerEl = document.getElementById('dragger-blur_brightness'),
       imageEl = document.getElementById(id),
       imageFilter = imageEl.style.WebkitFilter;
@@ -505,7 +474,7 @@ function setBlurBrightnessD(id) {
   showDragger(draggerEl);
 };
 
-function setContrastSaturateD(id) {
+export function setContrastSaturateD(id) {
   let draggerEl = document.getElementById('dragger-contrast_saturate'),
       imageEl = document.getElementById(id),
       imageFilter = imageEl.style.WebkitFilter;
@@ -514,7 +483,7 @@ function setContrastSaturateD(id) {
   showDragger(draggerEl);
 };
 
-function setPartyD(id) {
+export function setPartyD(id) {
   let draggerEl = document.getElementById('dragger-party'),
       imageEl = document.getElementById(id),
 
@@ -531,7 +500,7 @@ function setPartyD(id) {
   showDragger(draggerEl);
 };
 
-function setThreeDD(id) {
+export function setThreeDD(id) {
   let draggerEl = document.getElementById('dragger-threeD'),
       imageEl = document.getElementById(id),
       x = (( 180 + parseFloat(imageEl.getAttribute('data-rotateY')) ) / 360),
