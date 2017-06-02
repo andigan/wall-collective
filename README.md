@@ -10,11 +10,18 @@ A multi-user responsive real-time web app for sharing, arranging, and transformi
 Uses:
 
 - Node.js express framework.
-- MongoDB for persistent storage of element styles.
+- MongoDB for persistent storage of image styles and positions.
 - Socket.IO to share style changes with other clients in real time.
-- jQuery sparingly.
+- AWS S3 for cloud storage of streamed uploaded images.
+- Redux store for state management.
+- Webpack for an efficient build.
+- Sass for styles.
+- Handlebars for templating.
+- Babel for ES2015/ES2016 transpiling.
+- jQuery.UI for drag and drop.
+- Instagram API and OAuth for feed integration.
 - Interact.js for touchscreen rotating and resizing.
-- HTTP cookies to remember which draggers are activated.
+- HTTP cookies to remember which draggers are activated and session ID.
 
 ## Functionality
 
@@ -30,7 +37,8 @@ Uses:
   - 3D rotation
   - hue-rotation
 - Number of currently connected clients indicated by <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person-icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person-icon.png" width="8" height="17" /><img src="https://raw.githubusercontent.com/andigan/whatadrag/master/public/icons/person-icon.png" width="8" height="17" /> icons.
-- Reset page to remove image transformations.
+- Reset image or page to remove image transformations.
+- Share background color changes.
 - Optional: On a touchscreen, use pinch gesture to change an image size and angle.
 
 ## Installation
@@ -47,23 +55,13 @@ Uses:
   ```
 3. Edit the config.js file.
 
-  Example:
+4. Build and run the app:
 
   ```
-  config.port = '80';
-  config.database_name = 'mydatabase';
-  config.useCDN = true;
-  config.imageDir = '/images/';
-  ```
-
-4. Run the app:
-
-  ```
-  $ node app.js
+  $ env PORT=8000 npm start
   ```
 
 ## Notes
 
 The app is currently in beta mode.
 - Instagram integration is currently in sandbox mode due to API restrictions.  Contact me for a working Instagram demo account!
-- Currently only works consistently with Chrome and Safari.
