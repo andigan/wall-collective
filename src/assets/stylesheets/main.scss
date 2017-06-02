@@ -30,8 +30,8 @@ body {
 
 #images {
   border: 1px black solid;
-  position: relative;
   margin: auto;
+  position: relative;
 }
 
 .wallPic {
@@ -40,18 +40,15 @@ body {
 
 // selected image animation
 @-webkit-keyframes blink {
-  0%   { outline: 1px solid white;
-         z-index: 90000;  }
-  33%  { outline: 1px solid white;
-    z-index: 90000;  }
-  100% { outline: 1px solid transparent;
-    z-index: 90000;  }
+  0%   { outline: 1px solid white; z-index: 90000;  }
+  33%  { outline: 1px solid white; z-index: 90000;  }
+  100% { outline: 1px solid transparent; z-index: 90000; }
 }
 
 .animation-selected-image {
-  outline: 1px solid transparent;
   -webkit-animation: blink 2s ease-out 0s 1;
   animation: blink 2s ease-out 0s 1;
+  outline: 1px solid transparent;
 }
 
 @-webkit-keyframes animation-temp-fade {

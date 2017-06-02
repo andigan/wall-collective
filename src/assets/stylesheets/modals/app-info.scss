@@ -33,24 +33,22 @@
     position: absolute;
     width: 50%;
   }
-
 }
 
 #app-info-inner-container {
   height: 100%;
   left: 10%;
-  top: 72px;
   position: absolute;
+  top: 72px;
   width: 80%;
 
   .app-info-paragraph {
     display: block;
-    text-align: justify;
     position: static;
+    text-align: justify;
   }
 
   .app-info-person-icon {
     height: 2vh;
   }
-
 }
