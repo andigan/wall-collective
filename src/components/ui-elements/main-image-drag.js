@@ -1,4 +1,4 @@
-  import pageSettings from '../../_init/page-settings';
+  import pageVars from '../../_config/page-vars';
   import stateChange from '../../views/state-change';
   import { setSelectedImage } from '../../actions';
   import { resetClickCount } from '../../actions';
@@ -28,8 +28,8 @@
         scroll: true,
         start:  function (event, ui) {
           // convert percentage to original pixel size
-          let left = parseInt(this.style.left) / 100 * pageSettings.imagesWide,
-              top = parseInt(this.style.top) / 100 * pageSettings.imagesHigh,
+          let left = parseInt(this.style.left) / 100 * pageVars.imagesWide,
+              top = parseInt(this.style.top) / 100 * pageVars.imagesHigh,
               topZ = highestZ();
 
           // recoup for transformed objects, to keep the drag event centered on a transformed object.
@@ -71,8 +71,8 @@
           ui.position.top += this.recoupTop;
 
           // prepare socketdata to pass
-          this.socketdata.posTop = (ui.position.top / pageSettings.imagesHigh * 100).toFixed(2);
-          this.socketdata.posLeft = (ui.position.left / pageSettings.imagesWide * 100).toFixed(2);
+          this.socketdata.posTop = (ui.position.top / pageVars.imagesHigh * 100).toFixed(2);
+          this.socketdata.posLeft = (ui.position.left / pageVars.imagesWide * 100).toFixed(2);
 
           // pass socket data to server
           window.socket.emit('ce:_moving', this.socketdata);

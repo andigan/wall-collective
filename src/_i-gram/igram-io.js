@@ -1,6 +1,6 @@
 import igConfig from './config';
 import stateChange from '../views/state-change';
-import pageSettings from '../_init/page-settings';
+import pageVars from '../_config/page-vars';
 
 import { assignImageDrag } from '../components/ui-elements/main-image-drag';
 
@@ -95,8 +95,8 @@ export function igramIOInit(socket) {
       // create a clone of the ui.draggable within the images div
       clone = ui.draggable.clone(false);
 
-      dropData.left = ((ui.offset.left - (pageSettings.mainWide - pageSettings.imagesWide) / 2) / pageSettings.imagesWide * 100).toFixed(2) + '%';
-      dropData.top = ((ui.offset.top - (pageSettings.mainHigh - pageSettings.imagesHigh) / 2) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+      dropData.left = ((ui.offset.left - (pageVars.mainWide - pageVars.imagesWide) / 2) / pageVars.imagesWide * 100).toFixed(2) + '%';
+      dropData.top = ((ui.offset.top - (pageVars.mainHigh - pageVars.imagesHigh) / 2) / pageVars.imagesHigh * 100).toFixed(2) + '%';
 
       clone.css('left', dropData.left)
            .css('top', dropData.top)
@@ -111,8 +111,8 @@ export function igramIOInit(socket) {
       dropData.imageID = ui.draggable[0].getAttribute('id');
       dropData.src = ui.draggable[0].src;
       dropData.owner = window.store.getState().pageConfig.sessionID;
-      dropData.width = (parseFloat(window.getComputedStyle(ui.draggable[0]).width) / pageSettings.imagesWide * 100).toFixed(2) + '%';
-      dropData.height = (parseFloat(window.getComputedStyle(ui.draggable[0]).height) / pageSettings.imagesHigh * 100).toFixed(2) + '%';
+      dropData.width = (parseFloat(window.getComputedStyle(ui.draggable[0]).width) / pageVars.imagesWide * 100).toFixed(2) + '%';
+      dropData.height = (parseFloat(window.getComputedStyle(ui.draggable[0]).height) / pageVars.imagesHigh * 100).toFixed(2) + '%';
 
       dropData.link = ui.draggable[0].getAttribute('data-link');
 

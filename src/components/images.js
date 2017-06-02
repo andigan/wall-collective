@@ -1,5 +1,5 @@
 import config from '../_config/config';
-import pageSettings from '../_init/page-settings';
+import pageVars from '../_config/page-vars';
 
 export function initializeImage(imageEl) {
 
@@ -21,8 +21,8 @@ export function initializeImage(imageEl) {
 
 export function convertDimToPercent(imageEl) {
   if (!imageEl.style.height.includes('%')) {
-    imageEl.style.width = ((parseInt(window.getComputedStyle(imageEl).width) / pageSettings.imagesWide * 100).toFixed(2)) + '%';
-    imageEl.style.height = ((parseInt(window.getComputedStyle(imageEl).height) / pageSettings.imagesHigh * 100).toFixed(2)) + '%';
+    imageEl.style.width = ((parseInt(window.getComputedStyle(imageEl).width) / pageVars.imagesWide * 100).toFixed(2)) + '%';
+    imageEl.style.height = ((parseInt(window.getComputedStyle(imageEl).height) / pageVars.imagesHigh * 100).toFixed(2)) + '%';
   };
 }
 

@@ -1,4 +1,4 @@
-import pageSettings from '../_init/page-settings.js';
+import pageVars from '../_config/page-vars.js';
 
 module.exports = {
 
@@ -9,8 +9,8 @@ module.exports = {
     if (id) lineEl.setAttribute('id', id);
     lineEl.classList.add('grid-vline');
     lineEl.style.left = left;
-    lineEl.style.top = pageSettings.dLimits.intop + 'px';
-    lineEl.style.height = pageSettings.dLimits.inheight + 'px';
+    lineEl.style.top = pageVars.dLimits.intop + 'px';
+    lineEl.style.height = pageVars.dLimits.inheight + 'px';
     lineEl.style.backgroundColor = color;
 
     wrapperEl.appendChild(lineEl);
@@ -23,8 +23,8 @@ module.exports = {
     if (id) lineEl.setAttribute('id', id);
     lineEl.classList.add('grid-hline');
     lineEl.style.top = top;
-    lineEl.style.left = pageSettings.dLimits.inleft + 'px';
-    lineEl.style.width = pageSettings.dLimits.inwidth + 'px';
+    lineEl.style.left = pageVars.dLimits.inleft + 'px';
+    lineEl.style.width = pageVars.dLimits.inwidth + 'px';
     lineEl.style.backgroundColor = color;
 
     wrapperEl.appendChild(lineEl);
@@ -35,16 +35,16 @@ module.exports = {
         wrapperEl = document.getElementById('wrapper');
 
     infoEl.setAttribute('id', 'grid-info');
-    infoEl.style.left = `${((pageSettings.draggerWidth / 2) + 1)}px`;
-    infoEl.style.height = `${(pageSettings.draggerHeight / 2)}px`;
-    infoEl.style.width = `${(pageSettings.mainWide - pageSettings.draggerWidth - 2)}px`;
+    infoEl.style.left = `${((pageVars.draggerWidth / 2) + 1)}px`;
+    infoEl.style.height = `${(pageVars.draggerHeight / 2)}px`;
+    infoEl.style.width = `${(pageVars.mainWide - pageVars.draggerWidth - 2)}px`;
 
     wrapperEl.appendChild(infoEl);
 
-    this.vline(`${pageSettings.dLimits.inleft}px`, 'red', 'grid-right');
-    this.vline(`${pageSettings.dLimits.inright}px`, 'blue'  , 'grid-left');
-    this.hline(`${pageSettings.dLimits.intop}px`, 'purple', 'grid-bottom');
-    this.hline(`${pageSettings.dLimits.inbottom}px`, 'yellow', 'grid-top');
+    this.vline(`${pageVars.dLimits.inleft}px`, 'red', 'grid-right');
+    this.vline(`${pageVars.dLimits.inright}px`, 'blue'  , 'grid-left');
+    this.hline(`${pageVars.dLimits.intop}px`, 'purple', 'grid-bottom');
+    this.hline(`${pageVars.dLimits.inbottom}px`, 'yellow', 'grid-top');
   },
 
   remove_grid() {

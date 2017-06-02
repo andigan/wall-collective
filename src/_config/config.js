@@ -9,6 +9,18 @@ module.exports = {
 
   initialDraggers: 'SrObcgTP',
 
+  // set aspect ratio for images canvas
+  ar: { width: 320,
+        height: 460 },
+
+  // set position of drag limits
+  dLimits: {
+    top: 48,
+    bottom: 100,
+    left: 48,
+    right: 48
+  },
+
   // set maximum limit for draggers
   blurLevel: 7,
   brightnessLevel: 8,
@@ -17,7 +29,9 @@ module.exports = {
 
   // color chooser size in pixels
   chooserPos: { width: 180,
-                height: 100 }
+                height: 100 },
 
+  // app globals
+  uploadTotal: 0
 
 };

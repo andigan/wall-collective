@@ -1,6 +1,6 @@
 import config from '../_config/config';
 import dData from '../_config/config-draggers';
-import pageSettings from '../_init/page-settings';
+import pageVars from '../_config/page-vars';
 import Grid from './grid';
 import stateChange from '../views/state-change';
 import { resetClickCount } from '../actions';
@@ -30,6 +30,9 @@ export function createDraggers() {
     draggerEl.appendChild(iconContainerEl);
     wrapperEl.appendChild(draggerEl);
   });
+
+  pageVars.setDXY();
+
 }
 
 // dragger API
@@ -65,8 +68,8 @@ export function draggersInit() {
 
     getPos: function (position) {
 
-      return { x: (((position.left + pageSettings.draggerWidth / 2) - pageSettings.dLimits.inleft) / pageSettings.dLimits.inwidth * 100).toFixed(2),
-               y: ((pageSettings.dLimits.inheight - ((position.top + pageSettings.draggerHeight / 2) - pageSettings.dLimits.intop)) / pageSettings.dLimits.inheight * 100).toFixed(2) };
+      return { x: (((position.left + pageVars.dWidth / 2) - pageVars.dLimits.inleft) / pageVars.dLimits.inwidth * 100).toFixed(2),
+               y: ((pageVars.dLimits.inheight - ((position.top + pageVars.dHeight / 2) - pageVars.dLimits.intop)) / pageVars.dLimits.inheight * 100).toFixed(2) };
     },
 
     drag: function () {
@@ -118,20 +121,20 @@ export function draggersInit() {
 
     limitDrag(ui) {
       // top
-      if (ui.position.top < pageSettings.dLimits.top) {
-        ui.position.top = pageSettings.dLimits.top;
+      if (ui.position.top < pageVars.dLimits.top) {
+        ui.position.top = pageVars.dLimits.top;
       };
       // bottom
-      if (ui.position.top > pageSettings.dLimits.bottom - pageSettings.draggerHeight) {
-        ui.position.top = pageSettings.dLimits.bottom - pageSettings.draggerHeight;
+      if (ui.position.top > pageVars.dLimits.bottom - pageVars.dHeight) {
+        ui.position.top = pageVars.dLimits.bottom - pageVars.dHeight;
       };
       // left
-      if (ui.position.left < pageSettings.dLimits.left) {
-        ui.position.left = pageSettings.dLimits.left;
+      if (ui.position.left < pageVars.dLimits.left) {
+        ui.position.left = pageVars.dLimits.left;
       };
       // right
-      if (ui.position.left > pageSettings.dLimits.right - pageSettings.draggerWidth) {
-        ui.position.left = pageSettings.dLimits.right - pageSettings.draggerWidth;
+      if (ui.position.left > pageVars.dLimits.right - pageVars.dWidth) {
+        ui.position.left = pageVars.dLimits.right - pageVars.dWidth;
       };
     }
   };
@@ -406,8 +409,8 @@ export function setDraggerLocations(id) {
 
 // set the dragger location within inner limits using percentages normalized between 0 and 1
 function setDraggerLoc(draggerEl, x, y) {
-  draggerEl.style.left = `${pageSettings.dLimits.left + x * pageSettings.dLimits.inwidth}px`;
-  draggerEl.style.top = `${pageSettings.dLimits.top + y * pageSettings.dLimits.inheight}px`;
+  draggerEl.style.left = `${pageVars.dLimits.left + x * pageVars.dLimits.inwidth}px`;
+  draggerEl.style.top = `${pageVars.dLimits.top + y * pageVars.dLimits.inheight}px`;
 }
 
 // get the number within the parentheses before the value from the string
@@ -490,8 +493,8 @@ export function setPartyD(id) {
       imageFilter = imageEl.style.WebkitFilter,
       opacity = parseInt( imageEl.style.opacity * 100) / 100,
 
-      isLeft = (draggerEl.offsetLeft + pageSettings.draggerWidth / 2 < pageSettings.dLimits.inmiddlex),
-      isTop = (draggerEl.offsetTop + pageSettings.draggerWidth / 2 < pageSettings.dLimits.inmiddley),
+      isLeft = (draggerEl.offsetLeft + pageVars.dWidth / 2 < pageVars.dLimits.inmiddlex),
+      isTop = (draggerEl.offsetTop + pageVars.dHeight / 2 < pageVars.dLimits.inmiddley),
 
       adjustedY = isTop ? ((1 - (getValue('hue-rotate', imageFilter) / 360)) / 2 ).toFixed(2) : (0.5 + getValue('hue-rotate', imageFilter) / 720).toFixed(2),
       adjustedZ = isLeft ? opacity / 2 : 1 - opacity / 2;

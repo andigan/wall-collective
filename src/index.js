@@ -16,14 +16,11 @@ import config from './_config/config';
 import styles from './assets/stylesheets/main.scss';
 
 // redux store
-import configureStore from './_init/configure-store';
+import configureStore from './_config/config-store';
 const store = configureStore();
 
-// init
-import pageSettings from './_init/page-settings';
-import { pageInit } from './_init/page-helpers';
-
 // components
+import Page from './components/page';
 import { createDraggers } from './components/draggers';
 import { buttonsInit } from './components/buttons';
 import { navToggleInit } from './components/ui-elements/nav-toggle-button';
@@ -42,8 +39,6 @@ import { dSwitchsInit } from './components/d-switchs';
 // sockets
 import { IOInit } from './sockets/io';
 
-import { textboxInit } from './components/ui-elements/textbox.js';
-
 // OPTIONAL Igram
 import { igramInit } from './_i-gram/init';
 import { igramIOInit } from './_i-gram/igram-io';
@@ -52,7 +47,10 @@ import igramStyle from './_i-gram/igram-styles.scss';
 
 // OPTIONAL debug
 import debug from './_debug/debug';
-import debugCss from './_debug/debug.scss';
+import debugStyle from './_debug/debug.scss';
+
+// Experimental
+import { textboxInit } from './components/ui-elements/textbox.js';
 
 window.store = store;
 window.socket = IOInit();
@@ -69,12 +67,9 @@ if (useIGram) {
 if (config.debugOn) debug.init(store);
 
 
-pageInit();
-
 createDraggers();
-
+Page.init(); // set page sizes and resize listeners
 buttonsInit(); // create buttons and assign functionality
-pageSettings.init(); // set page sizes and resize listeners
 navToggleInit(); // make nav-toggle-button draggable
 draggersInit(); // set up draggers functionality
 dSwitchsInit(); // set up dragger switches

@@ -1,4 +1,4 @@
-import pageSettings from '../../_init/page-settings';
+import pageVars from '../../_config/page-vars';
 
 module.exports = {
 
@@ -19,8 +19,8 @@ module.exports = {
         this.wide = $(this).width();
 
         // get values of top and left for bottom and right placements
-        this.topWhenOnBottom = (pageSettings.mainHigh - this.high);
-        this.leftWhenOnRight = (pageSettings.mainWide - this.wide);
+        this.topWhenOnBottom = (pageVars.mainHigh - this.high);
+        this.leftWhenOnRight = (pageVars.mainWide - this.wide);
       },
       drag: function (event, ui) {
         // ui.position.top is wherever the drag cursor goes
