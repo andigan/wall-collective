@@ -8,6 +8,9 @@ import { shiftZsAboveXDown } from '../components/images';
 import { zReport } from '../components/images';
 import { setDraggerLocations } from '../components/draggers';
 
+// import React from 'react';
+// import ReactDOM from 'react-dom';
+import NavMain from './react/nav-main';
 
 export function buttonsInit() {
 
@@ -54,6 +57,7 @@ function createButton(targetID, action, text, iconPath, buttonClass) {
 
 function onClick(e) {
   switch (e.currentTarget.getAttribute('data-action')) {
+
     case 'main-nav-click':
       let navMainEl = document.getElementById('nav-tog-button');
 
@@ -72,6 +76,16 @@ function onClick(e) {
           };
         // else when no containers are open
         } else {
+
+
+
+
+          // ReactDOM.render(<NavMain />, document.getElementById('nav'));
+
+
+
+
+
           // open the navigation container
           document.getElementById('nav-main-container').classList.add('nav-is-open');
           document.body.classList.add('a-nav-container-is-open');
@@ -81,7 +95,7 @@ function onClick(e) {
           document.getElementById('ham-line1').style.top = '35%';
           document.getElementById('ham-line3').style.top = '65%';
 
-          stateChange.hideDraggers();
+//          stateChange.hideDraggers();
         };
       };
       break;

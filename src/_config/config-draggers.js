@@ -1,6 +1,7 @@
 import { setStretchD, setRotationD, setOpacityD, setBlurBrightnessD, setContrastSaturateD, setGrayscaleInvertD, setThreeDD, setPartyD } from '../components/draggers';
 
 module.exports = [
+
   { name: 'stretch',
     color: 'blue',
     shadowColor: 'blue',
@@ -19,6 +20,12 @@ module.exports = [
     icon: 'icons/ic_rotate_90_degrees_ccw_black_24px.svg',
     handler: setRotationD },
 
+    { name: 'threeD',
+      color: 'deeppink',
+      shadowColor: 'deeppink',
+      icon: 'icons/ic_3d_rotation_black_24px.svg',
+      handler: setThreeDD },
+
   { name: 'blur_brightness',
     color: 'darkorange',
     shadowColor: 'darkorange',
@@ -36,12 +43,6 @@ module.exports = [
     shadowColor: 'silver',
     icon: 'icons/ic_cloud_black_24px.svg',
     handler: setGrayscaleInvertD },
-
-  { name: 'threeD',
-    color: 'deeppink',
-    shadowColor: 'deeppink',
-    icon: 'icons/ic_3d_rotation_black_24px.svg',
-    handler: setThreeDD },
 
   { name: 'party',
     color: 'purple',

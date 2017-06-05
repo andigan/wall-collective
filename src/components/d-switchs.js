@@ -13,11 +13,11 @@ export function dSwitchsInit() {
 
 function createSwitches() {
   let wrapperEl = document.getElementById('wrapper'),
-      switchesEl = document.createElement('div');
+      SwitchesEl = document.createElement('div');
 
-  switchesEl.id = 'switches-container';
+  SwitchesEl.id = 'switches-container';
 
-  wrapperEl.appendChild(switchesEl);
+  wrapperEl.appendChild(SwitchesEl);
 
   dData.forEach(function (aswitch) {
     let switchContainerEl = document.createElement('div'),
@@ -39,7 +39,8 @@ function createSwitches() {
 
     switchContainerEl.appendChild(iconContainerEl);
 
-    switchesEl.appendChild(switchContainerEl);
+    SwitchesEl.appendChild(switchContainerEl);
+
   });
 }
 

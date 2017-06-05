@@ -36,23 +36,26 @@
 
 // switches
 #switches-container {
-  bottom: 55px;
+  bottom: 48px;
   display: none;
   flex-direction: row;
-  flex-wrap: wrap;
-  height: 48px;
+  flex-wrap: none;
   justify-content: space-around;
-  position: fixed;
+  position: absolute;
   width: 100%;
+  z-index:50000;
 }
 
 .switch-container {
+  padding: 0 0 7px;
+  text-align: -webkit-center;
   width: 12.5%;
 }
 
 .switch-icon-container {
   border-radius: 100%;
   height: 36px;
+  text-align: -webkit-auto;
   transform: scale(0.75) rotateY(60deg);
   transition: all .2s ease-in-out;
   width: 36px;

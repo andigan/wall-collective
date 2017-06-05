@@ -9,6 +9,7 @@ module.exports = {
     }.bind(this));
 
     document.getElementById('switches-container').style.display = 'none';
+
   },
 
   hideOtherDraggers(id) {
@@ -49,7 +50,8 @@ module.exports = {
     document.getElementById('nav-tools-container').classList.add('nav-tools-container-is-open');
     // hide
     document.getElementById('nav-main-container').classList.remove('nav-is-open');
-    document.getElementById('switches-container').classList.remove('d-switches-is-open');
+//    document.getElementById('switches-container').classList.remove('d-switches-is-open');
+
   },
 
   openAccount() {
