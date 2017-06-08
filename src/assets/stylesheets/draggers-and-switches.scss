@@ -37,14 +37,21 @@
 // switches
 #switches-container {
   bottom: 48px;
-  display: none;
+  display: flex;
   flex-direction: row;
   flex-wrap: none;
   justify-content: space-around;
+  transform: scale(0);
   position: absolute;
   width: 100%;
+  transition: all .2s ease-in-out;
   z-index:50000;
 }
+
+.switches-container-open {
+  transform: scale(1) !important;
+}
+
 
 .switch-container {
   padding: 0 0 7px;

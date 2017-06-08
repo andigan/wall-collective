@@ -2,10 +2,11 @@ import config from '../_config/config';
 import dData from '../_config/config-draggers';
 import pageVars from '../_config/page-vars';
 import Grid from './grid';
-import stateChange from '../views/state-change';
+import stateChange from '../scripts/state-change';
 import { resetClickCount } from '../actions';
 
 export function createDraggers() {
+  let draggersEl = document.getElementById('draggers');
 
   dData.forEach(function (d) {
     let draggerEl = document.createElement('div'),
@@ -28,7 +29,7 @@ export function createDraggers() {
     iconContainerEl.appendChild(iconEl);
 
     draggerEl.appendChild(iconContainerEl);
-    wrapperEl.appendChild(draggerEl);
+    draggersEl.appendChild(draggerEl);
   });
 
   pageVars.setDXY();
@@ -392,11 +393,6 @@ export function draggersInit() {
 export function setDraggerLocations(id) {
 
   if (id) {
-    // if a nav bar is open, show the dragger switches
-    if (document.body.classList.contains('a-nav-container-is-open')) {
-      document.getElementById('switches-container').style.display = 'flex';
-    };
-
     dData.forEach(function (sw) {
       if (document.getElementById('switch-' + sw.name).classList.contains('switchon')) {
         sw.handler(id);

@@ -2,7 +2,7 @@ import { clickme } from '../helpers';
 
 var options = {
   consoleStore: false,
-  consoleZIndexes: true,
+  consoleZIndexes: false,
   consoleClickTarget: true,
   consoleAllElsUnderClick: false // Chrome only
 };
@@ -11,47 +11,12 @@ module.exports = {
 
   init: function () {
 
-    //    clickme('nav-tog-button', 50);
-    //    clickme('dragger_switches_button', 1000);
-    //    clickme('nav-upload-container_button', 1000);
-    clickme('debug-button', 1000);
+    clickme('nav-tog-button', 50);
 
-    this.createDebugButton();
     this.createDebugDiv();
+    document.getElementById('debug-container').style.display = 'block';
+
     this.setListeners(options);
-  },
-
-  createDebugButton: function () {
-    var debugButton = document.getElementById('t5'),
-        debugIcon = document.createElement('img'),
-        debugText = document.createElement('span');
-
-    // create debug button
-    debugButton.setAttribute('id', 'debug-button');
-    debugButton.classList.add('button', 'button-tools');
-    debugButton.classList.remove('button-no-show');
-
-    debugText.textContent = 'report is off';
-    debugText.setAttribute('id', 'debug-text');
-
-    debugIcon.classList.add('nav-button-icon');
-    debugIcon.src = '/icons/debug-icon.png';
-    debugButton.appendChild(debugText);
-    debugButton.appendChild(debugIcon);
-
-    // add button functionality
-    debugButton.addEventListener('click', function () {
-
-      if ( this.classList.contains('debug-on') ) {
-        this.classList.remove('debug-on');
-        document.getElementById('debug-container').style.display = 'none';
-        document.getElementById('debug-text').innerText = 'report is off';
-      } else {
-        this.classList.add('debug-on');
-        document.getElementById('debug-container').style.display = 'block';
-        document.getElementById('debug-text').innerText = 'report is on';
-      };
-    });
   },
 
   createDebugDiv: function () {

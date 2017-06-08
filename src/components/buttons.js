@@ -1,32 +1,16 @@
 import config from '../_config/config';
-import stateChange from '../views/state-change';
+import stateChange from '../scripts/state-change';
 import { setDeleteID } from '../actions';
-import { setSelectedImage } from '../actions';
+import { setSelectedImage, clearSelectedImage } from '../actions';
 import { initializeImage } from '../components/images';
 import { highestZ } from '../components/images';
 import { shiftZsAboveXDown } from '../components/images';
 import { zReport } from '../components/images';
 import { setDraggerLocations } from '../components/draggers';
+import { openNav, closeNav } from '../actions';
 
-// import React from 'react';
-// import ReactDOM from 'react-dom';
-import NavMain from './react/nav-main';
 
 export function buttonsInit() {
-
-  createButton('n1', 'open-account', 'account', '/icons/person_circle-icon.png', 'button-nav');
-  createButton('n2', 'open-tools', 'tools', '/icons/tools-icon.png', 'button-nav');
-  createButton('n3', 'open-upload', 'upload', '/icons/upload-icon.png', 'button-nav');
-  createButton('n4', 'exit-door', 'remove', '/icons/door-icon.png', 'button-nav');
-
-  createButton('t1', 'choose-color', 'color', '/icons/palette-icon.png', 'button-tools');
-  createButton('t2', 'reset-page', 'reset page', '/icons/reset-icon.png', 'button-tools');
-  createButton('t3', 'reset-image', 'reset image', '/icons/eraser-icon.png', 'button-tools');
-
-  createButton('a1', 'app-info', 'info', '/icons/info-icon.png', 'button-tools');
-  document.getElementById('u2').appendChild(document.getElementById('upload-form-button'));
-  createButton('a3', 'textbox', 'textbox', '/icons/info-icon.png', 'button-tools');
-
 
   createjsColor();
 
@@ -36,23 +20,6 @@ export function buttonsInit() {
     document.getElementById('button-confirm-delete'),
     document.getElementById('button-reject-upload')
   ]);
-  exitDoorDrop();
-}
-
-
-function createButton(targetID, action, text, iconPath, buttonClass) {
-  let buttonEl = document.getElementById(targetID),
-      iconEl = document.createElement('img');
-
-  buttonEl.classList.remove('button-no-show');
-  buttonEl.classList.add('button', buttonClass);
-  buttonEl.setAttribute('data-action', action);
-  buttonEl.innerText = text;
-  iconEl.classList.add('nav-button-icon');
-  iconEl.src = iconPath;
-  buttonEl.appendChild(iconEl);
-
-  addEvents([buttonEl]);
 }
 
 function onClick(e) {
@@ -63,6 +30,8 @@ function onClick(e) {
 
       // if the main button is not being dragged, process the click.
       if ( navMainEl.classList.contains('nav-tog-dragging') === false ) {
+
+//        store.dispatch(closeNav());
 
         // if any containers are open
         if ( document.body.classList.contains('a-nav-container-is-open') ) {
@@ -77,17 +46,11 @@ function onClick(e) {
         // else when no containers are open
         } else {
 
-
-
-
-          // ReactDOM.render(<NavMain />, document.getElementById('nav'));
-
-
-
+          store.dispatch(openNav());
 
 
           // open the navigation container
-          document.getElementById('nav-main-container').classList.add('nav-is-open');
+//          document.getElementById('nav-main-container').classList.add('nav-is-open');
           document.body.classList.add('a-nav-container-is-open');
           document.getElementById('connect-info').classList.add('connect-info-is-open');
 
@@ -110,76 +73,11 @@ function onClick(e) {
       break;
 
     case 'open-upload':
-      stateChange.openUpload();
+//      stateChange.openUpload();
       break;
 
     case 'app-info':
       stateChange.openInfo();
-      break;
-
-    case 'exit-door':
-      // hide original image
-      if (window.store.getState().selectedImage.id !== '') {
-        let deleteID = window.store.getState().selectedImage.id;
-
-        window.store.dispatch(setDeleteID(deleteID));
-
-        stateChange.hideID(deleteID);
-        stateChange.hideDraggers();
-        stateChange.deletePreview(deleteID);
-        window.socket.emit('ce:_hideImage', deleteID);
-      };
-      break;
-
-    case 'reset-page':
-      let xhr = new XMLHttpRequest ();
-
-      xhr.open('GET', '/resetpage');
-      xhr.send(null);
-
-      window.socket.emit('ce:_saveBackground', '#000000');
-
-      xhr.onreadystatechange = function () {
-        // readyState 4: request is done.
-        if (xhr.readyState === 4) {
-          if (xhr.status === 200) {
-            // send socket to reset other pages
-            window.socket.emit('ce:_resetPage');
-            // reload the page
-            window.location.assign([location.protocol, '//', location.host, location.pathname].join(''));
-          } else {
-            console.log('Error: ' + xhr.status);
-          };
-        }
-      };
-      break;
-
-    case 'reset-image':
-      let imageID = window.store.getState().selectedImage.id;
-
-      if (imageID !== '') {
-        let imageEl = document.getElementById(imageID),
-            topZ = highestZ(),
-            socketdata;
-
-        // change zIndexes
-        if (parseInt(imageEl.style.zIndex) < topZ) {
-          shiftZsAboveXDown(imageEl.style.zIndex);
-          imageEl.style.zIndex = topZ;
-          window.socket.emit('ce:_changeZs', zReport());
-        };
-
-        initializeImage(imageEl);
-
-        socketdata = {
-          imageID: imageID,
-          filename: imageEl.title
-        };
-
-        setDraggerLocations(imageID);
-
-        window.socket.emit('ce:_resetImageAll', socketdata);
-      }
       break;
 
     case 'choose-color':
@@ -219,7 +117,7 @@ function onClick(e) {
       stateChange.afterDelete();
 
       // reset store
-      store.dispatch(setSelectedImage(''));
+      store.dispatch(clearSelectedImage());
       store.dispatch(setDeleteID(''));
 
       // send data to server to delete image
@@ -302,27 +200,4 @@ function createjsColor() {
   jscolorEl.setAttribute('onchange', 'window.jScOlOrChoice(this.jscolor)');
 
   wrapperEl.appendChild(jscolorEl);
-}
-
-function exitDoorDrop() {
-
-  $('#n4').droppable({
-    accept: '.wallPic',
-    // activeClass: 'exit_active_class',
-    hoverClass: 'exit-door-hover',
-    tolerance: 'pointer',
-
-    over: function () { /* console.log('over exit door'); */ },
-    out: function () { /* console.log('back out over exit door '); */ },
-    drop: function (event, ui) {
-      let deleteID = ui.draggable[0].id;
-
-      window.store.dispatch(setDeleteID(deleteID));
-
-      stateChange.hideID(deleteID);
-      stateChange.hideDraggers();
-      stateChange.deletePreview(deleteID);
-      window.socket.emit('ce:_hideImage', deleteID);
-    }
-  });
 }

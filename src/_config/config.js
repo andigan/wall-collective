@@ -21,6 +21,10 @@ module.exports = {
     right: 48
   },
 
+  // set nav button size
+  navBSize: 55,
+
+
   // set maximum limit for draggers
   blurLevel: 7,
   brightnessLevel: 8,

@@ -97,6 +97,7 @@ module.exports = function (socket, sessionID) {
           { $set: {   dom_id     : iDBData.dom_id,
                       filename   : iDBData.filename,
                       created    : created,
+                      owner      : iDBData.owner,
                       url        : iDBData.src,
                       posleft    : iDBData.left,
                       postop     : iDBData.top,

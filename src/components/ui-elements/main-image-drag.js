@@ -1,5 +1,5 @@
   import pageVars from '../../_config/page-vars';
-  import stateChange from '../../views/state-change';
+  import stateChange from '../../scripts/state-change';
   import { setSelectedImage } from '../../actions';
   import { resetClickCount } from '../../actions';
   import { incrementClickCount } from '../../actions';

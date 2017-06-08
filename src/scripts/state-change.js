@@ -1,26 +1,19 @@
+import { closeNav } from '../actions';
+
 module.exports = {
 
   hideDraggers() {
     Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
-
-//      this.hideElement(dragger);
       dragger.classList.remove('d-on');
-
     }.bind(this));
-
-    document.getElementById('switches-container').style.display = 'none';
-
   },
 
   hideOtherDraggers(id) {
     Array.from(document.getElementsByClassName('dragger')).forEach(function (dragger) {
       if (dragger.id !== id) {
-//        this.hideElement(dragger);
         dragger.classList.remove('d-on');
       };
     }.bind(this));
-
-    document.getElementById('switches-container').style.display = 'none';
   },
 
   hideID(id) {
@@ -35,59 +28,19 @@ module.exports = {
     document.getElementById(id).style.display = 'block';
   },
 
-  deletePreview(deleteID) {
-    // show
-    document.getElementById('delete-preview-container').classList.add('delete-preview-container-is-open');
-    document.getElementById('delete-image-preview').src = document.getElementById(deleteID).src;
 
-    // hide
-    document.getElementById('nav-main-container').classList.remove('nav-is-open');
-    this.hideDraggers();
-  },
 
-  openTools() {
-    // show
-    document.getElementById('nav-tools-container').classList.add('nav-tools-container-is-open');
-    // hide
-    document.getElementById('nav-main-container').classList.remove('nav-is-open');
-//    document.getElementById('switches-container').classList.remove('d-switches-is-open');
-
-  },
-
-  openAccount() {
-    // show
-    document.getElementById('nav-account-container').classList.add('nav-account-container-is-open');
-    // hide
-    document.getElementById('nav-main-container').classList.remove('nav-is-open');
-  },
 
   openInfo() {
-    // show
     document.getElementById('app-info').style.display = 'block';
-    // hide
-    document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
-    this.hideDraggers();
-
-  },
-
-  openUpload() {
-    // show
-    document.getElementById('nav-upload-container').classList.add('upload-container-is-open');
-    // hide
-    document.getElementById('nav-main-container').classList.remove('nav-is-open');
-  },
-
-  uploadPreview() {
-    // hide
-    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
     this.hideDraggers();
   },
+
 
   afterUpload() {
-    // show element
-    document.getElementById('nav-main-container').classList.add('nav-is-open');
+    store.dispatch(closeNav());
+
     // hide elements
-    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
     this.hideID('upload-preview-container');
     document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
 
@@ -105,8 +58,6 @@ module.exports = {
   afterDelete() {
     let delPreviewEL = document.getElementById('delete-preview-container');
 
-    // show element
-    document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
     this.hideElement(delPreviewEL);
     delPreviewEL.classList.remove('delete-preview-container-is-open');
@@ -124,8 +75,6 @@ module.exports = {
     let deleteID = window.store.getState().pageConfig.deleteID,
         delPreviewEL = document.getElementById('delete-preview-container');
 
-    // show element
-    document.getElementById('nav-main-container').classList.add('nav-is-open');
     // hide elements
     this.hideElement(delPreviewEL);
     delPreviewEL.classList.remove('delete-preview-container-is-open');
@@ -133,7 +82,6 @@ module.exports = {
       document.getElementById('delete-preview-container').style.display = 'block';
     }, 500);
     // reshow hidden image that wasn't deleted
-//    debugger
     document.getElementById(deleteID).style.display = 'block';
 
     // show image on other clients
@@ -141,15 +89,14 @@ module.exports = {
   },
 
   closeAll() {
+
+    store.dispatch(closeNav());
+
     // hide
-    document.getElementById('switches-container').style.display = 'none';
-    document.getElementById('nav-main-container').classList.remove('nav-is-open');
+    document.getElementById('switches-container').classList.remove('switches-container-open');
     document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
     document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
-    document.getElementById('nav-tools-container').classList.remove('nav-tools-container-is-open');
-    document.getElementById('nav-account-container').classList.remove('nav-account-container-is-open');
     document.getElementById('app-info').style.display = 'none';
-    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
     document.getElementById('connect-info').classList.remove('connect-info-is-open');
     document.getElementById('igram-header').style.display = 'none';
     document.getElementById('igram-container').style.display = 'none';

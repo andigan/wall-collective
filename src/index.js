@@ -39,10 +39,17 @@ import { dSwitchsInit } from './components/d-switchs';
 // sockets
 import { IOInit } from './sockets/io';
 
+// react
+import React from 'react'; // required
+import ReactDOM from 'react-dom';
+import { Provider }  from 'react-redux';
+
+import NavContainer from './components/react/nav-container';
+
+
 // OPTIONAL Igram
 import { igramInit } from './_i-gram/init';
 import { igramIOInit } from './_i-gram/igram-io';
-import { igramButtonsInit } from './_i-gram/buttons';
 import igramStyle from './_i-gram/igram-styles.scss';
 
 // OPTIONAL debug
@@ -52,6 +59,9 @@ import debugStyle from './_debug/debug.scss';
 // Experimental
 import { textboxInit } from './components/ui-elements/textbox.js';
 
+document.getElementById('nav-tog-button').dispatchEvent(new Event ('click'));
+
+
 window.store = store;
 window.socket = IOInit();
 
@@ -60,13 +70,15 @@ if (useIGram) {
   config.useIGram = useIGram; // instagram switch; arriving from server response
   igramInit();
   igramIOInit(window.socket);
-  igramButtonsInit();
 };
 
 // debug conditional
 if (config.debugOn) debug.init(store);
 
-
+ReactDOM.render(
+  <Provider store={store}>
+    <NavContainer />
+  </Provider>, document.getElementById('nav'));
 createDraggers();
 Page.init(); // set page sizes and resize listeners
 buttonsInit(); // create buttons and assign functionality

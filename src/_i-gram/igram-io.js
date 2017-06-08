@@ -1,5 +1,5 @@
 import igConfig from './config';
-import stateChange from '../views/state-change';
+import stateChange from '../scripts/state-change';
 import pageVars from '../_config/page-vars';
 
 import { assignImageDrag } from '../components/ui-elements/main-image-drag';
@@ -136,6 +136,7 @@ export function igramIOInit(socket) {
     imageEl.classList.remove('igram-image');
     imageEl.setAttribute('title', dbDropData.filename);
     imageEl.setAttribute('data-link', dbDropData.link);
+    imageEl.setAttribute('data-owner', dbDropData.owner);
     imageEl.setAttribute('data-scale', '1');
     imageEl.setAttribute('data-angle', '0');
     imageEl.setAttribute('data-rotateX', '0');
@@ -165,6 +166,7 @@ export function igramIOInit(socket) {
     imageEl.style.left = dbDropData.left;
     imageEl.style.zIndex = dbDropData.z_index;
     imageEl.setAttribute('data-link', dbDropData.link);
+    imageEl.setAttribute('data-owner', dbDropData.owner);
 
     imageEl.setAttribute('data-scale', '1');
     imageEl.setAttribute('data-angle', '0');

@@ -57,45 +57,19 @@
 
     {{! nav containers }}
     <div id='nav'></div>
-
-
-    <div id='nav-main-container'>
-      {{#repeat 5}}
-      <div id='n{{@index}}' class='button-no-show'>
-      </div>
-      {{/repeat}}
-    </div>
-
-    <div id='nav-account-container'>
-      {{#repeat 5}}
-      <div id='a{{@index}}' class='button-no-show'>
-      </div>
-      {{/repeat}}
-    </div>
-
-    <div id='nav-tools-container'>
-      {{#repeat 5}}
-      <div id='t{{@index}}' class='button-no-show'>
-      </div>
-      {{/repeat}}
-    </div>
-
-    <div id='nav-upload-container'>
-      {{#repeat 5}}
-      <div id='u{{@index}}' class='button-no-show'>
-      </div>
-      {{/repeat}}
-
-      <form id='upload-form-button' name='title' method='post' enctype='multipart/form-data' action='addfile/' runat='server'>
-         <div class='btn-file button button-tools'> device
-           <img class='nav-button-icon' src='/icons/upload-icon.png'>
-           <input id='fileselect' type='file' name='session_id_goes_here'>
-         </div>
-      </form>
-    </div>
-
+    <div id='draggers'></div>
     <div id='connect-info' class='connect-info'></div>
     {{>upload-download-previews}}
+
+
+    <div id='debug'></div>
+
+    {{! upload form holder }}
+    <div id='upload-form-holder'>
+      <form id='upload-form' name='title' method='post' enctype='multipart/form-data' action='addfile/' runat='server'>
+        <input id='fileselect' type='file' name='session_id_goes_here'>
+      </form>
+    </div>
 
     {{!>experimental}}
     {{>igram}}

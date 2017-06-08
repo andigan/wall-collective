@@ -12,6 +12,13 @@ export function setSelectedImage(id) {
   };
 }
 
+export function clearSelectedImage() {
+  return {
+    type: 'CLEAR_SELECTED_IMAGE'
+  };
+}
+
+
 export function setSessionID(id) {
   return {
     type: 'SET_SESSION_ID',
@@ -43,5 +50,35 @@ export function setPreviousClickedIDs(ids) {
   return {
     type: 'SET_CLICKED_IDS',
     payload: ids
+  };
+}
+
+export function openNav() {
+  return {
+    type: 'OPEN_NAV'
+  };
+}
+
+export function closeNav() {
+  return {
+    type: 'CLOSE_NAV'
+  };
+}
+
+export function openUpload() {
+  return {
+    type: 'OPEN_UPLOAD'
+  };
+}
+
+export function openSettings() {
+  return {
+    type: 'OPEN_SETTINGS'
+  };
+}
+
+export function openEdit() {
+  return {
+    type: 'OPEN_EDIT'
   };
 }

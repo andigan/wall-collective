@@ -1,6 +1,7 @@
 import config from '../_config/config';
-import stateChange from '../views/state-change';
 import pageVars from '../_config/page-vars';
+import stateChange from '../scripts/state-change';
+import { clearSelectedImage } from '../actions';
 
 module.exports = {
   init: function () {
@@ -24,6 +25,7 @@ module.exports = {
 
       // remove all draggers
       stateChange.hideDraggers();
+      window.store.dispatch(clearSelectedImage());
       // remove dragger transitions
       // so that the draggers appear instantly instead of transitioning from previous position
       document.body.classList.remove('d-transition');
@@ -89,4 +91,5 @@ module.exports = {
 
     pageVars.changeDLimits(config.dLimits.top, config.dLimits.bottom, config.dLimits.left, config.dLimits.right);
   }
+
 };

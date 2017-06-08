@@ -1,7 +1,7 @@
 import { assignImageDrag } from '../components/ui-elements/main-image-drag';
 import { initializeImage } from '../components/images';
-import { setSelectedImage } from '../actions';
-import stateChange from '../views/state-change';
+import { clearSelectedImage } from '../actions';
+import stateChange from '../scripts/state-change';
 
 export default function (socket) {
   socket.on('bc:_moving', function (data) {
@@ -51,7 +51,7 @@ export default function (socket) {
   socket.on('bc:_deleteImage', function (data) {
     document.getElementById(data.deleteID).remove();
     if (data.deleteID === window.store.getState().selectedImage.id) {
-      window.store.dispatch(setSelectedImage(''));
+      window.store.dispatch(clearSelectedImage());
       stateChange.hideDraggers();
     };
   });

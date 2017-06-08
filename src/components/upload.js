@@ -1,11 +1,11 @@
 import config from '../_config/config';
-import stateChange from '../views/state-change';
+import stateChange from '../scripts/state-change';
 
 export function uploadInit() {
 
   // on file_select element change, load up the image preview
   document.getElementById('fileselect').onchange = function () {
-    stateChange.uploadPreview();
+    stateChange.hideDraggers();
     readURL(this);
   };
 
@@ -32,11 +32,11 @@ export function uploadInit() {
   // and is parsed by busboy
   document.getElementById('button-confirm-upload').onclick = function () {
     let request = new XMLHttpRequest,
-        form = document.getElementById('upload-form-button'),
+        form = document.getElementById('upload-form'),
         data,
         inputField = document.createElement('input');
 
-    // send file size as fieldna,e
+    // send file size as fieldname
     inputField.setAttribute('name', 'filesize');
     inputField.value = document.getElementById('fileselect').files[0].size;
     inputField.style.display = 'none';
