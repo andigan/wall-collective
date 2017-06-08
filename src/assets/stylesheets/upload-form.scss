@@ -1,0 +1,18 @@
+#upload-form-holder {
+  display: none;
+}
+
+#fileselect {
+  background: gray;
+  cursor: inherit;
+  display: block;
+  filter: alpha(opacity=0);
+  height: 100%;
+  width: 50%;
+  flex: 0 0 100%;
+  opacity: 0;
+  outline: none;
+  position: absolute;
+  left: 0;
+  top: 0;
+}

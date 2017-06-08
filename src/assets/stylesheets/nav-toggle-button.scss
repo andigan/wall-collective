@@ -1,0 +1,45 @@
+#nav-toggle-button-container {
+  bottom:0;
+  height:48px;
+  position:absolute;
+  right:0;
+  width:48px;
+  z-index:80000;
+}
+
+#nav-toggle-button-container button {
+  background-color:gray;
+  color:black;
+  cursor:pointer;
+  display: block;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
+// hamburger lines
+#ham-line1 {
+  top:40%;
+}
+
+#ham-line2 {
+  top:50%;
+}
+
+#ham-line3 {
+  top:60%;
+}
+
+#ham-line1,#ham-line2,#ham-line3 {
+  -moz-transition:all .13s;
+  -ms-transition:all .13s;
+  -o-transition:all .13s;
+  -webkit-transition:all .13s;
+  background-color:black;
+  border-radius:20%;
+  height:4%;
+  left:25%;
+  position:absolute;
+  transition:all .13s ease-in-out;
+  width:50%;
+}

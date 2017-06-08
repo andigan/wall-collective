@@ -16,13 +16,12 @@ export function igramInit() {
 
     document.getElementById('igram-header').style.display = 'flex';
     document.getElementById('igram-container').style.display = 'block';
-    document.body.classList.add('a-nav-container-is-open');
 
     // animate open hamburgers
     document.getElementById('ham-line1').style.top = '35%';
     document.getElementById('ham-line3').style.top = '65%';
 
     // remove query string from url
-    // window.history.pushState('object or string', 'Title', '/' + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split('?')[0]);
+    window.history.pushState('object or string', 'Title', '/' + window.location.href.substring(window.location.href.lastIndexOf('/') + 1).split('?')[0]);
   };
 }

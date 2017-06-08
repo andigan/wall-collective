@@ -33,7 +33,7 @@ class UploadMenu extends Component {
   componentWillUnmount() {
     // move form back to DOM
     document.getElementById('upload-form-holder').appendChild(document.getElementById('upload-form'));
-    document.getElementById('here-nav-container').style.width = 0;
+    document.getElementById('nav-container').style.width = 0;
   }
 
   handleClick(action) {
@@ -53,18 +53,18 @@ class UploadMenu extends Component {
     const x = this.buttons.map((button, i, all) => {
 
       return (
-          <div key={button.action} className='here-nav-button' data-action={button.action} onClick={this.handleClick.bind(this, button.action)} style={{width: 100 / all.length + '%'}}>
-            <div className='here-nav-icon-container'>
-              <Img className='here-nav-icon' src={button.icon} />
+          <div key={button.action} className='nav-button' data-action={button.action} onClick={this.handleClick.bind(this, button.action)} style={{width: 100 / all.length + '%'}}>
+            <div className='nav-icon-container'>
+              <Img className='nav-button-icon' src={button.icon} />
             </div>
-            <div className='here-nav-button-text'> {button.text} </div>
+            <div className='nav-button-text'> {button.text} </div>
           </div>
       );
 
     });
 
     return (
-      <div className='react-required-wrapper'>
+      <div className='nav-react-wrapper'>
         {x}
       </div>
     );

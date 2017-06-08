@@ -24,8 +24,6 @@ export function IgramClick() {
 
     document.getElementById('igram-header').style.display = 'flex';
     document.getElementById('igram-container').style.display = 'block';
-    document.getElementById('nav-upload-container').classList.remove('upload-container-is-open');
-    document.body.classList.add('a-nav-container-is-open');
 
     // animate open hamburgers
     document.getElementById('ham-line1').style.top = '35%';

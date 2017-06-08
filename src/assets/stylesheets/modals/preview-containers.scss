@@ -28,7 +28,7 @@
   z-index:90000;
 }
 
-.delete-preview-container-is-open {
+.delete-preview-container-is-open, .upload-preview-container_is_open {
   transform:scaleY(1)!important;
   -webkit-transform:scaleY(1)!important;
 }

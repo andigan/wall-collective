@@ -29,14 +29,6 @@ module.exports = {
   },
 
 
-
-
-  openInfo() {
-    document.getElementById('app-info').style.display = 'block';
-    this.hideDraggers();
-  },
-
-
   afterUpload() {
     store.dispatch(closeNav());
 
@@ -86,28 +78,6 @@ module.exports = {
 
     // show image on other clients
     window.socket.emit('ce:_showImage', deleteID);
-  },
-
-  closeAll() {
-
-    store.dispatch(closeNav());
-
-    // hide
-    document.getElementById('switches-container').classList.remove('switches-container-open');
-    document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
-    document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
-    document.getElementById('app-info').style.display = 'none';
-    document.getElementById('connect-info').classList.remove('connect-info-is-open');
-    document.getElementById('igram-header').style.display = 'none';
-    document.getElementById('igram-container').style.display = 'none';
-
-    // replace upload-image-preview image and delete-image-preview image
-    document.getElementById('upload-image-preview').src = '/icons/1x1.png';
-    document.getElementById('delete-image-preview').src = '/icons/1x1.png';
-    // close navigation button
-    document.body.classList.remove('a-nav-container-is-open');
-    // animate close hamburgers
-    document.getElementById('ham-line1').style.top = '40%';
-    document.getElementById('ham-line3').style.top = '60%';
   }
+
 };

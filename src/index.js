@@ -1,13 +1,3 @@
-// wall-collective
-//
-// Version: 0.7.0
-// Requires: jQuery v1.7+
-//           jquery-ui
-//           jquery.mobile-events
-//           jquery.ui.touch-punch
-//           socket.io v1.3.7+
-//           interact.js
-//
 // Copyright (c) 2018 Andrew Nease (andrew.nease.code@gmail.com)
 
 import config from './_config/config';
@@ -39,13 +29,15 @@ import { dSwitchsInit } from './components/d-switchs';
 // sockets
 import { IOInit } from './sockets/io';
 
+// color chooser
+import colorChooseInit from './scripts/choose-color-init';
+
 // react
 import React from 'react'; // required
 import ReactDOM from 'react-dom';
 import { Provider }  from 'react-redux';
 
 import NavContainer from './components/react/nav-container';
-
 
 // OPTIONAL Igram
 import { igramInit } from './_i-gram/init';
@@ -85,8 +77,9 @@ buttonsInit(); // create buttons and assign functionality
 navToggleInit(); // make nav-toggle-button draggable
 draggersInit(); // set up draggers functionality
 dSwitchsInit(); // set up dragger switches
+colorChooseInit(); // set up color chooser
+uploadInit(); // set up upload
 textboxInit();
-uploadInit();
 
 assignImageDrag(); // assign draggable to all .wallPic elements
 assignImageInteract(); // assign Interact.js to .wallPic elements

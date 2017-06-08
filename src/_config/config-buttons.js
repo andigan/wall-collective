@@ -46,10 +46,10 @@ module.exports =
       icon: '/icons/ic_replay_black_24px.svg',
       imageReq: false,
       text: 'reset page' },
-    { action: 'here-igram-logout',
-      icon: '/icons/1x1.png',
-      imageReq: false,
-      text: 'igram logout' }
+    // { action: 'here-igram-logout',
+    //   icon: '/icons/1x1.png',
+    //   imageReq: false,
+    //   text: 'igram logout' }
   ],
 
   'edit': [

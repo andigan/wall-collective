@@ -1,102 +1,23 @@
-import config from '../_config/config';
 import stateChange from '../scripts/state-change';
 import { setDeleteID } from '../actions';
-import { setSelectedImage, clearSelectedImage } from '../actions';
-import { initializeImage } from '../components/images';
-import { highestZ } from '../components/images';
-import { shiftZsAboveXDown } from '../components/images';
-import { zReport } from '../components/images';
-import { setDraggerLocations } from '../components/draggers';
-import { openNav, closeNav } from '../actions';
-
+import { clearSelectedImage } from '../actions';
 
 export function buttonsInit() {
 
-  createjsColor();
-
   addEvents([
-    document.getElementById('nav-tog-button'),
     document.getElementById('button-reject-delete'),
     document.getElementById('button-confirm-delete'),
     document.getElementById('button-reject-upload')
   ]);
 }
 
+function addEvents(buttons) {
+  buttons.forEach(
+    button => { button.addEventListener('click', onClick.bind(this)); });
+}
+
 function onClick(e) {
   switch (e.currentTarget.getAttribute('data-action')) {
-
-    case 'main-nav-click':
-      let navMainEl = document.getElementById('nav-tog-button');
-
-      // if the main button is not being dragged, process the click.
-      if ( navMainEl.classList.contains('nav-tog-dragging') === false ) {
-
-//        store.dispatch(closeNav());
-
-        // if any containers are open
-        if ( document.body.classList.contains('a-nav-container-is-open') ) {
-          // close all containers
-          stateChange.closeAll();
-
-          // if an image is selected
-          if ( store.getState().selectedImage.id !== '' ) {
-            // restore selected image in case it was removed by being dragged onto the exit door
-            document.getElementById(store.getState().selectedImage.id).style.display = 'initial';
-          };
-        // else when no containers are open
-        } else {
-
-          store.dispatch(openNav());
-
-
-          // open the navigation container
-//          document.getElementById('nav-main-container').classList.add('nav-is-open');
-          document.body.classList.add('a-nav-container-is-open');
-          document.getElementById('connect-info').classList.add('connect-info-is-open');
-
-          // animate open hamburgers
-          document.getElementById('ham-line1').style.top = '35%';
-          document.getElementById('ham-line3').style.top = '65%';
-
-//          stateChange.hideDraggers();
-        };
-      };
-      break;
-
-    case 'open-tools':
-      stateChange.openTools();
-      // NOTES: this.store.dispatch(open-tools())
-      break;
-
-    case 'open-account':
-      stateChange.openAccount();
-      break;
-
-    case 'open-upload':
-//      stateChange.openUpload();
-      break;
-
-    case 'app-info':
-      stateChange.openInfo();
-      break;
-
-    case 'choose-color':
-      let chooserEl = document.getElementById('color-chooser'),
-          chooserPos = config.chooserPos,
-          wrapperEl = document.getElementById('wrapper');
-
-      stateChange.hideDraggers();
-
-      chooserEl.style.display = 'block';
-      // set the initial location for the color
-      chooserEl.jscolor.fromString(wrapperEl.style.backgroundColor);
-
-      // position the input element; the palette box appears above and left-justified
-      chooserEl.style.left = `${(parseInt(wrapperEl.style.width) / 2) - (chooserPos.width / 2)}px`;
-      chooserEl.style.top = `${(parseInt(wrapperEl.style.height) / 2) + (chooserPos.height / 2)}px`;
-
-      chooserEl.jscolor.show();
-      break;
 
     case 'delete-reject':
       stateChange.rejectDelete();
@@ -128,8 +49,8 @@ function onClick(e) {
       stateChange.afterUpload();
       break;
 
-    // experimental
 
+    // experimental
     case 'textbox':
       let x = document.getElementById('cube');
 
@@ -162,42 +83,4 @@ function onClick(e) {
     default:
       break;
   }
-}
-
-function addEvents(buttons) {
-  buttons.forEach(
-    button => { button.addEventListener('click', onClick.bind(this)); });
-}
-
-function createjsColor() {
-  let jscolorEl,
-      chooserPos = config.chooserPos,
-      wrapperEl = document.getElementById('wrapper');
-
-
-  // fires rapidly when dragging on palette box
-  window.jScOlOrUpdate = function (jscolor) {
-    wrapperEl.style.backgroundColor = `#${jscolor}`;
-    window.socket.emit('ce:_changeBackground', `#${jscolor}`);
-  }.bind(this);
-
-  // fires on mouseup
-  window.jScOlOrChoice = function (jscolor) {
-    window.socket.emit('ce:_saveBackground', `#${jscolor}`);
-  };
-
-  jscolorEl = document.createElement('input');
-  jscolorEl.id = 'color-chooser';
-  jscolorEl.classList.add('jscolor');
-
-  jscolorEl.style.display = 'none';
-  jscolorEl.style.position = 'fixed';
-  jscolorEl.style.width = '1px';
-  jscolorEl.style.height = '1px';
-  jscolorEl.style.opacity = '0';
-
-  jscolorEl.setAttribute('data-jscolor', `{position: 'top', mode:'HVS', width:${chooserPos.width}, height:${chooserPos.height}, padding:0, shadow:false, borderWidth:0, backgroundColor:'transparent', insetColor:'#000', onFineChange: 'window.jScOlOrUpdate(this)'}`);
-  jscolorEl.setAttribute('onchange', 'window.jScOlOrChoice(this.jscolor)');
-
-  wrapperEl.appendChild(jscolorEl);
 }

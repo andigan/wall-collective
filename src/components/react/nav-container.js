@@ -24,7 +24,7 @@ class NavContainer extends Component {
 
   render() {
     return (
-      <div id='here-nav-container' className='here-nav-container'>
+      <div id='nav-container' className='nav-container'>
         {this.getMenu()}
       </div>
     );

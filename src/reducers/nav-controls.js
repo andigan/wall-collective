@@ -1,15 +1,15 @@
-export default function (state = {isOpen: false, status: 'none', imageSelected: false}, action) {
+export default function (state = {status: 'none', imageSelected: false}, action) {
   switch (action.type) {
     case 'OPEN_NAV':
-      return {...state, isOpen: true, status: 'initial'};
+      return {...state, status: 'initial'};
     case 'CLOSE_NAV':
-      return {...state, isOpen: false, status: 'none'};
+      return {...state, status: 'none'};
     case 'OPEN_UPLOAD':
-      return {...state, isOpen: true, status: 'upload'};
+      return {...state, status: 'upload'};
     case 'OPEN_SETTINGS':
-      return {...state, isOpen: true, status: 'settings'};
+      return {...state, status: 'settings'};
     case 'OPEN_EDIT':
-      return {...state, isOpen: true, status: 'edit'};
+      return {...state, status: 'edit'};
     case 'SET_SELECTED_IMAGE':
       return {...state, imageSelected: true};
     case 'CLEAR_SELECTED_IMAGE':

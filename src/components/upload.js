@@ -67,7 +67,7 @@ export function uploadInit() {
 
         } else {
           console.log('Error:' + request.status);
-          // change nav-main-container and remove upload_preview
+          // remove upload_preview
           stateChange.afterUpload();
           config.uploadTotal = 0;
         };

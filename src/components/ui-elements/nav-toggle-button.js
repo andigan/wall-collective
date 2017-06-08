@@ -1,8 +1,59 @@
 import pageVars from '../../_config/page-vars';
+import { openNav, closeNav } from '../../actions';
 
 module.exports = {
 
   navToggleInit() {
+
+    // handle click
+    document.getElementById('nav-tog-button').onclick = () => {
+      let navMainEl = document.getElementById('nav-tog-button');
+
+      // if the main button is not being dragged, process the click.
+      if ( navMainEl.classList.contains('nav-tog-dragging') === false ) {
+
+        // if any containers are open
+        if ( store.getState().navBar.status !== 'none' ) {
+
+          // close all containers
+          store.dispatch(closeNav());
+
+          // hide elements
+          document.getElementById('switches-container').classList.remove('switches-container-open');
+          document.getElementById('upload-preview-container').classList.remove('upload-preview-container_is_open');
+          document.getElementById('delete-preview-container').classList.remove('delete-preview-container-is-open');
+          document.getElementById('connect-info').classList.remove('connect-info-is-open');
+
+          document.getElementById('app-info').style.display = 'none';
+          document.getElementById('igram-header').style.display = 'none';
+          document.getElementById('igram-container').style.display = 'none';
+
+          // replace upload-image-preview image and delete-image-preview image
+          document.getElementById('upload-image-preview').src = '/icons/1x1.png';
+          document.getElementById('delete-image-preview').src = '/icons/1x1.png';
+
+          // animate close hamburgers
+          document.getElementById('ham-line1').style.top = '40%';
+          document.getElementById('ham-line3').style.top = '60%';
+
+          // if an image is selected
+          if ( store.getState().selectedImage.id !== '' ) {
+            // restore selected image in case it was removed by being dragged onto the exit door
+            document.getElementById(store.getState().selectedImage.id).style.display = 'initial';
+          };
+        // else when no containers are open
+        } else {
+          store.dispatch(openNav());
+          document.getElementById('connect-info').classList.add('connect-info-is-open');
+
+          // animate open hamburgers
+          document.getElementById('ham-line1').style.top = '35%';
+          document.getElementById('ham-line3').style.top = '65%';
+        };
+      };
+    };
+
+    // make toggle button container draggable
     $('#nav-toggle-button-container').draggable({
       cancel: true,
       containment: 'parent',
