@@ -82,3 +82,9 @@ export function openEdit() {
     type: 'OPEN_EDIT'
   };
 }
+
+export function openInfo() {
+  return {
+    type: 'OPEN_INFO'
+  };
+}

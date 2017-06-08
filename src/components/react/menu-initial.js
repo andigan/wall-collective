@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
 import Img from 'react-image';
 
-import { openUpload, openSettings, openEdit, closeNav } from '../../actions';
+import { openUpload, openSettings, openEdit, closeNav, openInfo } from '../../actions';
 import Buttons from '../../_config/config-buttons';
 import changeContainerSize from './scripts/change-container-size';
 
@@ -24,7 +24,7 @@ class InitialMenu extends Component {
         this.props.openUpload();
         break;
       case 'here-open-info':
-        this.props.closeNav();
+        this.props.openInfo();
         document.getElementById('app-info').style.display = 'block';
         stateChange.hideDraggers();
         break;
@@ -79,7 +79,7 @@ function mapStatetoProps(state) {
 }
 
 function mapDispatchtoProps (dispatch) {
-  return bindActionCreators( { openUpload, openSettings, openEdit, closeNav }, dispatch)
+  return bindActionCreators( { openUpload, openSettings, openEdit, closeNav, openInfo }, dispatch)
 }
 
 export default connect (mapStatetoProps, mapDispatchtoProps)(InitialMenu);
