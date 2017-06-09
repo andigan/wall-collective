@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Img from 'react-image';
 
 import Buttons from '../../_config/config-buttons';
+import NavButtons from './nav-buttons';
+
 import findElement from './scripts/find-element';
-import changeContainerSize from './scripts/change-container-size';
 
 import exitDoorDrop from '../../scripts/exit-door-drop';
 import resetImage from '../../scripts/reset-image';
@@ -18,19 +18,11 @@ class EditMenu extends Component {
     this.buttons = Buttons.edit;
   }
 
-  componentWillMount() {
-    changeContainerSize(this.buttonsToRender(this.props).length);
-  }
-
   componentDidMount() {
     if (this.props.navBar.imageSelected) {
       this.setExitDrop();
       this.setImageIcon();
     }
-  }
-
-  componentWillUpdate(nextProps) {
-    changeContainerSize(this.buttonsToRender(nextProps).length);
   }
 
   componentDidUpdate() {
@@ -40,29 +32,19 @@ class EditMenu extends Component {
     }
   }
 
-  componentWillUnmount() {
-    document.getElementById('nav-container').style.width = 0;
-  }
-
-  buttonsToRender(props) {
-    return (props.navBar.imageSelected) ? this.buttons : this.buttons.filter((button) => {
-      return !button.imageReq;
-    });
-  }
-
   setExitDrop() {
-    findElement('here-remove-image').id = 'exit-drop';
+    findElement('remove-image').id = 'exit-drop';
     exitDoorDrop();
   }
 
   setImageIcon() {
-    findElement('here-image-placeholder').style.backgroundImage = `url(${document.getElementById(this.props.selectedImageId).src})`;
+    findElement('nav-image-placeholder').style.backgroundImage = `url(${document.getElementById(this.props.selectedImageId).src})`;
   }
 
   handleClick(action) {
 
     switch (action) {
-      case 'here-open-draggers':
+      case 'open-switches':
         {
           let switchesEl = document.getElementById('switches-container');
 
@@ -73,10 +55,10 @@ class EditMenu extends Component {
           }
         }
         break;
-      case 'here-reset-image':
+      case 'reset-image':
         resetImage();
         break;
-      case 'here-remove-image':
+      case 'remove-image':
         removeImage();
         break;
       default:
@@ -86,26 +68,13 @@ class EditMenu extends Component {
   }
 
   render() {
-    let x = this.buttonsToRender(this.props).map((button, i, all) => {
-
-          return (
-              <div key={button.action} className='nav-button' data-action={button.action} onClick={this.handleClick.bind(this, button.action)} style={{width: 100 / all.length + '%'}}>
-                <div className='nav-icon-container'>
-                  <Img className='nav-button-icon' src={button.icon} />
-                </div>
-                <div className='nav-button-text'> {button.text} </div>
-              </div>
-          );
-        });
-
     return (
       <div className='nav-react-wrapper'>
-        {x}
+        <NavButtons buttons={this.buttons} handleClick={this.handleClick} />
       </div>
     );
   }
 }
-
 
 function mapStatetoProps(state) {
   return {

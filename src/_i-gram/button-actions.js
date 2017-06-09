@@ -43,7 +43,9 @@ export function igramLogout() {
   document.getElementById('wrapper').appendChild(tempImgEl);
   tempImgEl.remove();
 
-  alert('logged out');
+  // close elements
+  document.getElementById('igram-header').style.display = 'none';
+  document.getElementById('igram-container').style.display = 'none';
 
   // igram-#24: Remove client's access token from server
   socket.emit('ce:_removeClientAccessToken', window.store.getState().pageConfig.sessionID);

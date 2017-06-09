@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux'
-import Img from 'react-image';
+
+import Buttons from '../../_config/config-buttons';
+import NavButtons from './nav-buttons';
 
 import { openUpload, openSettings, openEdit, closeNav, openInfo } from '../../actions';
-import Buttons from '../../_config/config-buttons';
-import changeContainerSize from './scripts/change-container-size';
-
 import stateChange from '../../scripts/state-change';
-
 
 class InitialMenu extends Component {
   constructor() {
@@ -20,18 +18,18 @@ class InitialMenu extends Component {
   handleClick(action) {
 
     switch (action) {
-      case 'here-add-image':
+      case 'open-add':
         this.props.openUpload();
         break;
-      case 'here-open-info':
+      case 'open-app-info':
         this.props.openInfo();
         document.getElementById('app-info').style.display = 'block';
         stateChange.hideDraggers();
         break;
-      case 'here-open-settings':
+      case 'open-settings':
         this.props.openSettings();
         break;
-      case 'here-open-edit':
+      case 'open-edit':
         this.props.openEdit();
         break;
       default:
@@ -39,47 +37,18 @@ class InitialMenu extends Component {
     }
   }
 
-  componentWillMount() {
-    changeContainerSize(this.buttons.length);
-  }
-
-  componentWillUnmount() {
-    document.getElementById('nav-container').style.width = 0;
-  }
-
   render() {
-
-    const x = this.buttons.map((button, i, all) => {
-
-      return (
-          <div key={button.action} className='nav-button'  data-action={button.action} onClick={this.handleClick.bind(this, button.action)} style={{width: 100 / all.length + '%'}}>
-            <div className='nav-icon-container'>
-              <Img className='nav-button-icon' src={button.icon} />
-            </div>
-            <div className='nav-button-text'> {button.text} </div>
-          </div>
-      );
-
-    });
 
     return (
       <div className='nav-react-wrapper'>
-        {x}
+        <NavButtons buttons={this.buttons} handleClick={this.handleClick} />
       </div>
     );
   }
 }
 
-
-function mapStatetoProps(state) {
-  return {
-    navBar: state.navBar
-//  account: state.account
-  }
+function mapDispatchtoProps(dispatch) {
+  return bindActionCreators( { openUpload, openSettings, openEdit, closeNav, openInfo }, dispatch);
 }
 
-function mapDispatchtoProps (dispatch) {
-  return bindActionCreators( { openUpload, openSettings, openEdit, closeNav, openInfo }, dispatch)
-}
-
-export default connect (mapStatetoProps, mapDispatchtoProps)(InitialMenu);
+export default connect (null, mapDispatchtoProps)(InitialMenu);

@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import Img from 'react-image';
+
+import Buttons from '../../_config/config-buttons';
+import NavButtons from './nav-buttons';
 
 import { closeNav } from '../../actions';
-import Buttons from '../../_config/config-buttons';
-import changeContainerSize from './scripts/change-container-size';
-
-import resetPage from '../../scripts/reset-page';
-import chooseColor from '../../scripts/choose-color';
 import { igramLogout } from '../../_i-gram/button-actions';
-
+import chooseColor from '../../scripts/choose-color';
+import resetPage from '../../scripts/reset-page';
 
 class SettingsMenu extends Component {
   constructor() {
@@ -19,24 +17,16 @@ class SettingsMenu extends Component {
     this.buttons = Buttons.settings;
   }
 
-  componentWillMount() {
-    changeContainerSize(this.buttons.length);
-  }
-
-  componentWillUnmount() {
-    document.getElementById('nav-container').style.width = 0;
-  }
-
   handleClick(action) {
 
     switch (action) {
-      case 'here-reset-page':
+      case 'reset-page':
         resetPage();
         break;
-      case 'here-change-background-color':
+      case 'change-background-color':
         chooseColor();
         break;
-      case 'here-igram-logout':
+      case 'igram-logout':
         igramLogout();
         break;
       default:
@@ -45,38 +35,16 @@ class SettingsMenu extends Component {
   }
 
   render() {
-
-    const x = this.buttons.map((button, i, all) => {
-
-      return (
-          <div key={button.action} className='nav-button' data-action={button.action} onClick={this.handleClick.bind(this, button.action)} style={{width: 100 / all.length + '%'}}>
-            <div className='nav-icon-container'>
-              <Img className='nav-button-icon' src={button.icon} />
-            </div>
-            <div className='nav-button-text'> {button.text} </div>
-          </div>
-      );
-
-    });
-
     return (
       <div className='nav-react-wrapper'>
-        {x}
+        <NavButtons buttons={this.buttons} handleClick={this.handleClick} />
       </div>
     );
   }
 }
 
-
-function mapStatetoProps(state) {
-  return {
-    navBar: state.navBar
-//  account: state.account
-  }
+function mapDispatchtoProps(dispatch) {
+  return bindActionCreators( { closeNav }, dispatch);
 }
 
-function mapDispatchtoProps (dispatch) {
-  return bindActionCreators( { closeNav }, dispatch)
-}
-
-export default connect (mapStatetoProps, mapDispatchtoProps)(SettingsMenu);
+export default connect (null, mapDispatchtoProps)(SettingsMenu);

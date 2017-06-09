@@ -328,8 +328,10 @@ export function draggersInit() {
       draggerAPI.limitDrag(ui);
 
       let draggerPos = draggerAPI.getPos(ui.position),
-          opacity = draggerPos.x < 50 ? (draggerPos.x * 0.02).toFixed(2) : (1 - (draggerPos.x - 50) * 0.02).toFixed(2),
+          opacity = 1 - draggerPos.x / 100,
           hueRotate = draggerPos.y < 50 ? (360 - draggerPos.y * 7.2).toFixed(2) : (draggerPos.y * 7.2 - 360).toFixed(2);
+
+      // opacity = draggerPos.x < 50 ? (draggerPos.x * 0.02).toFixed(2) : (1 - (draggerPos.x - 50) * 0.02).toFixed(2), // center opacity
 
       draggerAPI.updateInfo(`opacity: ${(opacity * 100).toFixed(0)}% hue-rotation: ${hueRotate}\xB0`);
 
@@ -489,13 +491,15 @@ export function setPartyD(id) {
       imageFilter = imageEl.style.WebkitFilter,
       opacity = parseInt( imageEl.style.opacity * 100) / 100,
 
-      isLeft = (draggerEl.offsetLeft + pageVars.dWidth / 2 < pageVars.dLimits.inmiddlex),
       isTop = (draggerEl.offsetTop + pageVars.dHeight / 2 < pageVars.dLimits.inmiddley),
 
       adjustedY = isTop ? ((1 - (getValue('hue-rotate', imageFilter) / 360)) / 2 ).toFixed(2) : (0.5 + getValue('hue-rotate', imageFilter) / 720).toFixed(2),
-      adjustedZ = isLeft ? opacity / 2 : 1 - opacity / 2;
+      adjustedX = 1 - opacity;
 
-  setDraggerLoc(draggerEl, adjustedZ, adjustedY);
+      // isLeft = (draggerEl.offsetLeft + pageVars.dWidth / 2 < pageVars.dLimits.inmiddlex);
+      // adjustedX = isLeft ? opacity / 2 : 1 - opacity / 2; // for centered opacity;
+
+  setDraggerLoc(draggerEl, adjustedX, adjustedY);
   showDragger(draggerEl);
 };
 

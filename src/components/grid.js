@@ -41,17 +41,17 @@ module.exports = {
 
     wrapperEl.appendChild(infoEl);
 
-    this.vline(`${pageVars.dLimits.inleft}px`, 'red', 'grid-right');
-    this.vline(`${pageVars.dLimits.inright}px`, 'blue'  , 'grid-left');
-    this.hline(`${pageVars.dLimits.intop}px`, 'purple', 'grid-bottom');
-    this.hline(`${pageVars.dLimits.inbottom}px`, 'yellow', 'grid-top');
+    // this.vline(`${pageVars.dLimits.inleft}px`, 'red', 'grid-right');
+    // this.vline(`${pageVars.dLimits.inright}px`, 'blue'  , 'grid-left');
+    // this.hline(`${pageVars.dLimits.intop}px`, 'purple', 'grid-bottom');
+    // this.hline(`${pageVars.dLimits.inbottom}px`, 'yellow', 'grid-top');
   },
 
   remove_grid() {
-    document.getElementById('grid-top').remove();
-    document.getElementById('grid-bottom').remove();
-    document.getElementById('grid-left').remove();
-    document.getElementById('grid-right').remove();
+    // document.getElementById('grid-top').remove();
+    // document.getElementById('grid-bottom').remove();
+    // document.getElementById('grid-left').remove();
+    // document.getElementById('grid-right').remove();
     document.getElementById('grid-info').remove();
   }
 };
