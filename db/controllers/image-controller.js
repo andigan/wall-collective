@@ -1,7 +1,8 @@
 var config = require('../../config/config.js'),
     fs = require('fs'),
     mongoose = require('mongoose'),
-    helpers = require('../../helpers'),
+    imageCheck = require('../../scripts/image-check'),
+    twoDSort = require('../../scripts/two-d-sort'),
     s3 = require('../../mods/aws')();
 
 function dbReseedImages(sortedDateFilenames, callback) {
@@ -320,7 +321,7 @@ module.exports = {
       if (err) return console.error(err);
 
       sorted = dirFilenames.filter(function (filename) {
-        return helpers.imageCheck(filename);
+        return imageCheck(filename);
       }).map(function (filename) {
         // create sorted, a two-dimensional array used for sorting images by date
         // sorted[0] = [ modification date, filename ]
@@ -332,7 +333,7 @@ module.exports = {
         // .mtime: a method to retrieve a 'modification date' object from the fsstatsync result
         // .toISOString: a date prototype method that converts the date object to a string
         return [fs.statSync( config.staticImageDir + '/' + filename ).mtime.toISOString(), filename ];
-      }).sort(helpers.twoDSort);
+      }).sort(twoDSort);
 
       dbReseedImages(sorted, callback);
     });
@@ -351,7 +352,7 @@ module.exports = {
           return [image.LastModified.toISOString(), image.Key];
         });
 
-        imagesDate.sort(helpers.twoDSort);
+        imagesDate.sort(twoDSort);
 
         dbReseedImages(imagesDate, callback);
       };
