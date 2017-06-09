@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import InitialMenu from './menu-initial';
 import SettingsMenu from './menu-settings';
 import EditMenu from './menu-edit';
-import UploadMenu from './menu-upload';
+import AddMenu from './menu-add';
 
 class NavContainer extends Component {
 
@@ -12,7 +12,7 @@ class NavContainer extends Component {
       case 'initial':
         return <InitialMenu />;
       case 'upload':
-        return <UploadMenu />;
+        return <AddMenu />;
       case 'settings':
         return <SettingsMenu />;
       case 'edit':

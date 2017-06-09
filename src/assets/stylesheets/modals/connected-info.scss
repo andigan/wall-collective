@@ -1,19 +1,20 @@
 #connect-info {
   background-color: transparent;
-  top: 0;
+  bottom: 100px;
   color: white;
-  left: 48px;
-  padding-left: 10px;
-  position: fixed;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  right: 14px;
   transform: scaleY(0);
   -webkit-transform: scaleY(0);
   transition: transform 150ms ease-in-out;
-  width: 80%;
-  z-index:50000;
+  z-index: 50000;
+
 
   .icon-person {
-    height: 3vh;
-    width: 1.5vh;
+    height: 20px;
+    width: 10px;
   }
 
 }

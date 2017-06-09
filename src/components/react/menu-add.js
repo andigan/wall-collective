@@ -7,9 +7,9 @@ import Buttons from '../../_config/config-buttons';
 import findElement from './scripts/find-element';
 
 import { IgramClick } from '../../_i-gram/button-actions';
-import { closeNav } from '../../actions';
+import { openIgram, closeNav } from '../../actions';
 
-class UploadMenu extends Component {
+class AddMenu extends Component {
   constructor() {
     super();
     this.handleClick = this.handleClick.bind(this);
@@ -36,7 +36,8 @@ class UploadMenu extends Component {
         break;
       case 'add-from-igram':
         IgramClick();
-        this.props.closeNav();
+//        this.props.closeNav();
+        this.props.openIgram();
         break;
       default:
         break;
@@ -53,7 +54,7 @@ class UploadMenu extends Component {
 }
 
 function mapDispatchtoProps(dispatch) {
-  return bindActionCreators( { closeNav }, dispatch);
+  return bindActionCreators( { openIgram, closeNav }, dispatch);
 }
 
-export default connect (null, mapDispatchtoProps)(UploadMenu);
+export default connect (null, mapDispatchtoProps)(AddMenu);

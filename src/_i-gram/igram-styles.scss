@@ -1,6 +1,6 @@
 #igram-container {
 	display: none;
-	right: 0;
+	height: 100%;
 	position: absolute;
 	top: 0;
 	width: 20%;
@@ -18,6 +18,7 @@
 	display: flex;
 	flex-direction: row;
 	flex-wrap: wrap;
+	height: 70%;
 	justify-content: space-between;
 	right: 0;
 	min-width: 64px;
@@ -25,6 +26,7 @@
 	overflow-y: scroll; /* not auto */
 	-webkit-overflow-scrolling: touch;
 	position: absolute;
+	top: 50px;
 	width: 100%;
 	z-index: 50000;
 }
@@ -43,11 +45,13 @@
 }
 
 #igram-opacity-mask {
-	position: absolute;
-	left: 0;
-	width: 100%;
 	background: gray;
+	height: 70%;
+	left: 0;
 	opacity: 0.3;
+	position: absolute;
+	top: 50px;
+	width: 100%;
 	z-index: 1;
 }
 
@@ -71,14 +75,15 @@
 	display: none;
 	flex-wrap: nowrap;
 	flex-direction: row;
+	height: 48px;
 	justify-content: space-around;
 	position: absolute;
-	right: 4vw;
 	top: 0;
 }
 
 #igram-info-username {
 	color: #FFF;
+	padding-left: 10px;
 	text-decoration: underline;
 }
 

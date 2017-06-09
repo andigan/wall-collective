@@ -1,14 +1,5 @@
 export function igramInit() {
 
-  // set igram-container's height
-  document.getElementById('igram-container').style.height = (window.innerHeight) + 'px';
-  document.getElementById('igram-images-container').style.height = (window.innerHeight * 0.8) + 'px';
-  document.getElementById('igram-images-container').style.top = (window.innerHeight * 0.1) + 'px';
-  document.getElementById('igram-header').style.height = (window.innerHeight * 0.07) + 'px';
-  document.getElementById('igram-opacity-mask').style.height = (window.innerHeight * 0.8) + 'px';
-  document.getElementById('igram-opacity-mask').style.top = (window.innerHeight * 0.1) + 'px';
-
-
   // igram-#6: On page load, if query includes ?open_igram (added by igram middleware),
   // fetch igram data and open the divs
   if (window.location.href.includes('open_igram')) {

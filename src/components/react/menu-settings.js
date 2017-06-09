@@ -5,7 +5,9 @@ import { bindActionCreators } from 'redux';
 import Buttons from '../../_config/config-buttons';
 import NavButtons from './nav-buttons';
 
-import { closeNav } from '../../actions';
+import findElement from './scripts/find-element';
+
+import { closeNav, gridToggle } from '../../actions';
 import { igramLogout } from '../../_i-gram/button-actions';
 import chooseColor from '../../scripts/choose-color';
 import resetPage from '../../scripts/reset-page';
@@ -17,7 +19,7 @@ class SettingsMenu extends Component {
     this.buttons = Buttons.settings;
   }
 
-  handleClick(action) {
+  handleClick(action, e) {
 
     switch (action) {
       case 'reset-page':
@@ -25,6 +27,16 @@ class SettingsMenu extends Component {
         break;
       case 'change-background-color':
         chooseColor();
+        break;
+      case 'grid-toggle':
+        this.props.gridToggle();
+        if (store.getState().navBar.gridOn) {
+          e.target.src = Buttons.altIcons.grid.on;
+          findElement('grid-toggle').children[1].textContent = 'grid on';
+        } else {
+          e.target.src = Buttons.altIcons.grid.off;
+          findElement('grid-toggle').children[1].textContent = 'grid off';
+        }
         break;
       case 'igram-logout':
         igramLogout();
@@ -44,7 +56,7 @@ class SettingsMenu extends Component {
 }
 
 function mapDispatchtoProps(dispatch) {
-  return bindActionCreators( { closeNav }, dispatch);
+  return bindActionCreators( { closeNav, gridToggle }, dispatch);
 }
 
 export default connect (null, mapDispatchtoProps)(SettingsMenu);

@@ -88,3 +88,16 @@ export function openInfo() {
     type: 'OPEN_INFO'
   };
 }
+
+export function openIgram() {
+  return {
+    type: 'OPEN_IGRAM'
+  };
+}
+
+
+export function gridToggle() {
+  return {
+    type: 'TOGGLE_GRID'
+  };
+}

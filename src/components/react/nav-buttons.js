@@ -47,7 +47,7 @@ class NavButtons extends Component {
       return (
           <div key={button.action} className='nav-button' data-action={button.action} onClick={this.props.handleClick.bind(this, button.action)} style={{width: 100 / all.length + '%'}}>
             <div className='nav-icon-container'>
-              <Img className='nav-button-icon' src={button.icon} />
+              <Img className='nav-button-icon' src={button.icon} alt={button.iconalt}/>
             </div>
             <div className='nav-button-text'> {button.text} </div>
           </div>
