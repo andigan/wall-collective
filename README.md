@@ -3,6 +3,8 @@
 
 # wall-collective
 
+blah blah blah
+
 A multi-user responsive real-time web app for sharing, arranging, and transforming images collaboratively on your laptop or phone.
 
 ## Features  
