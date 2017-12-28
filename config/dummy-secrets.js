@@ -1,6 +1,6 @@
 module.exports = {
 
-  s3accessKeyId: 's3accessKeyID',
-  s3secretAccessKey: 's3secretAccessKey'
+  s3accessKeyId: 'ACCESS KEY ID HERE',
+  s3secretAccessKey: 'SECRET ACCESS KEY HERE'
 
 };

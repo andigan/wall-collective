@@ -3,8 +3,6 @@
 
 # wall-collective
 
-blah blah blah
-
 A multi-user responsive real-time web app for sharing, arranging, and transforming images collaboratively on your laptop or phone.
 
 ## Features  
@@ -43,24 +41,19 @@ Uses:
 - Share background color changes.
 - Optional: On a touchscreen, use pinch gesture to change an image size and angle.
 
-## Installation
+## Development Installation
 
-1. Install and run MongoDB:
-
-  ```
-  $ mongod
-  ```
-2. Install the npm dependencies:
+1. Install the npm dependencies:
 
   ```
   $ npm install
   ```
-3. Edit the config.js file.
+2. Edit the config files (/config).
 
-4. Build and run the app:
+3. Build and run the app:
 
   ```
-  $ env PORT=8000 npm start
+  $ npm run dev-build
   ```
 
 ## Notes
