@@ -1,31 +1,63 @@
+const webpack = require('webpack');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const merge = require('webpack-merge');
 
-module.exports = {
+const common = {
   entry: './src/index.js',
   output: {
     filename: './public/js/bundle.js'
   },
+  plugins: [
+    // environmental variables to pass to client, e.g. process.env.API_URL
+    new webpack.DefinePlugin({
+      'process.env': {
+        'NODE_ENV': JSON.stringify(process.env.NODE_ENV)
+      }
+    }),
+    new ExtractTextPlugin('./public/css/styles.css')
+  ],
+
   module: {
     rules: [
       {
+        // js and jsx
         test: /\.js$/,
-        exclude: [/node_modules/],
-        use: [{
-          loader: 'babel-loader',
-          options: { presets: ['es2015', 'stage-2', 'react'] },
-        }],
+        exclude: /node_modules/,
+        use: {
+          loader: 'babel-loader'
+        }
       },
+      // scss
       {
-        test: /\.scss$/,
-        use: ExtractTextPlugin.extract({
-          fallback: 'style-loader',
-          use: ['css-loader', 'sass-loader']
-        })
+        test: /\.scss|.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'sass-loader'
+        ]
       }
-    ]},
-
-
-  plugins: [
-    new ExtractTextPlugin('./public/css/styles.css')
-  ]
+    ]
+  }
 };
+
+
+module.exports = function () {
+  switch (process.env.NODE_ENV) {
+
+    case 'development':
+      return merge(
+        common,
+        { devtool: 'eval' }
+      );
+      break;
+
+    case 'production':
+    default:
+
+      return merge(
+        common,
+        { devtool: 'eval' }
+      );
+      break;
+  }
+}();
