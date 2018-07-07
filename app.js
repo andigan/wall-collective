@@ -1,6 +1,6 @@
-// wall-collective
+// theupto
 //
-// Version: 0.7.0
+// Version: 0.9.0
 // Requires: jQuery v1.7+
 //           jquery-ui
 //           jquery.form

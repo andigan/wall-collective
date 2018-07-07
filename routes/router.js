@@ -25,7 +25,7 @@ router.get('/', function (req, res) {
 
   function renderPage(databaseResult) {
     res.render('index.handlebars', {
-      title          : 'wall-collective',
+      title          : 'the•up•to',
       databaseResult : databaseResult,
       useCDN         : config.useCDN,
       useIGram       : config.useIGram

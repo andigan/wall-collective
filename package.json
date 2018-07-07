@@ -1,5 +1,5 @@
 {
-  "name": "wall-collective",
+  "name": "theupto",
   "version": "0.9.0",
   "description": "A multi-user responsive real-time web app for sharing, arranging, and transforming images collaboratively on your laptop or phone.",
   "author": "Andrew Nease <andrew.nease.code@gmail.com",
@@ -51,6 +51,8 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "node-sass": "^4.7.2",
     "sass-loader": "^6.0.6",
+    "shipit-cli": "^4.1.1",
+    "shipit-deploy": "^4.1.1",
     "style-loader": "^0.19.1"
   }
 }
