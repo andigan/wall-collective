@@ -11,7 +11,11 @@
     "build": "NODE_ENV=production webpack",
     "server:watch": "PORT=8080 nodemon app.js",
     "server:run": "PORT=80 node app.js",
-    "mongo:run": "mongod --quiet"
+    "mongo:run": "mongod --quiet",
+    "deploy-local": "npx shipit production deploy-local",
+    "deploy-github": "npm-run-all copy-from-github restart-server",
+    "copy-from-github": "npx shipit production deploy",
+    "restart-server": "npx shipit production restart-server"
   },
   "dependencies": {
     "aws-sdk": "^2.54.0",
