@@ -19,7 +19,7 @@ module.exports = shipit => {
   shipit.task('deploy-local', async () => {
     await shipit.copyToRemote(
       './',
-      '/var/www/theupto/',
+      '/var/www/theupto/local',
     );
 
     let commands = [
@@ -43,25 +43,23 @@ module.exports = shipit => {
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
         'pm2 delete app',
-        'pm2 start app.js'
+        'pm2 start /var/www/theupto/local/app.js'
       ];
 
-      await shipit.remote(commands.join(' && '),
-        {cwd: '/var/www/theupto/'});
+      await shipit.remote(commands.join(' && '));
     } else {
       let commands = [
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
         'pm2 delete app',
-        'pm2 start app.js'
+        'pm2 start /var/www/theupto/local/app.js'
       ];
 
-      await shipit.remote(commands.join(' && '),
-        {cwd: '/var/www/theupto/'});
+      await shipit.remote(commands.join(' && '));
     }
   });
 
-  shipit.task('restart-server', async () => {
+  shipit.task('restart-server-current', async () => {
     let commands = [
       'source ~/.nvm/nvm.sh',
       'nvm use 8.0.0',
@@ -83,21 +81,19 @@ module.exports = shipit => {
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
         'pm2 delete app',
-        'pm2 start app.js'
+        'pm2 start /var/www/theupto/current/app.js'
       ];
 
-      await shipit.remote(commands.join(' && '),
-        {cwd: '/var/www/theupto/'});
+      await shipit.remote(commands.join(' && '));
     } else {
       let commands = [
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
         'pm2 delete app',
-        'pm2 start app.js'
+        'pm2 start /var/www/theupto/current/app.js'
       ];
 
-      await shipit.remote(commands.join(' && '),
-        {cwd: '/var/www/theupto/'});
+      await shipit.remote(commands.join(' && '));
     }
   });
 
