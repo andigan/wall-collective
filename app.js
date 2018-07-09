@@ -50,7 +50,8 @@ app.set('views', path.join(__dirname, 'views'));
 app.engine('handlebars', handlebars(
   { defaultLayout: 'main',
     helpers: hbHelpers,
-    partialsDir: [ 'shared/templates/', 'views/partials/' ]
+    partialsDir: path.join(__dirname, '/views/partials/'),
+    layoutsDir: path.join(__dirname, '/views/layouts'),
   }));
 app.set('view engine', 'handlebars');
 
