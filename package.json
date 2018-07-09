@@ -12,10 +12,11 @@
     "server:watch": "PORT=8080 nodemon app.js",
     "server:run": "PORT=80 node app.js",
     "mongo:run": "mongod --quiet",
-    "deploy-local": "npx shipit production deploy-local",
+    "deploy-local": "HOST=theupto.com DEPLOY_TO=/var/www/theupto REPO=https://github.com/andigan/theupto npx shipit production deploy-local",
     "deploy-master": "npm-run-all deploy restart-server-current",
     "deploy": "npx shipit production deploy",
-    "restart-server-current": "npx shipit production restart-server-current"
+    "restart-server-current": "npx shipit production restart-server-current",
+    "nothin": "DEPLOY_TO=/var/www/theupto npx shipit production nothin"
   },
   "dependencies": {
     "aws-sdk": "^2.54.0",

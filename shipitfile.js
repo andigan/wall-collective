@@ -1,6 +1,5 @@
 // NOTE: deploy won't work due to secret files in the gitignore file.
 
-
 module.exports = shipit => {
   // Load shipit-deploy tasks
   require('shipit-deploy')(shipit);
@@ -8,11 +7,11 @@ module.exports = shipit => {
   // from repo
   shipit.initConfig({
     default: {
-      deployTo: '/var/www/theupto',
-      repositoryUrl: 'https://github.com/andigan/theupto',
+      deployTo: process.env.DEPLOY_TO,
+      repositoryUrl: process.env.REPO,
     },
     production: {
-      servers: 'root@theupto.com',
+      servers: `root@${process.env.HOST}`,
       branch: 'master',
       workspace: './'
     },
@@ -23,12 +22,13 @@ module.exports = shipit => {
     1. Copy local directory to server in local directory
     2. pm2 delete and start app.js
   */
+
   shipit.task('deploy-local', async () => {
 
     console.log('\nCopy files from local directory to server.\n');
     await shipit.copyToRemote(
       './',
-      '/var/www/theupto/local',
+      `${process.env.DEPLOY_TO}/local`,
     );
 
     console.log('\nCheck if a fork is already running.\n');
@@ -55,7 +55,7 @@ module.exports = shipit => {
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
         'pm2 delete app',
-        'pm2 start /var/www/theupto/local/app.js'
+        `pm2 start ${process.env.DEPLOY_TO}/local/app.js`
       ];
 
       await shipit.remote(commands.join(' && '));
@@ -64,7 +64,7 @@ module.exports = shipit => {
       let commands = [
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
-        'pm2 start /var/www/theupto/local/app.js'
+        `pm2 start ${process.env.DEPLOY_TO}/local/app.js`
       ];
 
       await shipit.remote(commands.join(' && '));
@@ -81,7 +81,7 @@ module.exports = shipit => {
     console.log('\nCopy secret files to server.\n');
     await shipit.copyToRemote(
       './config/secrets.js',
-      '/var/www/theupto/current/config',
+      `${process.env.DEPLOY_TO}/current/config`,
     );
 
     console.log('\nCheck if a fork is already running.\n');
@@ -106,7 +106,7 @@ module.exports = shipit => {
     commands = [
       'source ~/.nvm/nvm.sh',
       'nvm use 8.0.0',
-      'cd ../var/www/theupto/current',
+      `cd ..${process.env.DEPLOY_TO}/current`,
       'npm install'
     ];
 
@@ -118,7 +118,7 @@ module.exports = shipit => {
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
         'pm2 delete app',
-        'pm2 start /var/www/theupto/current/app.js'
+        `pm2 start ${process.env.DEPLOY_TO}/current/app.js`
       ];
 
       await shipit.remote(commands.join(' && '));
@@ -127,7 +127,7 @@ module.exports = shipit => {
       let commands = [
         'source ~/.nvm/nvm.sh',
         'nvm use 8.0.0',
-        'pm2 start /var/www/theupto/current/app.js'
+        `pm2 start ${process.env.DEPLOY_TO}/current/app.js`
       ];
 
       await shipit.remote(commands.join(' && '));
