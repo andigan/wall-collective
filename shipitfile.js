@@ -1,4 +1,6 @@
-// shipitfile.js
+// NOTE: deploy won't work due to secret files in the gitignore file.
+
+
 module.exports = shipit => {
   // Load shipit-deploy tasks
   require('shipit-deploy')(shipit);
@@ -72,7 +74,8 @@ module.exports = shipit => {
 
   /*
     npm run restart-server-current
-    1. pm2 delete and start app.js
+    1. npm install
+    2. pm2 delete and start app.js
   */
   shipit.task('restart-server-current', async () => {
     console.log('\nCopy secret files to server.\n');
