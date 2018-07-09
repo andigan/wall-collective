@@ -1,7 +1,7 @@
 
 <img src="https://raw.githubusercontent.com/andigan/whatadrag/master/wall-collective.jpg" width="100" />
 
-# the•up•do
+# the•up•to
 
 A multi-user responsive real-time web app for sharing, arranging, and transforming images collaboratively on your laptop or phone.
 
